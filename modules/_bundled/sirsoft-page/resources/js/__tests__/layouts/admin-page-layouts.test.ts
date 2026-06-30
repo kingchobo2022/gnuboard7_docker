@@ -568,6 +568,80 @@ describe('admin_page_form.json', () => {
             expect(emptyDivWrapper, id).toBeUndefined();
         }
     });
+
+    // ─── Issue #424: 수정→등록 SPA 전환 시 폼/첨부 잔존 차단 ───
+
+    it('FileUploader initialFiles 가 _local.form.attachments 에 바인딩됨 (등록 모드 전환 시 빈 배열로 동기화되어 이전 첨부 잔존 차단)', () => {
+        // 회귀 배경: pageData?.data?.attachments 바인딩은 등록 모드에서 pageData 가 없어
+        // initialFiles 참조가 불변 → FileUploader 동기화 useEffect 미발화 → 이전 첨부 잔존.
+        // _local.form.attachments 바인딩은 init_actions 의 form 초기화로 참조가 바뀌어 동기화 트리거.
+        const uploaders = findComponentsByName(adminPageForm, 'FileUploader');
+        expect(uploaders.length).toBeGreaterThan(0);
+        expect(uploaders[0].props.initialFiles).toContain('_local.form');
+        expect(uploaders[0].props.initialFiles).toContain('attachments');
+        expect(uploaders[0].props.initialFiles).not.toContain('pageData');
+    });
+
+    it('생성 모드 init_actions 가 form 을 null 로 비운 뒤 빈 기본값으로 초기화함 (수정→등록 전환 시 이전 form 잔존 차단)', () => {
+        const initActions = (adminPageForm as any).init_actions as any[];
+        // 생성 모드(if !route?.id) 의 form 관련 setState 액션들
+        const createFormActions = initActions.filter(
+            (a) => a.if && a.if.includes('!route?.id') && a.params?.target === 'local' && 'form' in (a.params ?? {}),
+        );
+        // form: null 로 먼저 비우는 액션
+        const nullReset = createFormActions.find((a) => a.params.form === null);
+        expect(nullReset, 'form=null 리셋 액션').toBeDefined();
+        // form: {기본값} 으로 채우는 액션 (attachments: [] 포함)
+        const defaultInit = createFormActions.find(
+            (a) => a.params.form && typeof a.params.form === 'object' && Array.isArray(a.params.form.attachments),
+        );
+        expect(defaultInit, 'form 기본값 초기화 액션').toBeDefined();
+        expect(defaultInit.params.form.attachments).toEqual([]);
+    });
+
+    it('생성 모드 init_actions 가 슬러그 검증 상태(slugChecked/slugAvailable)를 false 로 리셋함 (이전 "사용 가능" 메시지 잔존 차단)', () => {
+        const initActions = (adminPageForm as any).init_actions as any[];
+        const slugReset = initActions.find(
+            (a) =>
+                a.if &&
+                a.if.includes('!route?.id') &&
+                a.params?.slugChecked === false &&
+                a.params?.slugAvailable === false,
+        );
+        expect(slugReset).toBeDefined();
+    });
+
+    it('slug_hint URL 미리보기가 빈 슬러그일 때 || fallback 으로 example 치환됨 ({{slug}} 미치환 회귀 차단)', () => {
+        // 회귀 배경: ?? 'example' 은 빈 문자열('')을 통과시켜 다국어 파라미터가 빈 값이 되고
+        // {{slug}} 가 치환되지 않은 채 노출됨. || 'example' 로 빈 문자열도 fallback 처리.
+        const slugField = findById(adminPageForm, 'slug_field');
+        const hintSpan = (slugField.children ?? []).find(
+            (c: any) => typeof c.text === 'string' && c.text.includes('slug_hint'),
+        );
+        expect(hintSpan).toBeDefined();
+        expect(hintSpan.text).toContain("|| 'example'");
+        expect(hintSpan.text).not.toContain("?? 'example'");
+    });
+
+    // ─── Issue #424 6-2: 첨부 순서 — form.attachments 동기화 (이커머스 패턴) ───
+
+    it('FileUploader 에 onUploadComplete/onReorder/onRemove 액션이 form.attachments 를 동기화함', () => {
+        const uploaders = findComponentsByName(adminPageForm, 'FileUploader');
+        const actions = uploaders[0].actions ?? [];
+        const events = actions.map((a: any) => a.event);
+        expect(events).toContain('onUploadComplete');
+        expect(events).toContain('onReorder');
+        expect(events).toContain('onRemove');
+        // onReorder 가 form.attachments 를 최종 순서로 덮어씀
+        const onReorder = actions.find((a: any) => a.event === 'onReorder');
+        expect(onReorder.handler).toBe('setState');
+        expect(onReorder.params['form.attachments']).toContain('$args[0]');
+    });
+
+    it('FileUploader reorder 엔드포인트가 수정 모드(route.id)에서만 활성화됨 (생성 모드는 temp 첨부라 reorder 불가)', () => {
+        const uploaders = findComponentsByName(adminPageForm, 'FileUploader');
+        expect(uploaders[0].props.apiEndpoints.reorder).toContain('route?.id');
+    });
 });
 
 // ─────────────────────────────────────────────

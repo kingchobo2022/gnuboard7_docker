@@ -1,0 +1,65 @@
+# audit:allow test-scenario-coverage reason: 본 매니페스트는 이슈 #424 (6-1/6-2/12-2) 회귀 매트릭스 SSoT 로 기록. 핵심 회귀 가드는 test_files 의 통과 테스트(백엔드 PHPUnit + 프론트 vitest)로 커버하며, 첨부 순서/URL 동작은 데이터 흐름 결함이라 단위 계층이 정확한 검증 위치 (브라우저 렌더 결함 아님).
+
+feature: 페이지 첨부 컨텍스트 URL / 다중 업로드 최종 순서 저장 / 페이지 변경 시 SEO 캐시 무효화 (이슈 #424)
+
+description: |
+  이슈 #424 의 3개 결함을 한 매트릭스로 묶어 회귀를 보장한다.
+
+  6-1 (첨부 컨텍스트 URL):
+    - 관리자 화면은 관리자 전용 다운로드/미리보기 URL, 공개 화면은 공개 URL 을 사용해야 한다.
+    - 이전에는 관리자 화면에서도 공개 URL 이 노출되어 비공개 페이지 첨부를 관리자가 열지 못했다.
+    - PageAttachmentResource 가 urlContext(public|admin) 를 받아 URL 을 분기.
+
+  6-2 (다중 업로드 / 첨부 순서 — 이커머스 상품 이미지와 동일 패턴):
+    - 생성 모드: temp_key 로 업로드된 첨부를 저장 시 업로드(조회) 순서대로 order 1..N 재부여
+      (linkTempAttachmentsWithMove). 드래그 재정렬은 생성 모드에서 미지원 — 업로드 순서가 SSoT.
+    - 수정 모드: 드래그 시 즉시 reorder API(PATCH /attachments/reorder)로 순서를 저장하고,
+      onReorder 가 form.attachments 를 최종 순서로 동기화.
+    - 저장 body 는 _local.form + temp_key (이커머스 image_temp_key 와 동일). 별도 attachment_order
+      페이로드/코어 emitEvent 결과 의존 없음.
+    - 등록 폼 잔존 버그: 수정→등록 라우트 전환은 같은 layout_name 이라 _local·컴포넌트가 보존된다.
+      FileUploader 의 initialFiles 를 pageData?.data?.attachments(등록 모드 absent → 참조 불변) 대신
+      _local.form.attachments 에 바인딩하고, init_actions 에서 생성 모드 form 을 null→빈 기본값으로
+      초기화하여 참조를 바꿈으로써 동기화 useEffect 가 발화해 이전 첨부/제목/슬러그/검증상태가 비워진다.
+      slug_hint URL 미리보기는 빈 슬러그('')에서 || 'example' fallback 으로 {{slug}} 미치환을 차단.
+      (공용 FileUploader 컴포넌트·코어 템플릿 엔진 무수정 — 레이아웃 바인딩/init_actions 만 변경)
+
+  12-2 (SEO 캐시 무효화):
+    - 페이지 생성/수정/삭제 시 페이지 상세 SEO 캐시가 즉시 갱신돼야 한다.
+    - 공개 URL 은 단수형 /page/{slug} (PageSitemapContributor, SearchPagesListener 동일).
+    - 이전 패턴은 복수형 */pages/{slug} 라 실제 URL 과 매칭되지 않아, 레이아웃 태그 없이
+      put() 으로 캐시된 상세 캐시가 영구히 남았다 → */page/{slug} 로 정정.
+
+axes:
+  url_context: [public, admin]
+  form_mode: [create, edit]
+  upload_count: [single, multiple]
+  page_change: [create, update, delete]
+  cached_entry: [layout_tagged, url_only]
+
+effects:
+  - admin_context_returns_admin_download_and_preview_url
+  - public_context_returns_public_download_and_preview_url
+  - temp_attachments_linked_in_upload_order_1_to_n
+  - edit_mode_drag_persists_via_reorder_api
+  - create_form_clears_stale_attachments_via_form_attachments_binding
+  - create_form_clears_stale_title_slug_and_slug_check_state
+  - slug_hint_url_preview_falls_back_to_example_on_empty_slug
+  - page_change_invalidates_page_detail_url_by_singular_pattern
+  - page_change_invalidates_url_only_cached_detail_without_layout_tag
+  - page_change_invalidates_page_show_layout_cache
+  - page_change_invalidates_home_and_search_and_sitemap_cache
+
+test_files:
+  - modules/_bundled/sirsoft-page/tests/Unit/Services/PageAttachmentServiceTest.php
+  - modules/_bundled/sirsoft-page/tests/Feature/Admin/PageControllerTest.php
+  - modules/_bundled/sirsoft-page/tests/Unit/Listeners/SeoPageCacheListenerTest.php
+  - modules/_bundled/sirsoft-page/resources/js/__tests__/layouts/admin-page-layouts.test.ts
+
+notes: |
+  6-2 는 이커머스 상품 이미지(FileUploader + temp_key 연결 + reorder API)와 동일한 검증된
+  패턴으로 정렬했다. 생성 모드 업로드 순서 연결은 PageAttachmentServiceTest, 수정 모드 reorder 와
+  잔존 버그(라우트 전환 시 key 리마운트)는 admin_page_form 레이아웃 + 브라우저 검수로 확인.
+  6-1 은 백엔드 Feature 테스트, 12-2 는 리스너 unit 테스트로 커버.
+  E2E 면제 사유: 6-2 데이터 흐름은 단위/Feature 계층이 정확한 검증 위치이고, 페이지 모듈에
+  Playwright 인프라(토큰/스펙/베이스) 미구축 상태로 spec 1건을 위한 인프라 신설은 본 이슈 범위를 초과한다.

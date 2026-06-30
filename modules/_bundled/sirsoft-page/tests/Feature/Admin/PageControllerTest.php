@@ -181,6 +181,77 @@ class PageControllerTest extends FeatureTestCase
         $response->assertStatus(404);
     }
 
+    /**
+     * 관리자 상세 조회 시 첨부 URL이 관리자 라우트를 가리키는지 확인 (이슈 #424 6-1)
+     *
+     * 첨부 URL이 공개 라우트(발행 가드 있음)를 가리키면 미발행 페이지의
+     * 첨부가 관리자에게도 404로 차단된다. 관리자 응답은 발행 가드 없는
+     * admin 라우트를 반환해야 한다.
+     */
+    public function test_admin_show_returns_admin_attachment_urls(): void
+    {
+        $page = Page::factory()->create([
+            'slug' => 'test-admin-attach-url',
+            'published' => false,
+            'created_by' => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
+        ]);
+        $attachment = PageAttachment::factory()->image()->create([
+            'page_id' => $page->id,
+            'hash' => 'abc123def456',
+            'created_by' => $this->adminUser->id,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->getJson("/api/modules/sirsoft-page/admin/pages/{$page->id}");
+
+        $response->assertStatus(200);
+        $att = $response->json('data.attachments.0');
+        $this->assertSame(
+            "/api/modules/sirsoft-page/admin/attachments/preview/{$attachment->hash}",
+            $att['preview_url']
+        );
+        $this->assertSame(
+            "/api/modules/sirsoft-page/admin/attachments/download/{$attachment->hash}",
+            $att['download_url']
+        );
+    }
+
+    /**
+     * 공개 상세 조회 시 첨부 URL이 공개 라우트를 유지하는지 확인 (이슈 #424 6-1)
+     *
+     * 공개 응답에 admin URL(발행 가드 없음)이 섞이면 미발행 첨부가
+     * 노출되는 보안 회귀가 된다. 공개 응답은 공개 라우트만 반환해야 한다.
+     */
+    public function test_public_show_returns_public_attachment_urls(): void
+    {
+        $page = Page::factory()->create([
+            'slug' => 'test-public-attach-url',
+            'published' => true,
+            'published_at' => now(),
+            'created_by' => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
+        ]);
+        $attachment = PageAttachment::factory()->image()->create([
+            'page_id' => $page->id,
+            'hash' => 'pub123def456',
+            'created_by' => $this->adminUser->id,
+        ]);
+
+        $response = $this->getJson("/api/modules/sirsoft-page/pages/{$page->slug}");
+
+        $response->assertStatus(200);
+        $att = $response->json('data.attachments.0');
+        $this->assertSame(
+            "/api/modules/sirsoft-page/pages/attachment/{$attachment->hash}/preview",
+            $att['preview_url']
+        );
+        $this->assertSame(
+            "/api/modules/sirsoft-page/pages/attachment/{$attachment->hash}",
+            $att['download_url']
+        );
+    }
+
     // ─── 생성 (store) ──────────────────────────────────
 
     /**

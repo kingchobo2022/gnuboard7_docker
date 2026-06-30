@@ -72,9 +72,12 @@ class PageService
             // 버전 1 스냅샷 저장
             $this->saveVersionSnapshot($page, $userId);
 
-            // temp_key 첨부파일 연결 및 파일 이동
+            // temp_key 첨부파일 연결 및 파일 이동 (업로드 순서대로 order 부여)
             if (! empty($data['temp_key'])) {
-                $this->pageAttachmentService->linkTempAttachmentsWithMove($data['temp_key'], $page->id);
+                $this->pageAttachmentService->linkTempAttachmentsWithMove(
+                    $data['temp_key'],
+                    $page->id
+                );
             }
 
             HookManager::doAction('sirsoft-page.page.after_create', $page, $data);
@@ -122,9 +125,12 @@ class PageService
             // 버전 스냅샷 저장
             $this->saveVersionSnapshot($page, $userId);
 
-            // temp_key 첨부파일 연결 및 파일 이동
+            // temp_key 첨부파일 연결 및 파일 이동 (업로드 순서대로 order 부여)
             if (! empty($data['temp_key'])) {
-                $this->pageAttachmentService->linkTempAttachmentsWithMove($data['temp_key'], $page->id);
+                $this->pageAttachmentService->linkTempAttachmentsWithMove(
+                    $data['temp_key'],
+                    $page->id
+                );
             }
 
             HookManager::doAction('sirsoft-page.page.after_update', $page, $data, $snapshot);
