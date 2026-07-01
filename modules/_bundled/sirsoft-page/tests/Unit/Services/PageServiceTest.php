@@ -218,7 +218,7 @@ class PageServiceTest extends ModuleTestCase
     }
 
     /**
-     * 일괄 발행 시 after_publish 훅이 페이지 수만큼 발화되는지 확인 (이슈 #424-19 회귀)
+     * 일괄 발행 시 after_publish 훅이 페이지 수만큼 발화되는지 확인 (회귀)
      *
      * 일괄변경 경로가 after_publish 훅을 발화하지 않으면 활동로그가 기록되지 않는다.
      * 단일 발행(changePublishStatus)과 동일하게 페이지별(per-item) 발화를 보장한다.
@@ -254,7 +254,7 @@ class PageServiceTest extends ModuleTestCase
     }
 
     /**
-     * 일괄 미발행 시 after_publish 훅이 published=false 로 발화되는지 확인 (이슈 #424-19 회귀)
+     * 일괄 미발행 시 after_publish 훅이 published=false 로 발화되는지 확인 (회귀)
      */
     public function test_bulk_change_publish_status_fires_unpublish_hook_per_page(): void
     {
@@ -277,7 +277,7 @@ class PageServiceTest extends ModuleTestCase
     }
 
     /**
-     * 일괄 처리 도중 한 건이라도 실패하면 전체 롤백되는지 확인 (이슈 #424-19 회귀)
+     * 일괄 처리 도중 한 건이라도 실패하면 전체 롤백되는지 확인 (회귀)
      *
      * all-or-nothing: 존재하지 않는 id 가 섞이면 정상 페이지도 발행되지 않아야 한다.
      */

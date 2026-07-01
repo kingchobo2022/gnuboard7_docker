@@ -740,7 +740,7 @@
                                         }
                                     },
                                     {
-                                        "comment": "드래그 순서 변경 시 form.attachments 를 최종 순서로 덮어쓰기 (이커머스 상품 이미지와 동일 패턴, 이슈 #424 6-2)",
+                                        "comment": "드래그 순서 변경 시 form.attachments 를 최종 순서로 덮어쓰기 (이커머스 상품 이미지와 동일 패턴)",
                                         "event": "onReorder",
                                         "handler": "setState",
                                         "params": {

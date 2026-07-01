@@ -136,7 +136,7 @@ class SeoPageCacheListenerTest extends ModuleTestCase
     }
 
     /**
-     * onPageChange 호출 시 페이지 상세 URL 캐시가 URL 패턴으로 무효화되는지 확인합니다 (이슈 #424 12-2).
+     * onPageChange 호출 시 페이지 상세 URL 캐시가 URL 패턴으로 무효화되는지 확인합니다.
      *
      * 페이지 공개 URL은 단수형 /page/{slug} 이다 (PageSitemapContributor, SearchPagesListener 동일).
      * 레이아웃 태그 없이 put()으로 캐시된 항목은 invalidateByLayout('page/show')로는 지워지지 않으므로,

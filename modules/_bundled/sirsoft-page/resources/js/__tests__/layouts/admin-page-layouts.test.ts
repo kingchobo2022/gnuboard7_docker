@@ -569,7 +569,7 @@ describe('admin_page_form.json', () => {
         }
     });
 
-    // ─── Issue #424: 수정→등록 SPA 전환 시 폼/첨부 잔존 차단 ───
+    // ─── 수정→등록 SPA 전환 시 폼/첨부 잔존 차단 ───
 
     it('FileUploader initialFiles 가 _local.form.attachments 에 바인딩됨 (등록 모드 전환 시 빈 배열로 동기화되어 이전 첨부 잔존 차단)', () => {
         // 회귀 배경: pageData?.data?.attachments 바인딩은 등록 모드에서 pageData 가 없어
@@ -623,7 +623,7 @@ describe('admin_page_form.json', () => {
         expect(hintSpan.text).not.toContain("?? 'example'");
     });
 
-    // ─── Issue #424 6-2: 첨부 순서 — form.attachments 동기화 (이커머스 패턴) ───
+    // ─── 첨부 순서 — form.attachments 동기화 (이커머스 패턴) ───
 
     it('FileUploader 에 onUploadComplete/onReorder/onRemove 액션이 form.attachments 를 동기화함', () => {
         const uploaders = findComponentsByName(adminPageForm, 'FileUploader');
@@ -790,5 +790,46 @@ describe('admin_page_detail.json', () => {
         expect(layoutStr).not.toMatch(/_local\.lang \?\? 'ko'/);
         // $locale 로 fallback 하는 표현식이 존재해야 함 (탭 + 콘텐츠 표현식)
         expect(layoutStr).toMatch(/_local\.lang \?\? \$locale/);
+    });
+
+    // ─── 변경내역 필드명 다국어 매핑 ───
+
+    /**
+     * 버전 이력 테이블의 변경내역(changes_summary) 컬럼에서
+     * changed_fields 를 표시하는 cellChild 를 찾는다.
+     */
+    function findChangedFieldsCell(): any {
+        const grids = findComponentsByName(adminPageDetail, 'DataGrid');
+        const col = grids[0]?.props?.columns?.find((c: any) => c.field === 'changes_summary');
+        expect(col, 'changes_summary 컬럼').toBeDefined();
+        // changed_fields 길이 > 0 조건을 가진 cellChild (라벨 표시 셀)
+        return (col.cellChildren ?? []).find(
+            (cc: any) =>
+                typeof cc.if === 'string' &&
+                cc.if.includes('changed_fields?.length > 0'),
+        );
+    }
+
+    it('변경내역 셀이 changed_fields 를 raw 영문 식별자로 그대로 join 하지 않음 (제목/내용 다국어 매핑)', () => {
+        const cell = findChangedFieldsCell();
+        expect(cell, 'changed_fields 표시 셀').toBeDefined();
+        // 회귀 차단: 영문 식별자 배열을 그대로 join 하면 화면에 title, content 노출
+        expect(cell.text).not.toMatch(/changed_fields\?\.join\(', '\)\s*\?\?\s*'-'/);
+    });
+
+    it('변경내역 셀이 field_labels 다국어 키로 각 필드를 변환함 ($t 매핑)', () => {
+        const cell = findChangedFieldsCell();
+        expect(cell, 'changed_fields 표시 셀').toBeDefined();
+        const cellStr = JSON.stringify(cell);
+        // field_labels 키 경로 + $t 함수 변환 사용
+        expect(cellStr).toContain('field_labels');
+        expect(cellStr).toContain('$t');
+    });
+
+    it('field_labels 4종(title/content/seo_meta/content_mode) 키 경로를 참조함 (PageService compareFields 정합)', () => {
+        const cell = findChangedFieldsCell();
+        const cellStr = JSON.stringify(cell);
+        // 동적 키 prefix 가 versions.field_labels 를 가리킴
+        expect(cellStr).toContain('sirsoft-page.admin.page.detail.versions.field_labels');
     });
 });

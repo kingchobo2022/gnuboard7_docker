@@ -158,7 +158,7 @@ class PageAttachmentServiceTest extends ModuleTestCase
     }
 
     /**
-     * 연결 시 업로드(조회) 순서대로 order가 1..N 재부여되는지 확인 (이슈 #424 6-2)
+     * 연결 시 업로드(조회) 순서대로 order가 1..N 재부여되는지 확인
      *
      * 이커머스 ProductImageService::linkTempImages 와 동일하게, getByTempKey 가
      * order 순으로 반환한 순서대로 order 를 1,2,3 으로 재배치한다. (생성 모드의

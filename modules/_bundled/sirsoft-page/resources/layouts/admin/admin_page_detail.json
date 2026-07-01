@@ -1665,7 +1665,7 @@
                                                     "props": {
                                                         "className": "text-sm text-gray-600 dark:text-gray-400"
                                                     },
-                                                    "text": "{{row.changes_summary?.changed_fields?.join(', ') ?? '-'}}"
+                                                    "text": "{{row.changes_summary?.changed_fields?.map(f => $t('sirsoft-page.admin.page.detail.versions.field_labels.' + f)).join(', ') ?? '-'}}"
                                                 },
                                                 {
                                                     "type": "basic",
