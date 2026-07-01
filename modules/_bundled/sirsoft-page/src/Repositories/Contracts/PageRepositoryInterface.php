@@ -17,7 +17,7 @@ interface PageRepositoryInterface
      * @param  int  $perPage  페이지당 항목 수
      * @return LengthAwarePaginator 페이지 목록
      */
-    public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator;
+    public function paginate(array $filters = [], int $perPage = 20): LengthAwarePaginator;
 
     /**
      * ID로 페이지를 조회합니다.

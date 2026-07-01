@@ -32,7 +32,7 @@ class PageService
      * @param  int  $perPage  페이지당 항목 수
      * @return LengthAwarePaginator 페이지 목록
      */
-    public function getPages(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    public function getPages(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
         $filters = HookManager::applyFilters('sirsoft-page.page.filter_list_query', $filters);
 
@@ -237,7 +237,7 @@ class PageService
 
                 $page = $this->pageRepository->update($page, $updateData);
 
-                // 페이지별 after_publish 발화 → 활동로그 per-item 기록 (이슈 #424-19)
+                // 페이지별 after_publish 발화 → 활동로그 per-item 기록
                 HookManager::doAction('sirsoft-page.page.after_publish', $page, $published);
 
                 $count++;

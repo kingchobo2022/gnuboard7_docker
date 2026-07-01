@@ -44,7 +44,7 @@ class PageController extends AdminBaseController
     {
         try {
             $validated = $request->validated();
-            $perPage = $validated['per_page'] ?? 15;
+            $perPage = $validated['per_page'] ?? 20;
             $pages = $this->pageService->getPages(
                 array_filter($validated, fn ($v) => $v !== null),
                 $perPage

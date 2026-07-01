@@ -11,26 +11,10 @@ use App\Helpers\PermissionHelper;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Search\Engines\DatabaseFulltextEngine;
-use Laravel\Scout\EngineManager;
 use Modules\Sirsoft\Page\Models\Page;
 use Modules\Sirsoft\Page\Models\PageAttachment;
 use Modules\Sirsoft\Page\Models\PageVersion;
 use Modules\Sirsoft\Page\Tests\FeatureTestCase;
-
-/**
- * LIKE fallback 전용 Scout 엔진
- *
- * MySQL FULLTEXT는 트랜잭션 내 미커밋 데이터를 인덱싱하지 않으므로,
- * 테스트에서 Scout 파이프라인 전체를 검증하기 위해 LIKE fallback을 강제합니다.
- */
-class LikeFallbackEngine extends DatabaseFulltextEngine
-{
-    public static function supportsFulltext(): bool
-    {
-        return false;
-    }
-}
 
 /**
  * 관리자 페이지 관리 API 테스트
@@ -123,12 +107,13 @@ class PageControllerTest extends FeatureTestCase
 
     /**
      * 검색어로 목록을 조회할 수 있는지 확인
+     *
+     * 검색 동작은 슬러그(LIKE) 매칭으로 검증한다 — 슬러그 검색은 InnoDB FULLTEXT 가
+     * 트랜잭션 내 미커밋 데이터를 보장하지 않는 가시성 문제와 무관하게 안정적이다.
+     * (제목/본문 FULLTEXT 컬럼 범위 분리는 test_admin_search_title_excludes_content 가 담당)
      */
     public function test_admin_can_search_pages(): void
     {
-        // Scout 엔진을 LIKE fallback으로 교체 (트랜잭션 호환)
-        $this->swapScoutEngineToLikeFallback();
-
         Page::factory()->create([
             'slug' => 'test-search-target',
             'title' => ['ko' => '검색대상페이지', 'en' => 'Search Target'],
@@ -136,11 +121,158 @@ class PageControllerTest extends FeatureTestCase
             'updated_by' => $this->adminUser->id,
         ]);
 
+        // 전체(all) 검색에 슬러그 토큰을 넣으면 결과에 포함되어야 한다
         $response = $this->actingAs($this->adminUser)
-            ->getJson('/api/modules/sirsoft-page/admin/pages?search=검색대상');
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=search-target&search_field=all');
 
         $response->assertStatus(200);
-        $this->assertGreaterThanOrEqual(1, $response->json('data.meta.total'));
+        $slugs = collect($response->json('data.data'))->pluck('slug')->all();
+        $this->assertContains('test-search-target', $slugs);
+    }
+
+    /**
+     * 검색조건 '전체'(all)로 슬러그를 검색하면 결과에 포함되는지 확인
+     *
+     * 회귀: 기존에는 all 검색이 Scout(제목·본문 FULLTEXT) 경로로만 처리되어
+     * 슬러그가 검색 범위에서 누락됨. all 검색에도 슬러그 LIKE 가 포함되어야 한다.
+     *
+     * 슬러그 매칭은 LIKE 기반이라 테스트 트랜잭션의 미커밋 데이터도 검증 가능하다.
+     * (제목·본문 FULLTEXT 매칭은 별도 title 단독 검색 테스트가 담당)
+     */
+    public function test_admin_search_all_includes_slug(): void
+    {
+        // 제목/본문에 없는 고유 슬러그 토큰 (운영 시더 데이터와 충돌 회피)
+        Page::factory()->create([
+            'slug' => 'test-zzslugonly-target',
+            'title' => ['ko' => '제목없음표제', 'en' => 'Heading Only'],
+            'content' => ['ko' => '본문내용', 'en' => 'Body'],
+            'created_by' => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
+        ]);
+
+        // search_field 미지정 = all. 제목/본문에 없는 슬러그 토큰으로 검색
+        $response = $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=zzslugonly');
+
+        $response->assertStatus(200);
+        $slugs = collect($response->json('data.data'))->pluck('slug')->all();
+        $this->assertContains('test-zzslugonly-target', $slugs);
+    }
+
+    /**
+     * '전체'(all) 검색 결과의 total 이 실제 행 수와 일치하는지 확인 (#225 회귀 가드)
+     *
+     * 과거 Scout 콜백 내 orWhere('slug') 가 total 카운트를 부풀렸던 회귀(#225)를
+     * all 검색 통합 후에도 재발하지 않는지 검증한다.
+     * 고유 슬러그 토큰으로 결과를 1건으로 한정해 total ↔ 행 수 정합을 본다.
+     */
+    public function test_admin_search_all_total_matches_rows(): void
+    {
+        Page::factory()->create([
+            'slug' => 'test-zztotalguard-one',
+            'title' => ['ko' => '집계가드대상', 'en' => 'Count Guard'],
+            'created_by' => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=zztotalguard');
+
+        $response->assertStatus(200);
+        $total = $response->json('data.meta.total');
+        $rowCount = count($response->json('data.data'));
+        // 단일 페이지 결과: total 과 실제 반환 행 수가 일치해야 함 (부풀림 없음)
+        $this->assertSame(1, $total);
+        $this->assertSame(1, $rowCount);
+    }
+
+    /**
+     * per_page 미지정 시 기본값이 20 인지 확인
+     *
+     * 회귀: 백엔드 기본값이 15 였으나 프론트 셀렉트는 20 을 표시해
+     * '표시 20 / 실제 조회 15' 불일치 발생. 양쪽을 20 으로 통일한다.
+     */
+    public function test_admin_list_default_per_page_is_20(): void
+    {
+        $response = $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages');
+
+        $response->assertStatus(200);
+        $this->assertSame(20, $response->json('data.meta.per_page'));
+    }
+
+    /**
+     * 본문(content)에만 있는 단어는 제목/전체 검색 어느 쪽에서도 검색되지 않는지 확인 (E4)
+     *
+     * 검색 대상은 제목·슬러그이며 본문은 포함하지 않는다 (UI '제목 또는 슬러그로 검색',
+     * 검색 필드 옵션 전체/제목/슬러그와 일치). '제목'뿐 아니라 '전체' 검색도 본문을 제외한다.
+     *
+     * 검증 범위: '본문 단어가 검색에 누출되지 않음'(항상 0건이라 트랜잭션 FULLTEXT 가시성과 무관하게 안정적).
+     */
+    public function test_admin_search_excludes_content(): void
+    {
+        Page::factory()->create([
+            'slug' => 'test-content-scope',
+            'title' => ['ko' => '제목쪽고유단어', 'en' => 'Heading'],
+            'content' => ['ko' => '본문쪽고유단어', 'en' => 'Body'],
+            'created_by' => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
+        ]);
+
+        // 본문에만 있는 단어는 '제목' 검색에서 0건
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=본문쪽고유단어&search_field=title')
+            ->assertStatus(200)
+            ->assertJsonPath('data.meta.total', 0);
+
+        // 본문에만 있는 단어는 '전체' 검색에서도 0건 (본문은 검색 대상 아님)
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=본문쪽고유단어&search_field=all')
+            ->assertStatus(200)
+            ->assertJsonPath('data.meta.total', 0);
+    }
+
+    /**
+     * 검색조건 '전체'(all)는 제목 외에 슬러그도 검색해 title 보다 넓은 범위인지 확인 (E4 대조)
+     *
+     * '전체' 검색 = 제목 + 슬러그. title 검색이 제목만 보더라도, all 검색은 슬러그까지 포함해야 한다.
+     */
+    public function test_admin_search_all_wider_than_title(): void
+    {
+        Page::factory()->create([
+            'slug' => 'test-allscope-zzslugword',
+            'title' => ['ko' => '무관한제목', 'en' => 'x'],
+            'content' => ['ko' => '본문', 'en' => 'y'],
+            'created_by' => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
+        ]);
+
+        // all 검색: 슬러그 토큰으로 잡혀야 함 (제목엔 없음)
+        $all = $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=zzslugword&search_field=all');
+        $all->assertStatus(200);
+        $this->assertGreaterThanOrEqual(1, $all->json('data.meta.total'));
+
+        // title 검색: 같은 슬러그 토큰은 제목에 없으므로 0건 (범위가 좁음을 대조)
+        $title = $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?search=zzslugword&search_field=title');
+        $title->assertStatus(200);
+        $this->assertSame(0, $title->json('data.meta.total'));
+    }
+
+    /**
+     * 검색어가 최대 길이를 초과하면 500 이 아닌 422 검증 오류를 반환하는지 확인 (E5)
+     *
+     * 회귀: 공백 없는 긴 한글(140자+)이 FULLTEXT phrase 토큰 한도를 초과해
+     * 'Too many words in a FTS phrase'(191) → 500 을 유발했다.
+     * search max 를 100 으로 제한해 긴 입력을 422 로 사전 차단한다.
+     */
+    public function test_admin_search_too_long_returns_422(): void
+    {
+        // 레이아웃이 실제로 쓰는 filters[0][value] 경로로 긴 검색어 전송 → 500 이 아닌 422
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/modules/sirsoft-page/admin/pages?filters[0][field]=all&filters[0][value]='.str_repeat('가', 200))
+            ->assertStatus(422);
     }
 
     // ─── 상세 조회 (show) ──────────────────────────────
@@ -182,7 +314,7 @@ class PageControllerTest extends FeatureTestCase
     }
 
     /**
-     * 관리자 상세 조회 시 첨부 URL이 관리자 라우트를 가리키는지 확인 (이슈 #424 6-1)
+     * 관리자 상세 조회 시 첨부 URL이 관리자 라우트를 가리키는지 확인
      *
      * 첨부 URL이 공개 라우트(발행 가드 있음)를 가리키면 미발행 페이지의
      * 첨부가 관리자에게도 404로 차단된다. 관리자 응답은 발행 가드 없는
@@ -218,7 +350,7 @@ class PageControllerTest extends FeatureTestCase
     }
 
     /**
-     * 공개 상세 조회 시 첨부 URL이 공개 라우트를 유지하는지 확인 (이슈 #424 6-1)
+     * 공개 상세 조회 시 첨부 URL이 공개 라우트를 유지하는지 확인
      *
      * 공개 응답에 admin URL(발행 가드 없음)이 섞이면 미발행 첨부가
      * 노출되는 보안 회귀가 된다. 공개 응답은 공개 라우트만 반환해야 한다.
@@ -697,7 +829,7 @@ class PageControllerTest extends FeatureTestCase
     }
 
     /**
-     * 페이지 삭제 후 동일 슬러그로 재생성할 수 있는지 확인 (#424-20 회귀)
+     * 페이지 삭제 후 동일 슬러그로 재생성할 수 있는지 확인 (회귀)
      *
      * soft delete 시절에는 삭제된 페이지의 slug 가 잔존하여 동일 slug 재생성 시
      * Rule::unique 가 422 를 반환했다. hard delete 전환으로 재생성이 성공해야 한다.
@@ -738,7 +870,7 @@ class PageControllerTest extends FeatureTestCase
     }
 
     /**
-     * 페이지 삭제 후 슬러그 중복 체크와 생성 검증 결과가 일치하는지 확인 (#424-20 회귀)
+     * 페이지 삭제 후 슬러그 중복 체크와 생성 검증 결과가 일치하는지 확인 (회귀)
      *
      * 삭제 후 check-slug 는 "사용 가능", 생성도 성공해야 한다 (두 경로 정합).
      */
@@ -778,7 +910,7 @@ class PageControllerTest extends FeatureTestCase
     }
 
     /**
-     * 첨부가 있는 페이지를 물리 삭제해도 삭제 흐름(첨부 정리 + 활동로그 기록)이 정상 완료되는지 확인 (#424-20)
+     * 첨부가 있는 페이지를 물리 삭제해도 삭제 흐름(첨부 정리 + 활동로그 기록)이 정상 완료되는지 확인
      *
      * 활동로그 리스너는 삭제되는 페이지를 loggable 로 참조한다. hard delete 후 loggable 행이
      * 사라지더라도 삭제 응답이 200 이고 페이지/첨부 행이 모두 물리 삭제되어야 한다.
@@ -882,7 +1014,7 @@ class PageControllerTest extends FeatureTestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.count', 3);
 
-        // 성공 메시지의 :count 플레이스홀더가 실제 건수로 치환되는지 확인 (이슈 #424-19 회귀)
+        // 성공 메시지의 :count 플레이스홀더가 실제 건수로 치환되는지 확인 (회귀)
         $message = $response->json('message');
         $this->assertStringNotContainsString(':count', $message, '메시지에 :count 플레이스홀더가 치환되지 않고 남았습니다.');
         $this->assertStringContainsString('3', $message, '메시지에 변경 건수(3)가 포함되어야 합니다.');
@@ -1019,7 +1151,7 @@ class PageControllerTest extends FeatureTestCase
         ]);
 
         $response = $this->actingAs($this->adminUser)
-            ->getJson('/api/modules/sirsoft-page/admin/pages?' . http_build_query([
+            ->getJson('/api/modules/sirsoft-page/admin/pages?'.http_build_query([
                 'filters' => [
                     ['field' => 'slug', 'value' => 'filters-target', 'operator' => 'like'],
                 ],
@@ -1240,7 +1372,7 @@ class PageControllerTest extends FeatureTestCase
     {
         // 별도 역할을 생성하여 read 권한만 부여 (admin 역할과 분리)
         $readOnlyRole = Role::create([
-            'identifier' => 'test_page_read_only_' . uniqid(),
+            'identifier' => 'test_page_read_only_'.uniqid(),
             'name' => ['ko' => '읽기전용', 'en' => 'Read Only'],
             'is_active' => true,
         ]);
@@ -1511,26 +1643,5 @@ class PageControllerTest extends FeatureTestCase
         $prop->setValue(null, []);
 
         return $user;
-    }
-
-    /**
-     * Scout 엔진을 LIKE fallback 모드로 교체합니다.
-     *
-     * MySQL FULLTEXT는 트랜잭션 내 미커밋 데이터를 검색하지 못하므로,
-     * Scout 파이프라인 전체(Model::search → EngineManager → performSearch → 쿼리)를
-     * 검증하기 위해 LIKE fallback 엔진으로 교체합니다.
-     *
-     * @return void
-     */
-    private function swapScoutEngineToLikeFallback(): void
-    {
-        $manager = $this->app->make(EngineManager::class);
-        $manager->extend('mysql-fulltext', fn () => new LikeFallbackEngine());
-
-        // EngineManager 캐시된 드라이버 인스턴스 초기화
-        $reflection = new \ReflectionClass($manager);
-        $property = $reflection->getProperty('drivers');
-        $property->setAccessible(true);
-        $property->setValue($manager, []);
     }
 }
