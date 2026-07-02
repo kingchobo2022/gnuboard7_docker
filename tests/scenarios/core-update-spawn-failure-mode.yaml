@@ -24,7 +24,7 @@ description: |
     4. V-1 안전 작성 패턴 docs + audit rule `upgrade-step-vone-safety` (warning) —
        upgrade step 안의 `app(*Service|*Manager|*Repository::class)` 호출을 reviewer 에게 surface.
 
-  분기 개정 (2026-07-02 #432 후속): `child_silent_skip_zero_steps` 를 discovered 축으로
+  분기 개정 (discovered 축 세분화): `child_silent_skip_zero_steps` 를 discovered 축으로
   세분화. 범위 내 스텝 파일이 애초에 없어 0건인 경우(discovered=0)를 정상 통과로 재분류하여,
   스텝이 필요 없는 패치 릴리즈(예: 7.0.0→7.0.1) 를 실패로 오판하던 결함을 차단.
 
@@ -44,7 +44,7 @@ exclusions:
   - { spawn_branch: proc_open_disabled, parent_memory_version: equal_to_to, reason: "proc_open 비활성 시점에 부모는 항상 fromVersion 메모리 — equal 케이스 시뮬 불가" }
   - { from_to_relation: from_eq_to_forced, spawn_branch: child_zero_steps_with_discovered, reason: "from==to + force 케이스는 step 0건이 정상 동작이므로 silent skip 가드 미트리거" }
   - { child_process_origin: beta_4_or_earlier, steps_executed_signal: present_positive, reason: "beta.5 이전 자식은 [STEPS_EXECUTED] 신호 자체를 모름 — present_positive 시뮬 불가" }
-  - { child_process_origin: beta_4_or_earlier, steps_discovered_signal: discovered_positive, reason: "discovered 필드는 #432 후속 신버전 자식만 발행 — 구버전 자식은 항상 absent" }
+  - { child_process_origin: beta_4_or_earlier, steps_discovered_signal: discovered_positive, reason: "discovered 필드는 신버전 자식만 발행 — 구버전 자식은 항상 absent" }
   - { child_process_origin: beta_4_or_earlier, steps_discovered_signal: discovered_zero, reason: "동일 — 구버전 자식은 discovered 필드 미발행(absent)" }
   - { spawn_branch: child_zero_steps_no_step_files, steps_discovered_signal: discovered_positive, reason: "스텝 파일 부재 브랜치는 정의상 discovered=0 — positive 모순" }
   - { spawn_branch: child_zero_steps_with_discovered, steps_discovered_signal: discovered_zero, reason: "스텝 파일 존재 브랜치는 정의상 discovered>0 — zero 모순" }
@@ -61,9 +61,9 @@ effects:
   - ExecuteUpgradeStepsCommand_does_not_emit_STEPS_EXECUTED_on_handoff_exit
   - spawnUpgradeStepsProcess_parses_STEPS_EXECUTED_with_positive_count_returns_true
   - spawnUpgradeStepsProcess_missing_STEPS_EXECUTED_dispatches_to_failSpawnWithMode
-  # discovered 기반 분기 (#432 후속) — executed=0 을 discovered 로 구분
+  # discovered 기반 분기 — executed=0 을 discovered 로 구분
   - handleSpawnExit_zero_executed_zero_discovered_returns_true          # 케이스 B: 스텝 파일 부재 정상 통과
-  - handleSpawnExit_zero_executed_positive_discovered_dispatches_to_failSpawnWithMode  # 케이스 A: #28 silent skip
+  - handleSpawnExit_zero_executed_positive_discovered_dispatches_to_failSpawnWithMode  # 케이스 A: gnuboard/g7#28 silent skip
   - handleSpawnExit_zero_executed_null_discovered_from_lt_to_dispatches_to_failSpawnWithMode  # 구버전 자식 레거시 판정
   - spawnUpgradeStepsProcess_no_step_files_returns_true_even_when_from_lt_to  # 7.0.0→7.0.1 실증
   - runUpgradeSteps_notifies_discovered_zero_when_no_step_in_range

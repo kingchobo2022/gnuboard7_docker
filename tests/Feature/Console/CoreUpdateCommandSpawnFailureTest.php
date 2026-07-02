@@ -12,7 +12,7 @@ use Tests\TestCase;
 /**
  * `spawn_failure_mode` + `[STEPS_EXECUTED]` 신호 + stale 메모리 가드 회귀 테스트 (§2/§2.1/§6).
  *
- * 회귀 시나리오 (이슈 #28):
+ * 회귀 시나리오 (gnuboard/g7#28):
  *   - spawn 자식 실패 → in-process fallback 진입 → 부모 메모리 stale → upgrade step
  *     안에서 신규 메서드 호출 fatal (예: `Call to undefined method ensureWritableDirectories()`)
  *
@@ -128,7 +128,7 @@ class CoreUpdateCommandSpawnFailureTest extends TestCase
     public function spawn_자식_범위내_스텝이_있는데_0건_실행이면_abort_throw_한다(): void
     {
         // 범위 내에 스텝 파일이 실제로 존재(discovered>0)하는데 executed=0 인 경우 —
-        // 이전 버전 자식이 신규 스텝을 놓치고 silent skip 한 이슈 #28 케이스 (케이스 A).
+        // 이전 버전 자식이 신규 스텝을 놓치고 silent skip 한 gnuboard/g7#28 케이스 (케이스 A).
         // 이 경우에만 fail-fast 를 발동해야 한다.
         //
         // 재현: 스텝 파일은 존재하나 자식의 runUpgradeSteps 가 executed 를 0 으로 보고하도록,

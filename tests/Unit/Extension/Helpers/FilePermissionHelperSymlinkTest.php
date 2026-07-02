@@ -10,7 +10,7 @@ use Tests\TestCase;
 /**
  * `FilePermissionHelper::copyDirectory` / `removeOrphanItems` 의 symlink 보존 동작 회귀 가드.
  *
- * 회귀 시나리오 (이슈 #28 + 본 계획 §1):
+ * 회귀 시나리오 (gnuboard/g7#28):
  *   - 코어 자동 롤백 시 `public/storage` symlink 가 target 디렉토리 내용으로 추적 복사되어
  *     symlink 가 일반 디렉토리로 변질 → 운영자가 `storage:link` 재실행 필요
  *   - `removeOrphanItems` 가 source 부재 symlink 를 디렉토리로 인식하여 target 의 모든 파일을

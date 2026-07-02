@@ -1662,7 +1662,7 @@ class CoreUpdateService
 
         // 범위 내에서 발견된 스텝 파일 수(discovered)를 먼저 통지한다.
         // 호출자(spawn 자식)는 이 값으로 "스텝 파일이 애초에 없어 0건(정상)" 과 "스텝 파일은
-        // 있는데 실행이 0건(비정상 — 이슈 #28 silent skip)" 을 구분한다. onStep 은 실제 실행
+        // 있는데 실행이 0건(비정상 — gnuboard/g7#28 silent skip)" 을 구분한다. onStep 은 실제 실행
         // 건마다 호출되므로 executed 수만 세며, discovered 는 실행 전에 1회 통지한다.
         $onDiscovered?->__invoke(count($steps));
 

@@ -877,7 +877,7 @@ class CoreUpdateCommand extends Command
      *  - `[STEPS_EXECUTED]` 신호 미수신 (`$stepsExecuted === null`) → fail-fast.
      *    이전 버전 자식 (신호 미발행) 또는 silent skip 의심.
      *  - executed=0 인데 **discovered>0** → fail-fast. 범위 내에 스텝 파일이 실제로
-     *    존재하는데 자식이 하나도 실행하지 못함 (이슈 #28 silent skip — 케이스 A).
+     *    존재하는데 자식이 하나도 실행하지 못함 (gnuboard/g7#28 silent skip — 케이스 A).
      *  - executed=0 이고 **discovered=0** → 정상 통과. 해당 from~to 범위에 스텝 파일이
      *    애초에 없는 릴리즈 (예: 데이터/설정 변경 없는 패치). from<to 여도 실패 아님 (케이스 B).
      *  - discovered 신호 부재 (`null`, 구버전 자식) + executed=0 + from<to → 레거시 판정 유지
@@ -936,7 +936,7 @@ class CoreUpdateCommand extends Command
             }
 
             // executed=0 + (discovered>0 또는 discovered 신호 부재) + from<to → fail-fast.
-            // discovered>0: 스텝 파일이 있는데 자식이 실행 못함 (이슈 #28 케이스 A).
+            // discovered>0: 스텝 파일이 있는데 자식이 실행 못함 (gnuboard/g7#28 케이스 A).
             // discovered=null: 구버전 자식 (discovered 미발행) — 레거시 판정 유지.
             if ($stepsExecuted === 0
                 && $stepsDiscovered !== 0
