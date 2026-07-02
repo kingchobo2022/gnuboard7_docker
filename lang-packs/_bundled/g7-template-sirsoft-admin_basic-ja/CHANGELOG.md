@@ -4,6 +4,12 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)를 따르며,
 [Semantic Versioning](https://semver.org/lang/ko/)을 준수합니다.
 
+## [1.0.1] - 2026-07-01
+
+### Changed
+
+- 첨부 개수 초과 안내 문구(`attachment.upload_limit_exceeded`)를 이미지 전용 표현에서 일반 파일에도 맞는 범용 표현으로 갱신했습니다 — 한국어/영어 원문 변경에 맞춰 일본어 번역을 동기화했습니다.
+
 ## [1.0.0] - 2026-07-01
 
 ### Added

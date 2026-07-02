@@ -6,8 +6,11 @@
 #   무의미 조합이 다수 포함되므로 docblock @scenario 전수 마킹이 부적합하다.
 #   실제 회귀 가드는 test_files 의 통과 테스트가 결함별로 담당한다:
 #     6-1 → PageControllerTest(Feature) / 6-2 → PageAttachmentServiceTest(Unit) +
-#     admin-page-layouts.test.ts(레이아웃 렌더) / 7 → admin-page-layouts.test.ts /
-#     12-2 → SeoPageCacheListenerTest(Unit) / 13 → admin-page-layouts.test.ts.
+#     admin-page-layouts.test.ts(레이아웃 렌더) / 7(폼 잔존) → admin-page-layouts.test.ts /
+#     12-2 → SeoPageCacheListenerTest(Unit) / 13 → admin-page-layouts.test.ts /
+#     7(검증 안내 toast) → admin-page-layouts.test.ts(onUploadError→toast 핸들러 존재) +
+#     FileUploaderLimit.test.ts(개수 초과 발화). upload_validation 축은 용량/확장자/개수/정상
+#     4값이나 용량·확장자는 컴포넌트 기존 검증이라 레이아웃 핸들러 존재로, 개수는 훅 단위로 커버.
 #   E2E: 페이지 모듈에 Playwright 인프라를 이커머스와 동일 패턴으로 신설(config + page-auth/
 #   page-seed fixture + playwright:seed-page stub)하고 spec 3건을 form_mode/upload_count/
 #   page_change axis 와 1:1 매핑해 등록했으며, 대상 화면 data-testid 보강 전까지 skip placeholder
@@ -60,6 +63,7 @@ axes:
   upload_count: [single, multiple]
   page_change: [create, update, delete, restore]
   cached_entry: [layout_tagged, url_only]
+  upload_validation: [size_exceeded, ext_not_allowed, count_exceeded, valid]
 
 effects:
   - admin_context_returns_admin_download_and_preview_url
@@ -76,12 +80,16 @@ effects:
   - page_restore_invalidates_page_detail_seo_cache
   - page_restore_creates_new_version_and_preserves_history
   - page_version_changed_fields_render_localized_labels
+  - attachment_size_or_ext_rejection_shows_error_toast
+  - attachment_count_exceeded_shows_error_toast_and_truncates
+  - valid_attachment_upload_shows_no_error_toast
 
 test_files:
   - modules/_bundled/sirsoft-page/tests/Unit/Services/PageAttachmentServiceTest.php
   - modules/_bundled/sirsoft-page/tests/Feature/Admin/PageControllerTest.php
   - modules/_bundled/sirsoft-page/tests/Unit/Listeners/SeoPageCacheListenerTest.php
   - modules/_bundled/sirsoft-page/resources/js/__tests__/layouts/admin-page-layouts.test.ts
+  - templates/_bundled/sirsoft-basic/src/components/composite/__tests__/FileUploaderLimit.test.ts
   - modules/_bundled/sirsoft-page/tests/Playwright/specs/admin/page-form-reset-on-route-switch.spec.ts
   - modules/_bundled/sirsoft-page/tests/Playwright/specs/admin/page-attachment-order.spec.ts
   - modules/_bundled/sirsoft-page/tests/Playwright/specs/admin/page-version-changed-fields-i18n.spec.ts

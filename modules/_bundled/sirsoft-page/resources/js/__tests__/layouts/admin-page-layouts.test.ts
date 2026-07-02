@@ -638,6 +638,21 @@ describe('admin_page_form.json', () => {
         expect(onReorder.params['form.attachments']).toContain('$args[0]');
     });
 
+    // ─── 첨부 검증 실패 안내 (용량/확장자/개수 초과 toast) ───
+
+    it('FileUploader 에 onUploadError → toast 액션이 있어 검증 실패를 사용자에게 안내함', () => {
+        // 회귀 배경: onUploadError 핸들러 부재로 용량/확장자/개수 초과 시 백엔드/클라이언트
+        // 차단은 되나 toast 안내가 없어 사용자가 이유를 알 수 없었음.
+        const uploaders = findComponentsByName(adminPageForm, 'FileUploader');
+        const actions = uploaders[0].actions ?? [];
+        const onUploadError = actions.find((a: any) => a.event === 'onUploadError');
+        expect(onUploadError, 'onUploadError 액션').toBeDefined();
+        expect(onUploadError.handler).toBe('toast');
+        expect(onUploadError.params.type).toBe('error');
+        // 훅이 만든 에러 메시지 문자열($args[0])을 그대로 표시
+        expect(onUploadError.params.message).toContain('$args[0]');
+    });
+
     it('FileUploader reorder 엔드포인트가 수정 모드(route.id)에서만 활성화됨 (생성 모드는 temp 첨부라 reorder 불가)', () => {
         const uploaders = findComponentsByName(adminPageForm, 'FileUploader');
         expect(uploaders[0].props.apiEndpoints.reorder).toContain('route?.id');
