@@ -12,7 +12,7 @@ use Modules\Sirsoft\Page\Models\PageAttachment;
 /**
  * Playwright E2E 용 페이지 도메인 시드 커맨드.
  *
- * 미발행 페이지 관리자 미리보기(#424-15) E2E 를 위해 고정 슬러그의 미발행/발행 페이지와
+ * 미발행 페이지 관리자 미리보기 E2E 를 위해 고정 슬러그의 미발행/발행 페이지와
  * 첨부를 발급하여 stdout 에 JSON 으로 반환한다. 재실행 시 동일 슬러그를 물리 삭제 후 재생성해
  * 멱등성을 보장한다 (페이지·첨부는 hard delete 모델).
  *

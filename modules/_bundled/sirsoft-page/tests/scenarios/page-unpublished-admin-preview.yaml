@@ -1,5 +1,5 @@
 # audit:allow test-scenario-coverage reason: |
-#   본 매니페스트는 미발행 페이지 관리자 미리보기(#424-15) 단일 결함의 권한 × 발행상태
+#   본 매니페스트는 미발행 페이지 관리자 미리보기 단일 결함의 권한 × 발행상태
 #   cross product 를 기록한다. viewer(guest/member/other_admin/page_reader) × published
 #   (published/unpublished) 8케이스 중 "미리보기 허용" 은 page_reader × unpublished 단 1조합이며,
 #   나머지는 기존 동작(발행=200 공개 / 미발행=404) 유지다. 실제 회귀 가드는 test_files 의
@@ -11,7 +11,7 @@
 feature: 미발행 페이지 관리자 미리보기 (권한자만 사용자 화면 노출 + 미리보기 배너 + 첨부 admin URL)
 
 description: |
-  #424-15: 미발행 페이지는 관리자여도 사용자 화면(/page/{slug})에 접근할 수 없던 결함을 수정한다.
+  미발행 페이지는 관리자여도 사용자 화면(/page/{slug})에 접근할 수 없던 결함을 수정한다.
 
   게이트 정책:
     - 비로그인·일반 회원: 미발행 페이지 → 404 유지 (비공개).

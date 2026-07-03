@@ -292,7 +292,7 @@ describe('admin_page_list.json', () => {
         expect(findById(adminPageList, 'published_false')).toBeNull();
     });
 
-    // ─── F2: 모바일 검색 저장/읽기 저장소 정합 (이슈 #424) ───
+    // ─── F2: 모바일 검색 저장/읽기 저장소 정합 ───
 
     /**
      * responsive.portable 등 반응형 오버라이드 내부까지 순회하며 id 로 노드를 찾는다.
@@ -350,7 +350,7 @@ describe('admin_page_list.json', () => {
         expect(inputChange?.params?.target).not.toBe('global');
     });
 
-    // ─── C1·C2·C5: 시맨틱 클래스 정리 (이슈 #424) ───
+    // ─── C1·C2·C5: 시맨틱 클래스 정리 ───
 
     it('[C1] 검색바 안 필드 셀렉트는 pill(select-composite), 툴바 발행/정렬/개수는 테두리(border+bg-white) — 이커머스 목록 관행', () => {
         // 관행(이커머스 shipping_policy/order/product 목록): 검색바 내부 필드 셀렉트 = pill,
@@ -772,7 +772,7 @@ describe('admin_page_form.json', () => {
         expect(uploaders[0].props.apiEndpoints.reorder).toContain('route?.id');
     });
 
-    // ─── UI 검토 M1·M6 회귀 차단 (이슈 #424) ───
+    // ─── UI 검토 M1·M6 회귀 차단 ───
 
     it('[M1-a] 검증에러 제목 클래스가 공백으로 분리됨 (font-medium + text-danger-soft, 병합 클래스 금지)', () => {
         // 회귀 배경: "font-mediumtext-danger-soft" 처럼 공백 없이 붙으면 두 클래스 모두 무효
@@ -1024,7 +1024,7 @@ describe('admin_page_detail.json', () => {
         expect(cellStr).toContain('sirsoft-page.admin.page.detail.versions.field_labels');
     });
 
-    // ─── UI 검토 M2·M3·M4·M5 회귀 차단 (이슈 #424) ───
+    // ─── UI 검토 M2·M3·M4·M5 회귀 차단 ───
 
     it('[M5] onError 메시지 바인딩이 $error 가 아닌 error 컨텍스트 변수를 사용함 (엔진 onError context 키는 error)', () => {
         // 회귀 배경: 엔진은 onError 콜백 컨텍스트를 `error` 키로 제공(ActionDispatcher).

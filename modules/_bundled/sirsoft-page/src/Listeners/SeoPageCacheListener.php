@@ -35,7 +35,7 @@ class SeoPageCacheListener implements HookListenerInterface
                 'method' => 'onPageChange',
                 'priority' => 20,
             ],
-            // 버전 복원도 콘텐츠(title/content/seo_meta) 변경이므로 수정과 동일하게 무효화 (이슈 #424-14)
+            // 버전 복원도 콘텐츠(title/content/seo_meta) 변경이므로 수정과 동일하게 무효화
             'sirsoft-page.page.after_restore' => [
                 'method' => 'onPageChange',
                 'priority' => 20,

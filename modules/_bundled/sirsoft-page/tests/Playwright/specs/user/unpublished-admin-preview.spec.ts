@@ -1,5 +1,5 @@
 /**
- * 미발행 페이지 관리자 미리보기 (#424-15).
+ * 미발행 페이지 관리자 미리보기.
  *
  * @scenario viewer=guest, viewer=member, viewer=other_admin, viewer=page_reader, published=published, published=unpublished
  * @effects page_reader_admin_previews_unpublished_page_with_200,
@@ -39,7 +39,7 @@ const NOT_FOUND_TEXT = /페이지를 찾을 수 없습니다|Page Not Found/;
 const UNPUBLISHED_TITLE = '미발행 미리보기 대상';
 const PUBLISHED_TITLE = '발행 대조군';
 
-test.describe('미발행 페이지 관리자 미리보기 (#424-15)', () => {
+test.describe('미발행 페이지 관리자 미리보기', () => {
   test('페이지 조회 권한 관리자는 미발행 페이지를 미리보고 배너가 노출된다', async ({
     page,
     pageReadToken,

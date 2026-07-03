@@ -402,7 +402,7 @@ class PageServiceTest extends ModuleTestCase
     }
 
     /**
-     * allowUnpublished=true 이면 미발행 페이지도 반환하는지 확인 (#424-15 미리보기)
+     * allowUnpublished=true 이면 미발행 페이지도 반환하는지 확인 (미리보기)
      */
     public function test_get_published_page_by_slug_returns_draft_when_preview_allowed(): void
     {

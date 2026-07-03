@@ -119,7 +119,7 @@ class PublicPageControllerTest extends FeatureTestCase
         $response->assertStatus(404);
     }
 
-    // ─── 미발행 페이지 관리자 미리보기 (#424-15) ────────
+    // ─── 미발행 페이지 관리자 미리보기 ────────
 
     /**
      * 페이지 조회 권한(pages.read) 관리자는 미발행 페이지를 미리볼 수 있는지 확인
