@@ -315,13 +315,13 @@ class PageControllerTest extends FeatureTestCase
     }
 
     /**
-     * 관리자 상세 조회 시 첨부 URL이 관리자 라우트를 가리키는지 확인
+     * 관리자 상세 조회 시 첨부 URL이 공개 hash 라우트를 가리키는지 확인
      *
-     * 첨부 URL이 공개 라우트(발행 가드 있음)를 가리키면 미발행 페이지의
-     * 첨부가 관리자에게도 404로 차단된다. 관리자 응답은 발행 가드 없는
-     * admin 라우트를 반환해야 한다.
+     * 썸네일 <img>·다운로드는 토큰을 실을 수 없어 인증 라우트에 물리면 401 로 깨진다.
+     * 게시판·이커머스 표준과 동일하게 공개 hash 라우트로 단일화하고, 미발행 콘텐츠
+     * 다운로드 차단은 공개 라우트 내부의 권한 게이트가 담당한다.
      */
-    public function test_admin_show_returns_admin_attachment_urls(): void
+    public function test_admin_show_returns_public_attachment_urls(): void
     {
         $page = Page::factory()->create([
             'slug' => 'test-admin-attach-url',
@@ -341,11 +341,11 @@ class PageControllerTest extends FeatureTestCase
         $response->assertStatus(200);
         $att = $response->json('data.attachments.0');
         $this->assertSame(
-            "/api/modules/sirsoft-page/admin/attachments/preview/{$attachment->hash}",
+            "/api/modules/sirsoft-page/pages/attachment/{$attachment->hash}/preview",
             $att['preview_url']
         );
         $this->assertSame(
-            "/api/modules/sirsoft-page/admin/attachments/download/{$attachment->hash}",
+            "/api/modules/sirsoft-page/pages/attachment/{$attachment->hash}",
             $att['download_url']
         );
     }

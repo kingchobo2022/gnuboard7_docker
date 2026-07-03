@@ -105,17 +105,8 @@ Route::prefix('admin/attachments')->middleware(['auth:sanctum', 'throttle:600,1'
         ->middleware('permission:admin,sirsoft-page.pages.update')
         ->name('reorder');
 
-    // 첨부파일 다운로드 (해시 기반)
-    Route::get('/download/{hash}', [PageAttachmentController::class, 'download'])
-        ->middleware('permission:admin,sirsoft-page.pages.read')
-        ->where('hash', '[a-zA-Z0-9]{12}')
-        ->name('download');
-
-    // 첨부파일 이미지 미리보기 (해시 기반, inline)
-    Route::get('/preview/{hash}', [PageAttachmentController::class, 'preview'])
-        ->middleware('permission:admin,sirsoft-page.pages.read')
-        ->where('hash', '[a-zA-Z0-9]{12}')
-        ->name('preview');
+    // 다운로드/미리보기는 공개 hash 라우트(pages/attachment/*)로 단일화 —
+    // 썸네일 <img>·다운로드는 토큰을 실을 수 없어 인증 라우트에 물리면 401 로 깨진다.
 
     // 첨부파일 삭제
     Route::delete('/{id}', [PageAttachmentController::class, 'destroy'])

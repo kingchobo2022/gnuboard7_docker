@@ -1310,7 +1310,7 @@
                                 ]
                             },
                             {
-                                "id": "attachments_list",
+                                "id": "attachments_list_{{att_idx}}",
                                 "type": "basic",
                                 "name": "Div",
                                 "if": "{{_local.showAttachments}}",
@@ -1324,13 +1324,22 @@
                                 },
                                 "children": [
                                     {
-                                        "id": "attachment_card",
+                                        "id": "attachment_card_{{att_idx}}",
                                         "type": "basic",
-                                        "name": "A",
+                                        "name": "Div",
                                         "props": {
-                                            "href": "{{attachment_item?.download_url}}",
-                                            "className": "flex-center group gap-3 px-4 py-2.5 hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700/50 transition-colors cursor-pointer no-underline"
+                                            "className": "flex-center group gap-3 px-4 py-2.5 hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
                                         },
+                                        "actions": [
+                                            {
+                                                "type": "click",
+                                                "handler": "downloadAttachment",
+                                                "params": {
+                                                    "url": "{{attachment_item?.download_url}}",
+                                                    "filename": "{{attachment_item?.original_filename}}"
+                                                }
+                                            }
+                                        ],
                                         "children": [
                                             {
                                                 "comment": "이미지 썸네일 (이미지 파일인 경우)",
@@ -1400,7 +1409,7 @@
                                                 "type": "basic",
                                                 "name": "Icon",
                                                 "props": {
-                                                    "name": "arrow-down-tray",
+                                                    "name": "download",
                                                     "className": "text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:text-blue-400 dark:group-hover:text-blue-400 transition-colors"
                                                 }
                                             }

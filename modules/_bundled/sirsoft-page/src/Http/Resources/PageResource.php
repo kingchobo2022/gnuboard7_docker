@@ -40,7 +40,7 @@ class PageResource extends BaseApiResource
             ]),
             'attachments' => $this->whenLoaded(
                 'attachments',
-                fn () => PageAttachmentResource::collectionFor($this->attachments, 'admin')
+                fn () => PageAttachmentResource::collectionFor($this->attachments)
             ),
             ...$this->formatTimestamps(),
             ...$this->resourceMeta($request),

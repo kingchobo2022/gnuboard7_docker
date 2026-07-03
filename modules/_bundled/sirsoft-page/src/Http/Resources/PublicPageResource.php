@@ -61,10 +61,7 @@ class PublicPageResource extends BaseApiResource
             'current_version' => $this->current_version,
             'attachments' => $this->whenLoaded(
                 'attachments',
-                fn () => PageAttachmentResource::collectionFor(
-                    $this->attachments,
-                    $this->preview ? 'admin' : 'public'
-                )
+                fn () => PageAttachmentResource::collectionFor($this->attachments)
             ),
             'created_at' => $this->created_at
                 ? $this->formatDateTimeStringForUser($this->created_at)

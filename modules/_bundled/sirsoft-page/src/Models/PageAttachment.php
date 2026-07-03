@@ -122,55 +122,50 @@ class PageAttachment extends Model
     }
 
     /**
-     * 다운로드 URL을 반환합니다 (공개 라우트 — 기본값).
+     * 다운로드 URL을 반환합니다 (공개 hash 라우트).
      *
      * @return string 다운로드 URL
      */
     public function getDownloadUrlAttribute(): string
     {
-        return $this->downloadUrlFor('public');
+        return $this->downloadUrl();
     }
 
     /**
-     * 이미지 미리보기 URL을 반환합니다 (공개 라우트 — 기본값).
+     * 이미지 미리보기 URL을 반환합니다 (공개 hash 라우트).
      *
      * @return string|null 미리보기 URL (이미지가 아니면 null)
      */
     public function getPreviewUrlAttribute(): ?string
     {
-        return $this->previewUrlFor('public');
+        return $this->previewUrl();
     }
 
     /**
-     * 컨텍스트별 다운로드 URL을 반환합니다.
+     * 다운로드 URL을 반환합니다.
      *
-     * 공개 라우트는 발행 가드가 있어 미발행 페이지의 첨부를 차단하므로,
-     * 관리자 응답에는 발행 가드가 없는 admin 라우트 URL을 사용합니다.
+     * 썸네일 <img>·다운로드는 브라우저 직접 GET 이라 토큰을 실을 수 없으므로,
+     * 게시판·이커머스 표준과 동일하게 공개 hash 라우트로 단일화한다.
+     * 미발행 콘텐츠 다운로드 차단은 공개 라우트 내부의 권한 게이트가 담당한다.
      *
-     * @param  string  $context  'admin' 또는 'public'
      * @return string 다운로드 URL
      */
-    public function downloadUrlFor(string $context = 'public'): string
+    public function downloadUrl(): string
     {
-        return $context === 'admin'
-            ? '/api/modules/sirsoft-page/admin/attachments/download/'.$this->hash
-            : '/api/modules/sirsoft-page/pages/attachment/'.$this->hash;
+        return '/api/modules/sirsoft-page/pages/attachment/'.$this->hash;
     }
 
     /**
-     * 컨텍스트별 이미지 미리보기 URL을 반환합니다.
+     * 이미지 미리보기 URL을 반환합니다 (공개 hash 라우트).
      *
-     * @param  string  $context  'admin' 또는 'public'
      * @return string|null 미리보기 URL (이미지가 아니면 null)
      */
-    public function previewUrlFor(string $context = 'public'): ?string
+    public function previewUrl(): ?string
     {
         if (! $this->isImage()) {
             return null;
         }
 
-        return $context === 'admin'
-            ? '/api/modules/sirsoft-page/admin/attachments/preview/'.$this->hash
-            : '/api/modules/sirsoft-page/pages/attachment/'.$this->hash.'/preview';
+        return '/api/modules/sirsoft-page/pages/attachment/'.$this->hash.'/preview';
     }
 }
