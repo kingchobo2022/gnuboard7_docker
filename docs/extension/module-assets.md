@@ -435,6 +435,16 @@ php artisan template:cache-clear          # 전체 번들 파일 정리 포함
 
 > 개별 에셋 서빙 라우트(`/api/{type}/assets/...`, `*.map` 포함)는 소스맵·static 참조를 위해 존치한다.
 
+### 전송 압축 (gzip)
+
+번들 JS/CSS 는 `fileResponse()`(= `response()->file()` → `BinaryFileResponse`)로 서빙되며, `GzipEncodeResponse` 미들웨어가 gzip 압축을 적용한다. `BinaryFileResponse` 는 `getContent()` 가 `false` 를 반환하므로, 미들웨어는 파일 경로(`getFile()->getPathname()`)에서 본문을 읽어 압축한 뒤 헤더(Content-Type/ETag/Cache-Control)를 승계한 일반 `Response` 로 치환한다.
+
+- 1KB 미만 번들(예: 빈 CSS)은 `MIN_COMPRESS_SIZE` 가드로 압축 생략.
+- `Accept-Encoding: gzip` 미포함 요청, 이미 `Content-Encoding` 이 있는 응답, 304 응답은 압축 대상에서 제외.
+- 회귀 테스트: `tests/Feature/Middleware/GzipEncodeResponseTest.php` (BinaryFileResponse 압축/헤더 승계/소용량 skip).
+
+> `BinaryFileResponse` 를 압축 대상에 포함하지 않으면 번들이 비압축 전송되는 사각지대가 생긴다(모듈/플러그인 번들은 크기가 커 압축 이득이 특히 크다).
+
 ---
 
 ## 에셋 로딩 전략
