@@ -1098,12 +1098,14 @@ function generateEnvContent(): ?string
         $replacements['DB_READ_USERNAME='] = 'DB_READ_USERNAME='.($config['db_read_username'] ?? 'root');
         $replacements['DB_READ_PASSWORD='] = 'DB_READ_PASSWORD='.escapeEnvValue($config['db_read_password'] ?? '');
     } else {
-        // Read DB를 사용하지 않는 경우 Write DB 정보와 동일하게 설정
-        $replacements['DB_READ_HOST='] = 'DB_READ_HOST='.($config['db_write_host'] ?? '127.0.0.1');
-        $replacements['DB_READ_PORT='] = 'DB_READ_PORT='.($config['db_write_port'] ?? '3306');
-        $replacements['DB_READ_DATABASE='] = 'DB_READ_DATABASE='.($config['db_write_database'] ?? 'g7');
-        $replacements['DB_READ_USERNAME='] = 'DB_READ_USERNAME='.($config['db_write_username'] ?? 'root');
-        $replacements['DB_READ_PASSWORD='] = 'DB_READ_PASSWORD='.escapeEnvValue($config['db_write_password'] ?? '');
+        // Read DB를 사용하지 않는 경우 DB_READ_* 를 빈 값으로 둔다.
+        // config/database.php 의 write fallback(Elvis) 이 SELECT 를 write DB 로 넘기므로
+        // .env 에 write 값을 중복 기록하지 않는다 (write 변경 시 read stale 방지). (이슈 #63)
+        $replacements['DB_READ_HOST='] = 'DB_READ_HOST=';
+        $replacements['DB_READ_PORT='] = 'DB_READ_PORT=';
+        $replacements['DB_READ_DATABASE='] = 'DB_READ_DATABASE=';
+        $replacements['DB_READ_USERNAME='] = 'DB_READ_USERNAME=';
+        $replacements['DB_READ_PASSWORD='] = 'DB_READ_PASSWORD=';
     }
 
     // 앱 설정 치환
