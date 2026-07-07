@@ -5,6 +5,7 @@
       "kcp_escrow_delivery": "エスクロー配送",
       "kcp_status": "決済状態",
       "nhnkcp_easy_pay_config": "簡便決済設定",
+      "nhnkcp_test_mode_status": "テストモード状態",
       "nhnkcp_test_map": "テスト決済マップ",
       "nicepay_test_map": "テスト決済マップ",
       "settings": "決済設定",
@@ -48,6 +49,10 @@
   "admin": {
     "test_mode_badge": "テスト決済",
     "test_mode_order_notice": "この注文はテスト決済として処理されました。",
+    "test_mode_settings_warning_plugin": "NHN KCP",
+    "test_mode_settings_warning_title": "（注意）NHN KCP決済設定が現在テスト決済になっています。",
+    "test_mode_settings_warning_body": "テスト決済では実際の決済は発生しません。ショップ運営中の場合は必ず実決済に設定して運営してください。",
+    "test_mode_settings_warning_action": "実決済に設定",
     "order_info_title": "NHN KCP決済情報",
     "order_info_description": "DBに保存されたKCP決済情報を表示します。",
     "pay_status_approved": "承認",
