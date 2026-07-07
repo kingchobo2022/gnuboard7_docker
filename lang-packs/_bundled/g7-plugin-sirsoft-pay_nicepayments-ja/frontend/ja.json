@@ -4,6 +4,7 @@
       "nicepay_easy_pay_config": "簡易決済設定",
       "nicepay_escrow": "エスクロー",
       "nicepay_status": "決済ステータス",
+      "nicepay_test_mode_status": "テストモード状態",
       "nicepay_test_map": "テスト決済マップ",
       "settings": "決済設定",
       "vbank_info": "仮想口座情報"
@@ -109,6 +110,10 @@
     "escrow_register_error": "エスクロー配送登録に失敗しました。",
     "test_mode_badge": "テスト決済",
     "test_mode_order_notice": "テスト決済として処理された注文です。実際のカード承認・出金通知が発生する可能性がありますが、NicePaymentsテストアカウント決済は当日23時30分頃一括自動キャンセルされます。配送前に運営決済の有無をご確認ください。",
+    "test_mode_settings_warning_plugin": "NicePayments",
+    "test_mode_settings_warning_title": "（注意）NicePayments決済設定が現在テスト決済になっています。",
+    "test_mode_settings_warning_body": "テスト決済では実際の決済は発生しません。ショップ運営中の場合は必ず実決済に設定して運営してください。",
+    "test_mode_settings_warning_action": "実決済に設定",
     "test_mode_orders_in_list": "テスト決済注文を含む"
   },
   "easy_pay": {
