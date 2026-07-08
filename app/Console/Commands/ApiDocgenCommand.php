@@ -128,10 +128,25 @@ class ApiDocgenCommand extends Command
         $checkFindings = [];
         $examplesOnly = (bool) $this->option('examples-only');
 
+        // 대상(코어/확장)별 README 목차 항목 누적: readmeKey => ['label' => ..., 'entries' => [...]]
+        $readmeIndex = [];
+
         foreach ($grouped as $file => $items) {
             $sections = [];
             $sectionKeys = [];
             $exampleBlocks = [];
+
+            // 목차용 도메인 파일 항목 (소유별). 예시-only/check 모드에서도 목차는 최신화한다.
+            $owner = $items[0]['owner'];
+            $readmeKey = $this->readmeFile($owner);
+            $readmeIndex[$readmeKey]['label'] = $owner['type'] === 'core'
+                ? '코어'
+                : ($owner['type'] === 'module' ? '모듈' : '플러그인')." `{$owner['id']}`";
+            $readmeIndex[$readmeKey]['entries'][] = [
+                'domain' => $items[0]['domain_group'],
+                'file' => basename($file),
+                'count' => count($items),
+            ];
 
             foreach ($items as $route) {
                 $request = $introspector->introspect($route['controller'], $route['controller_method']);
@@ -209,6 +224,17 @@ class ApiDocgenCommand extends Command
         }
 
         $probe->cleanup();
+
+        // 대상별 API 문서 목차(README.md) 생성/갱신 — 확장 API 레퍼런스 발견성의 규약 진입점.
+        // check/dry-run 은 파일을 쓰지 않으므로 제외. examples-only 는 목차도 최신화한다.
+        if (! $this->option('check')) {
+            foreach ($readmeIndex as $readmePath => $meta) {
+                $existing = File::exists($readmePath) ? File::get($readmePath) : null;
+                $content = $scaffolder->readmeIndex($meta['label'], $meta['entries'], $existing);
+                File::ensureDirectoryExists(dirname($readmePath));
+                File::put($readmePath, $content);
+            }
+        }
 
         if ($this->option('check')) {
             if ($checkFindings !== []) {
@@ -788,6 +814,23 @@ class ApiDocgenCommand extends Command
         $base = $owner['type'] === 'module' ? 'modules' : 'plugins';
 
         return base_path("{$base}/_bundled/{$owner['id']}/docs/api/{$domain}.md");
+    }
+
+    /**
+     * 소유 대상의 API 문서 목차(README.md) 경로를 반환합니다.
+     *
+     * @param  array{type: string, id: string|null}  $owner  소유 메타
+     * @return string README.md 절대 경로
+     */
+    private function readmeFile(array $owner): string
+    {
+        if ($owner['type'] === 'core') {
+            return base_path('docs/backend/api/README.md');
+        }
+
+        $base = $owner['type'] === 'module' ? 'modules' : 'plugins';
+
+        return base_path("{$base}/_bundled/{$owner['id']}/docs/api/README.md");
     }
 
     /**

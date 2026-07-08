@@ -840,4 +840,52 @@ MD;
         $this->assertStringNotContainsString('| identifier | query |', $section);
         $this->assertSame(1, substr_count($section, '| path | path |'));
     }
+
+    #[Test]
+    public function readme_목차는_도메인_파일과_엔드포인트_수를_표로_나열한다(): void
+    {
+        $scaffolder = new ApiDocScaffolder;
+
+        $entries = [
+            ['domain' => 'products', 'file' => 'products.md', 'count' => 30],
+            ['domain' => 'orders', 'file' => 'orders.md', 'count' => 22],
+        ];
+
+        $readme = $scaffolder->readmeIndex('모듈 `sirsoft-ecommerce`', $entries);
+
+        // 소유 라벨·집계·도메인 링크가 표에 나타난다.
+        $this->assertStringContainsString('# API 레퍼런스 문서 목차', $readme);
+        $this->assertStringContainsString('모듈 `sirsoft-ecommerce`', $readme);
+        $this->assertStringContainsString('**문서 수**: 2 · **엔드포인트 수**: 52', $readme);
+        $this->assertStringContainsString('| [products.md](products.md) | `products` | 30 |', $readme);
+        $this->assertStringContainsString('| [orders.md](orders.md) | `orders` | 22 |', $readme);
+        // 도메인 알파벳 정렬 — orders 가 products 보다 먼저.
+        $this->assertLessThan(strpos($readme, 'products.md'), strpos($readme, 'orders.md'));
+    }
+
+    #[Test]
+    public function readme_재생성은_generated_블록만_갱신하고_사람_서술을_보존한다(): void
+    {
+        $scaffolder = new ApiDocScaffolder;
+
+        $entries = [['domain' => 'pages', 'file' => 'pages.md', 'count' => 5]];
+        $first = $scaffolder->readmeIndex('모듈 `sirsoft-page`', $entries);
+
+        // @generated 블록 밖에 사람 개요 서술을 덧붙인다.
+        $human = $first."\n## 개요\n\n이 모듈은 정적 페이지를 관리합니다. (사람 서술)\n";
+
+        // 엔드포인트 수가 바뀐 재생성.
+        $entriesUpdated = [['domain' => 'pages', 'file' => 'pages.md', 'count' => 6]];
+        $regen = $scaffolder->readmeIndex('모듈 `sirsoft-page`', $entriesUpdated, $human);
+
+        // 표는 갱신되고(6), 사람 서술은 보존된다.
+        $this->assertStringContainsString('엔드포인트 수**: 6', $regen);
+        $this->assertStringContainsString('이 모듈은 정적 페이지를 관리합니다. (사람 서술)', $regen);
+        // 재재생성해도 사람 서술 중복 없이 멱등.
+        $regen2 = $scaffolder->readmeIndex('모듈 `sirsoft-page`', $entriesUpdated, $regen);
+        $this->assertSame(
+            substr_count($regen, '(사람 서술)'),
+            substr_count($regen2, '(사람 서술)')
+        );
+    }
 }

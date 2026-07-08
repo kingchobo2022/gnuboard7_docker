@@ -117,6 +117,55 @@ class ApiDocScaffolder
     }
 
     /**
+     * 대상(코어/확장)의 API 문서 디렉토리 목차(README.md)를 생성합니다.
+     *
+     * 도메인 파일별 링크 + 엔드포인트 수를 표로 나열해, 처음 진입한 개발자/AI 가 이 대상의
+     * API 레퍼런스 전모를 한눈에 파악하도록 한다. 표는 `@generated` 블록 안에 두어 재생성 시
+     * 갱신되며, 블록 밖 사람 서술(개요·주의사항)은 보존한다. 확장 API 문서의 발견성은
+     * 코어 인덱스 생성기가 이 README 를 패턴 스캔(확장명 하드코딩 없이)해 확보한다.
+     *
+     * @param  string  $ownerLabel  소유 라벨 (예: '코어', '모듈 `sirsoft-ecommerce`')
+     * @param  array<int, array{domain: string, file: string, count: int}>  $entries  도메인 파일 목록
+     * @param  string|null  $existing  기존 README (사람 서술 보존용, 없으면 null)
+     * @return string README 마크다운
+     */
+    public function readmeIndex(string $ownerLabel, array $entries, ?string $existing = null): string
+    {
+        usort($entries, fn ($a, $b) => strcmp($a['domain'], $b['domain']));
+        $total = array_sum(array_column($entries, 'count'));
+
+        $rows = ['| 문서 | 도메인 | 엔드포인트 |', '| --- | --- | --- |'];
+        foreach ($entries as $e) {
+            $rows[] = "| [{$e['file']}]({$e['file']}) | `{$e['domain']}` | {$e['count']} |";
+        }
+
+        $genKey = 'api-readme-index';
+        $lines = [];
+        $lines[] = '# API 레퍼런스 문서 목차';
+        $lines[] = '';
+        $lines[] = "> **소유**: {$ownerLabel} · **생성**: `php artisan api:docgen` (실측 기반).";
+        $lines[] = '> 아래 표는 자동 생성됩니다. 각 문서를 열면 엔드포인트별 파라미터·응답·예시를 볼 수 있습니다.';
+        $lines[] = '';
+        $lines[] = self::GEN_START.$genKey.' -->';
+        $lines[] = '- **문서 수**: '.count($entries)." · **엔드포인트 수**: {$total}";
+        $lines[] = '';
+        $lines[] = implode("\n", $rows);
+        $lines[] = '';
+        $lines[] = self::GEN_END;
+        $lines[] = '';
+
+        $generated = implode("\n", $lines)."\n";
+
+        // 블록 밖 사람 서술(개요 등)이 있으면 보존한다.
+        $prose = $existing !== null ? $this->extractHumanProse($existing, $genKey) : null;
+        if ($prose !== null && $prose !== '') {
+            $generated .= "\n".$prose."\n";
+        }
+
+        return $generated;
+    }
+
+    /**
      * 인증/권한 라인을 구성합니다.
      *
      * @param  array<string, mixed>  $route  라우트 메타데이터
