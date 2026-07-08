@@ -23,7 +23,7 @@
 | [activity-log-hooks.md](activity-log-hooks.md) | 활동 로그 훅 레퍼런스 (Activity Log Hooks Reference) | 코어 66훅 + 이커머스 92훅 + 게시판 32훅 + 페이지 8훅 = 총 198훅 |
 | [activity-log.md](activity-log.md) | 활동 로그 시스템 (Activity Log System) | Monolog 기반: Service 훅 → Listener → Log::channel... |
 | [admin-settings-access.md](admin-settings-access.md) | Admin 환경설정 값 접근 (`g7_core_settings` vs `config()`) | 동기화 SSoT: storage/app/settings/*.json → Setting... |
-| [api-documentation.md](api-documentation.md) | API 레퍼런스 문서 규정 (API Documentation) | 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 전... |
+| [api-documentation.md](api-documentation.md) | API 레퍼런스 문서 규정 (API Documentation) | 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 +... |
 | [api-resources.md](api-resources.md) | API 리소스 | Resource: BaseApiResource 상속 필수 / Collection: B... |
 | [authentication.md](authentication.md) | 인증 및 세션 처리 | Laravel Sanctum 토큰 전용 인증 (Bearer 토큰만 사용) |
 | [broadcasting.md](broadcasting.md) | Broadcasting (실시간 이벤트) | Laravel Reverb 사용 (WebSocket) |

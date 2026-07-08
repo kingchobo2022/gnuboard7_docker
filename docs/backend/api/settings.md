@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/settings HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -48,6 +57,368 @@ _단건 응답: `data` 객체의 필드._
 | identity | object | `{"default_provider":"g7:core.mail","purpose_providers":{"…` | 본인인증(IDV) 탭 설정 그룹 (기본 provider·목적별 provider 매핑(purpose_providers)·챌린지 유효시간(분)·최대 시도 횟수) |
 | available_drivers | object | `{"storage":[{"id":"local","label":{"ko":"로컬","en":"Local"…` | 드라이버 선택지 카탈로그 (DriverRegistryService 산물). 종류별(storage/cache/session/queue 등) 선택 가능한 드라이버 목록을 id/다국어 label 형태로 제공 |
 | abilities | object | `{"can_update":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "설정을 성공적으로 가져왔습니다.",
+    "data": {
+        "general": {
+            "site_name": "Test Site",
+            "site_url": "https://test.example.com",
+            "site_description": "",
+            "admin_email": "admin@example.com",
+            "timezone": "Asia/Seoul",
+            "language": "ko",
+            "currency": "KRW",
+            "maintenance_mode": false,
+            "site_logo": []
+        },
+        "security": {
+            "force_https": true,
+            "login_attempt_enabled": true,
+            "auth_token_lifetime": "{MASKED}",
+            "max_login_attempts": 5,
+            "login_lockout_time": 30,
+            "two_factor_auth": false,
+            "password_min_length": "{MASKED}",
+            "require_password_special_char": "{MASKED}"
+        },
+        "mail": {
+            "mailer": "smtp",
+            "host": "",
+            "port": 587,
+            "username": "",
+            "password": "{MASKED}",
+            "encryption": "tls",
+            "mailgun_domain": "",
+            "mailgun_secret": "{MASKED}",
+            "mailgun_endpoint": "api.mailgun.net",
+            "ses_key": "",
+            "ses_secret": "{MASKED}",
+            "ses_region": "ap-northeast-2",
+            "from_address": "heuristing@gmail.com",
+            "from_name": "그누보드7"
+        },
+        "upload": {
+            "max_file_size": 10,
+            "allowed_extensions": [
+                "jpg",
+                "jpeg",
+                "png",
+                "gif",
+                "webp",
+                "pdf",
+                "doc",
+                "docx",
+                "xls",
+                "xlsx",
+                "zip"
+            ],
+            "image_max_width": 2000,
+            "image_max_height": 2000,
+            "image_quality": 85
+        },
+        "seo": {
+            "meta_title_suffix": "",
+            "meta_description": "",
+            "meta_keywords": "",
+            "google_analytics_id": "",
+            "google_site_verification": "",
+            "naver_site_verification": "",
+            "bot_user_agents": [
+                "kakaotalk-scrap",
+                "Meta-ExternalAgent",
+                "ChatGPT-User"
+            ],
+            "bot_detection_enabled": true,
+            "bot_detection_library_enabled": true,
+            "og_default_site_name": "",
+            "og_image_default_width": 1200,
+            "og_image_default_height": 630,
+            "twitter_default_card": "summary_large_image",
+            "twitter_default_site": "",
+            "cache_enabled": true,
+            "cache_ttl": 7200,
+            "sitemap_enabled": true,
+            "sitemap_cache_ttl": 86400,
+            "sitemap_schedule": "daily",
+            "sitemap_schedule_time": "02:00",
+            "sitemap_last_updated_at": "2026-07-08T03:14:49+00:00",
+            "generator_enabled": true,
+            "generator_content": ""
+        },
+        "advanced": {
+            "cache_enabled": true,
+            "cache_default_ttl": 86400,
+            "layout_cache_enabled": true,
+            "layout_cache_ttl": 3600,
+            "seo_cache_enabled": true,
+            "seo_cache_ttl": 7200,
+            "seo_sitemap_cache_ttl": 86400,
+            "stats_cache_enabled": true,
+            "stats_cache_ttl": 1800,
+            "notification_cache_ttl": 3600,
+            "extension_status_cache_ttl": 86400,
+            "geoip_cache_enabled": true,
+            "geoip_cache_ttl": 86400,
+            "version_check_cache_ttl": 3600,
+            "debug_mode": true,
+            "sql_query_log": false,
+            "log_level": "error",
+            "core_update_github_url": "https://github.com/custom/repo",
+            "core_update_github_token": "{MASKED}",
+            "geoip_enabled": false,
+            "geoip_license_key": null,
+            "geoip_auto_update_enabled": true,
+            "geoip_last_updated_at": ""
+        },
+        "cache": {
+            "cache_enabled": true,
+            "cache_default_ttl": 86400,
+            "layout_cache_enabled": true,
+            "layout_cache_ttl": 3600,
+            "seo_cache_enabled": true,
+            "seo_cache_ttl": 7200,
+            "seo_sitemap_cache_ttl": 86400,
+            "stats_cache_enabled": true,
+            "stats_cache_ttl": 1800,
+            "notification_cache_ttl": 3600,
+            "extension_status_cache_ttl": 86400,
+            "geoip_cache_enabled": true,
+            "geoip_cache_ttl": 86400,
+            "version_check_cache_ttl": 3600
+        },
+        "debug": {
+            "debug_mode": true,
+            "sql_query_log": false,
+            "log_level": "error"
+        },
+        "drivers": {
+            "storage_driver": "local",
+            "s3_bucket": null,
+            "s3_region": "ap-northeast-2",
+            "s3_access_key": null,
+            "s3_secret_key": null,
+            "s3_url": null,
+            "cache_driver": "file",
+            "redis_host": "127.0.0.1",
+            "redis_port": 6379,
+            "redis_password": null,
+            "redis_database": "1",
+            "memcached_host": "127.0.0.1",
+            "memcached_port": 11211,
+            "session_driver": "file",
+            "session_lifetime": 120,
+            "queue_driver": "sync",
+            "log_driver": "daily",
+            "log_level": "error",
+            "log_days": 14,
+            "websocket_enabled": true,
+            "websocket_app_id": "test-app-id",
+            "websocket_app_key": "{MASKED}",
+            "websocket_app_secret": "{MASKED}",
+            "websocket_host": "localhost",
+            "websocket_port": 8080,
+            "websocket_scheme": "https",
+            "websocket_verify_ssl": true,
+            "websocket_server_host": "127.0.0.1",
+            "websocket_server_port": 8080,
+            "websocket_server_scheme": "http",
+            "search_engine_driver": "mysql-fulltext"
+        },
+        "core_update": {
+            "core_update_github_url": "https://github.com/custom/repo",
+            "core_update_github_token": "{MASKED}"
+        },
+        "geoip": {
+            "geoip_enabled": false,
+            "geoip_license_key": null,
+            "geoip_auto_update_enabled": true,
+            "geoip_last_updated_at": ""
+        },
+        "notifications": {
+            "channels": [
+                {
+                    "id": "mail",
+                    "is_active": true,
+                    "sort_order": 1
+                },
+                {
+                    "id": "database",
+                    "is_active": true,
+                    "sort_order": 2
+                }
+            ]
+        },
+        "identity": {
+            "default_provider": "g7:core.mail",
+            "purpose_providers": {
+                "signup": null,
+                "password_reset": null,
+                "inicis": {
+                    "adult_verification": "inicis"
+                }
+            },
+            "challenge_ttl_minutes": 15,
+            "max_attempts": 5
+        },
+        "available_drivers": {
+            "storage": [
+                {
+                    "id": "local",
+                    "label": {
+                        "ko": "로컬",
+                        "en": "Local",
+                        "fr": "로컬"
+                    }
+                },
+                {
+                    "id": "s3",
+                    "label": {
+                        "ko": "Amazon S3",
+                        "en": "Amazon S3",
+                        "fr": "Amazon S3"
+                    }
+                }
+            ],
+            "cache": [
+                {
+                    "id": "file",
+                    "label": {
+                        "ko": "파일",
+                        "en": "File",
+                        "fr": "파일"
+                    }
+                },
+                {
+                    "id": "redis",
+                    "label": {
+                        "ko": "Redis",
+                        "en": "Redis",
+                        "fr": "Redis"
+                    }
+                }
+            ],
+            "session": [
+                {
+                    "id": "file",
+                    "label": {
+                        "ko": "파일",
+                        "en": "File",
+                        "fr": "파일"
+                    }
+                },
+                {
+                    "id": "database",
+                    "label": {
+                        "ko": "데이터베이스",
+                        "en": "Database",
+                        "fr": "데이터베이스"
+                    }
+                },
+                {
+                    "id": "redis",
+                    "label": {
+                        "ko": "Redis",
+                        "en": "Redis",
+                        "fr": "Redis"
+                    }
+                }
+            ],
+            "queue": [
+                {
+                    "id": "sync",
+                    "label": {
+                        "ko": "동기",
+                        "en": "Sync",
+                        "fr": "동기"
+                    }
+                },
+                {
+                    "id": "database",
+                    "label": {
+                        "ko": "데이터베이스",
+                        "en": "Database",
+                        "fr": "데이터베이스"
+                    }
+                },
+                {
+                    "id": "redis",
+                    "label": {
+                        "ko": "Redis",
+                        "en": "Redis",
+                        "fr": "Redis"
+                    }
+                }
+            ],
+            "log": [
+                {
+                    "id": "single",
+                    "label": {
+                        "ko": "단일 파일",
+                        "en": "Single File",
+                        "fr": "단일 파일"
+                    }
+                },
+                {
+                    "id": "daily",
+                    "label": {
+                        "ko": "일별 파일",
+                        "en": "Daily File",
+                        "fr": "일별 파일"
+                    }
+                }
+            ],
+            "websocket": [
+                {
+                    "id": "reverb",
+                    "label": {
+                        "ko": "Laravel Reverb",
+                        "en": "Laravel Reverb",
+                        "fr": "Laravel Reverb"
+                    }
+                }
+            ],
+            "mail": [
+                {
+                    "id": "smtp",
+                    "label": {
+                        "ko": "SMTP",
+                        "en": "SMTP",
+                        "fr": "SMTP"
+                    }
+                },
+                {
+                    "id": "mailgun",
+                    "label": {
+                        "ko": "Mailgun",
+                        "en": "Mailgun",
+                        "fr": "Mailgun"
+                    }
+                },
+                {
+                    "id": "ses",
+                    "label": {
+                        "ko": "SES (Amazon)",
+                        "en": "SES (Amazon)",
+                        "fr": "SES (Amazon)"
+                    }
+                }
+            ]
+        },
+        "abilities": {
+            "can_update": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -86,9 +457,54 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.settings.save_validation_rules`, `core.search.engine_drivers`).
 
+**요청 예시**
+
+```http
+POST /api/admin/settings HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "_tab": "예시값",
+    "general": [
+        "예시값"
+    ],
+    "mail": [
+        "예시값"
+    ],
+    "upload": [
+        "예시값"
+    ],
+    "seo": [
+        "예시값"
+    ],
+    "security": [
+        "예시값"
+    ],
+    "drivers": [
+        "예시값"
+    ],
+    "advanced": [
+        "예시값"
+    ],
+    "notifications": [
+        "예시값"
+    ],
+    "identity": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -115,6 +531,15 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/settings/app-key HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -122,6 +547,22 @@ _단건 응답: `data` 객체의 필드._
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
 | --- | --- | --- | --- |
 | app_key | string | `base64:97gZH*************************…` | 현재 애플리케이션 키(`APP_KEY`)를 마스킹한 문자열. 앞부분 일부만 노출하고 나머지는 별표로 가려 전체 원문은 반환하지 않음 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "성공적으로 처리되었습니다.",
+    "data": {
+        "app_key": "{MASKED}"
+    }
+}
+```
 
 **에러 응답**
 
@@ -147,9 +588,22 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/backup HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -175,9 +629,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/backup-database HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -203,9 +670,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/clear-cache HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -231,9 +711,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/geoip/update HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -259,9 +752,34 @@ MaxMind GeoLite2-City DB 를 즉시 재다운로드합니다. GeoIpDatabaseServi
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/optimize-system HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "시스템이 성공적으로 최적화되었습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 
@@ -291,9 +809,27 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.settings.regenerate_app_key_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/regenerate-app-key HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "password": "Password123!"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -324,9 +860,27 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.settings.restore_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/restore HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "backup_path": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -352,6 +906,15 @@ _요청 파라미터 없음._
 **요청 파라미터**
 
 _요청 파라미터 없음._
+
+**요청 예시**
+
+```http
+GET /api/admin/settings/system-info HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -381,6 +944,86 @@ _단건 응답: `data` 객체의 필드._
 | database_config | object | `{"has_read_write_split":false,"write":{"host":"localhost"…` | DB 연결 구성 요약. has_read_write_split(읽기/쓰기 분리 여부)·write(쓰기 연결 정보)·read(읽기 replica 목록, write 와 동일하면 제외) |
 | timezone | string | `UTC` | 애플리케이션 기본 타임존 (`config('app.timezone')`) |
 | server_time | string | `2026-07-07 05:08:58` | 서버 현재 시각 (Y-m-d H:i:s) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "성공적으로 처리되었습니다.",
+    "data": {
+        "os_info": "Windows NT 10.0",
+        "web_server": "Apache/2.4.62 (Win64) OpenSSL/3.0.16 PHP/8.3.26",
+        "php_version": "8.3.26",
+        "mysql_version": "Mysql 8.4.3",
+        "g7_version": "7.0.1",
+        "g7_release_year": "2026",
+        "laravel_version": "12.54.1",
+        "environment": "local",
+        "cpu_info": "Intel(R) Core(TM) Ultra 5 225H",
+        "memory_usage": {
+            "total": "31.49 GB",
+            "used": "26.92 GB",
+            "free": "4.57 GB",
+            "percentage": 85.49
+        },
+        "disk_usage": {
+            "total": "474.72 GB",
+            "used": "362.59 GB",
+            "free": "112.12 GB",
+            "percentage": 76.38
+        },
+        "php_memory_limit": "512M",
+        "max_execution_time": "36000초",
+        "upload_max_filesize": "2G",
+        "install_path": "C:\\Users\\HeuJung\\htdocs\\g7_2",
+        "config_path": "C:\\Users\\HeuJung\\htdocs\\g7_2\\storage\\app/settings",
+        "log_path": "C:\\Users\\HeuJung\\htdocs\\g7_2\\storage\\logs",
+        "upload_path": "C:\\Users\\HeuJung\\htdocs\\g7_2\\storage\\app/public",
+        "php_extensions": {
+            "required": {
+                "openssl": true,
+                "pdo": true,
+                "mbstring": true,
+                "tokenizer": "{MASKED}",
+                "xml": true,
+                "curl": true,
+                "json": true,
+                "zip": true,
+                "fileinfo": true,
+                "bcmath": true
+            },
+            "optional": {
+                "gd": true,
+                "imagick": false,
+                "redis": true,
+                "memcached": false,
+                "sodium": true,
+                "exif": true,
+                "intl": true,
+                "ldap": false,
+                "zlib": true
+            }
+        },
+        "database_config": {
+            "has_read_write_split": false,
+            "write": {
+                "host": "localhost",
+                "port": 3306,
+                "database": "g7_2",
+                "username": "g7_2"
+            },
+            "read": []
+        },
+        "timezone": "UTC",
+        "server_time": "2026-07-08 03:14:54"
+    }
+}
+```
 
 **에러 응답**
 
@@ -429,9 +1072,46 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.settings.test_driver_connection_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/test-driver HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "storage_driver": "예시값",
+    "cache_driver": "예시값",
+    "session_driver": "예시값",
+    "queue_driver": "예시값",
+    "websocket_enabled": true,
+    "s3_bucket": "예시값",
+    "s3_region": "예시값",
+    "s3_access_key": "예시값",
+    "s3_secret_key": "예시값",
+    "s3_url": "https://example.com",
+    "redis_host": "예시값",
+    "redis_port": 1,
+    "redis_password": "Password123!",
+    "redis_database": 1,
+    "memcached_host": "예시값",
+    "memcached_port": 1,
+    "websocket_app_key": "예시값",
+    "websocket_host": "예시값",
+    "websocket_port": 1,
+    "websocket_scheme": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -476,9 +1156,41 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.settings.test_mail_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/settings/test-mail HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "to_email": "user@example.com",
+    "mailer": "smtp",
+    "from_address": "user@example.com",
+    "from_name": "예시 이름",
+    "host": "예시값",
+    "port": 1,
+    "username": "예시 이름",
+    "password": "Password123!",
+    "encryption": "tls",
+    "mailgun_domain": "예시값",
+    "mailgun_secret": "예시값",
+    "mailgun_endpoint": "예시값",
+    "ses_key": "예시값",
+    "ses_secret": "예시값",
+    "ses_region": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-500 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -507,9 +1219,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | key | path | string | 예 | — | 대상 설정/항목의 키 |
 
+**요청 예시**
+
+```http
+GET /api/admin/settings/{key} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -541,9 +1266,27 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.settings.update_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/settings/{key} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "value": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

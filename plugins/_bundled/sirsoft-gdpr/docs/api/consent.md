@@ -27,9 +27,22 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/plugins/sirsoft-gdpr/consent/cookie HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -50,6 +63,15 @@ _대표 에러 없음 (공개 조회). <!-- TODO: 도메인 특이 에러가 있
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/consent/cookie/status HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -61,6 +83,26 @@ _단건 응답: `data` 객체의 필드._
 | needs_renewal | boolean | `false` | 과거 동의 이력은 있으나 현재 정책 버전으로는 미동의인 상태(정책 갱신 후 재확인 필요). 동의 이력이 전혀 없는 신규 게스트는 `false`입니다 |
 | current_policy_version | string | `10` | 현재 발행된 최신 정책 버전 문자열(정책 버전 서비스 기준). 방문자 동의 버전과 비교해 배너 재노출 여부를 판단합니다 |
 | is_member | boolean | `true` | member 여부 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "has_consented": false,
+        "consents": [],
+        "needs_renewal": false,
+        "current_policy_version": "1",
+        "is_member": true
+    }
+}
+```
 
 **에러 응답**
 
@@ -81,9 +123,22 @@ _대표 에러 없음 (공개 조회). <!-- TODO: 도메인 특이 에러가 있
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/plugins/sirsoft-gdpr/consent/grant HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -106,6 +161,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/consent/history HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -113,6 +177,22 @@ _단건 응답: `data` 객체의 필드._
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
 | --- | --- | --- | --- |
 | histories | array | `[]` | 회원 본인의 동의 변경 이력 배열. 각 항목은 `consent_key`, `action`(granted/revoked), `source`, `policy_version`, `categories`, `created_at`로 구성되며 부여/철회 기록을 시간순으로 제공합니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "histories": []
+    }
+}
+```
 
 **에러 응답**
 
@@ -135,6 +215,15 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/consent/me HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -145,6 +234,94 @@ _단건 응답: `data` 객체의 필드._
 | needs_renewal | boolean | `false` | 회원의 활성 동의 중 옛 정책 버전인 항목이 있어 재동의가 필요한지 여부. 마이페이지가 「전체 다시 동의」 안내를 노출할지 판단합니다 |
 | current_policy_version | string | `10` | 현재 발행된 최신 정책 버전 문자열. 각 동의 항목의 `policy_version`과 비교해 항목별 갱신 필요 여부를 계산하는 기준입니다 |
 | consents | array | `[{"id":null,"consent_key":"cookie_necessary","consent_lab…` | 카탈로그의 모든 쿠키 카테고리와 회원 status를 합친 동의 매트릭스. 항목마다 다국어 라벨(`consent_label`), 필수 여부(`is_required`), 현재 동의 상태(`is_consented`), 철회/재동의 가능 여부(`can_revoke`/`can_grant`), 항목별 갱신 필요(`needs_renewal_this_item`)를 담아 한 화면에서 철회·재동의·신규 동의를 처리하게 합니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "user_id": 6,
+        "needs_renewal": false,
+        "current_policy_version": "1",
+        "consents": [
+            {
+                "id": null,
+                "consent_key": "cookie_necessary",
+                "consent_label": "필수 쿠키",
+                "consent_description": "세션·CSRF·로그인 토큰, 장바구니 식별자, 사용자가 가입 시 선택한 언어 설정, 쿠키 동의 기록 등 사이트 운영에 반드시 필요한 항목입니다. 비활성화할 수 없습니다.",
+                "consent_category": "necessary",
+                "is_required": true,
+                "is_consented": false,
+                "can_revoke": false,
+                "can_grant": false,
+                "needs_renewal_this_item": false,
+                "consented_at": null,
+                "revoked_at": null,
+                "consent_count": 0,
+                "policy_version": null,
+                "last_source": null
+            },
+            {
+                "id": null,
+                "consent_key": "cookie_functional",
+                "consent_label": "기능 쿠키",
+                "consent_description": "사용자 선호도(다크모드, 표시 통화 등)를 기억하는 쿠키입니다. 거부 시 매 방문마다 기본값으로 표시됩니다.",
+                "consent_category": "functional",
+                "is_required": false,
+                "is_consented": false,
+                "can_revoke": false,
+                "can_grant": true,
+                "needs_renewal_this_item": false,
+                "consented_at": null,
+                "revoked_at": null,
+                "consent_count": 0,
+                "policy_version": null,
+                "last_source": null
+            },
+            {
+                "id": null,
+                "consent_key": "cookie_analytics",
+                "consent_label": "분석 쿠키",
+                "consent_description": "방문자가 사이트를 어떻게 이용하는지 익명으로 측정해 더 나은 서비스를 만드는 데 사용됩니다. (예: Google Analytics, Hotjar)",
+                "consent_category": "analytics",
+                "is_required": false,
+                "is_consented": false,
+                "can_revoke": false,
+                "can_grant": true,
+                "needs_renewal_this_item": false,
+                "consented_at": null,
+                "revoked_at": null,
+                "consent_count": 0,
+                "policy_version": null,
+                "last_source": null
+            },
+            {
+                "id": null,
+                "consent_key": "cookie_marketing",
+                "consent_label": "마케팅 쿠키",
+                "consent_description": "관심사에 맞는 광고를 보여주거나, 광고가 얼마나 효과적이었는지 측정하는 데 사용됩니다. SNS 영상 임베드 등도 포함됩니다. (예: Facebook 픽셀, Google 광고, YouTube 영상)",
+                "consent_category": "marketing",
+                "is_required": false,
+                "is_consented": false,
+                "can_revoke": false,
+                "can_grant": true,
+                "needs_renewal_this_item": false,
+                "consented_at": null,
+                "revoked_at": null,
+                "consent_count": 0,
+                "policy_version": null,
+                "last_source": null
+            }
+        ]
+    }
+}
+```
 
 **에러 응답**
 
@@ -167,9 +344,38 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/plugins/sirsoft-gdpr/consent/renew-all HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| renewed | integer | `0` | 이번 호출로 현재 정책 버전으로 재동의 처리된 활성 선택형 동의 항목 수. 필수 쿠키와 이미 철회한 항목·이미 현재 버전인 항목은 제외되며, 프론트 toast 메시지의 `{renewed}` 보간값으로 사용됩니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "활성 항목 {renewed} 개를 새 정책 버전으로 갱신했습니다.",
+    "data": {
+        "renewed": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -192,9 +398,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/plugins/sirsoft-gdpr/consent/revoke HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

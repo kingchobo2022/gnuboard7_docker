@@ -85,19 +85,30 @@ class ResourceFieldDescriberTest extends TestCase
     {
         $describer = new ResourceFieldDescriber;
 
-        // 맥락 의존/도메인 특수 필드는 사전/패턴에 없어야 (TODO 로 폴백)
-        $this->assertNull($describer->describe('roles', 'array'));
-        // user/templates/modules/plugins/menus 는 맥락(객체 vs 목록)에 따라 의미가 갈려 제외
-        // (user 는 사용자 객체 vs 권한 그룹 객체로 다형적, updater 는 array 로 관계 객체 아님)
-        $this->assertNull($describer->describe('user', 'object'));
-        $this->assertNull($describer->describe('templates', 'array'));
-        // IDV/marketing 도메인 특이 필드는 제외
+        // IDV/marketing 도메인 특이 필드는 제외 (사전/패턴에 없어야 — TODO 로 폴백)
         $this->assertNull($describer->describe('purpose', 'string'));
         $this->assertNull($describer->describe('channels', 'array'));
         $this->assertNull($describer->describe('render_hint', 'string'));
-        // status/type/code/category 는 값 집합이 도메인마다 달라 제외 (역할은 있으나 도메인 종속)
-        $this->assertNull($describer->describe('status', 'string'));
+        // type/code/category 는 값 집합이 도메인마다 달라 제외 (역할은 있으나 도메인 종속)
         $this->assertNull($describer->describe('code', 'string'));
+        $this->assertNull($describer->describe('type', 'string'));
+        $this->assertNull($describer->describe('category', 'string'));
+    }
+
+    #[Test]
+    public function 쓰기_응답_공통_관계_실행이력_필드를_설명한다(): void
+    {
+        // 쓰기 메서드 실측 도입으로 응답에 자주 등장하는 공통 관계/실행이력/토큰 필드는
+        // 도메인 무관하게 역할이 고정되므로 설명한다(TODO 방치 금지).
+        $describer = new ResourceFieldDescriber;
+
+        $this->assertStringContainsString('역할', $describer->describe('roles', 'array'));
+        $this->assertStringContainsString('사용자', $describer->describe('user', 'object'));
+        $this->assertStringContainsString('토큰', $describer->describe('token', 'string'));
+        $this->assertStringContainsString('실행', $describer->describe('duration', 'integer'));
+        $this->assertStringContainsString('종료 코드', $describer->describe('exit_code', 'integer'));
+        // status 는 문자열/정수일 때 일반 설명(도메인 라벨은 status_label 참조)
+        $this->assertStringContainsString('상태 값', $describer->describe('status', 'string'));
     }
 
     #[Test]

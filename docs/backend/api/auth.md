@@ -27,9 +27,34 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/auth/logout HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "로그아웃이 성공했습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 
@@ -54,9 +79,76 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/auth/refresh HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| user | object | `{"uuid":"a234c2b1-cde8-437f-b28b-23323be2b98d","name":"AP…` | 대상 사용자 정보 객체 (uuid/name/email 등 — user 관계 파생) |
+| token | string | `75\|WgPUplvLGTv8YIj4507uIR6dEOHTXyNUed…` | 발급된 API 접근 토큰 평문 (Bearer 토큰으로 사용, 발급 시 1회만 노출) |
+| token_type | string | `Bearer` | 토큰 타입 (일반적으로 Bearer) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "성공적으로 처리되었습니다.",
+    "data": {
+        "user": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자",
+            "nickname": "song.hyunji",
+            "email": "apidoc-sample-user@example.com",
+            "avatar": null,
+            "language": "ko",
+            "language_label": "한국어",
+            "country": "KR",
+            "status": "active",
+            "status_label": "활성",
+            "status_variant": "success",
+            "is_admin": true,
+            "homepage": "https://example.com",
+            "mobile": "010-9595-2897",
+            "phone": "02-637-5618",
+            "zipcode": "16505",
+            "address": "경기도 안양시 봉은사로 2918",
+            "address_detail": "48동 718호",
+            "signature": "Fugit consequuntur repellendus sed.",
+            "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+            "last_login_at": "2026-07-07 10:41:24",
+            "email_verified_at": "2026-07-08 10:41:24",
+            "timezone": "Asia/Seoul",
+            "created_at": "2026-07-08 10:41:24",
+            "updated_at": "2026-07-08 10:41:24",
+            "is_owner": true,
+            "abilities": {
+                "can_read": true,
+                "can_create": true,
+                "can_update": true,
+                "can_delete": true,
+                "can_assign_roles": true
+            }
+        },
+        "token": "{MASKED}",
+        "token_type": "Bearer"
+    }
+}
+```
 
 **에러 응답**
 
@@ -80,6 +172,15 @@ _요청 파라미터 없음._
 **요청 파라미터**
 
 _요청 파라미터 없음._
+
+**요청 예시**
+
+```http
+GET /api/admin/auth/user HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -117,6 +218,1058 @@ _단건 응답: `data` 객체의 필드._
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_read":true,"can_create":true,"can_update":true,"can…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "성공적으로 처리되었습니다.",
+    "data": {
+        "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "name": "API 문서 샘플 사용자",
+        "nickname": "song.hyunji",
+        "email": "apidoc-sample-user@example.com",
+        "avatar": null,
+        "language": "ko",
+        "language_label": "한국어",
+        "country": "KR",
+        "status": "active",
+        "status_label": "활성",
+        "status_variant": "success",
+        "is_admin": true,
+        "homepage": "https://example.com",
+        "mobile": "010-9595-2897",
+        "phone": "02-637-5618",
+        "zipcode": "16505",
+        "address": "경기도 안양시 봉은사로 2918",
+        "address_detail": "48동 718호",
+        "signature": "Fugit consequuntur repellendus sed.",
+        "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+        "last_login_at": "2026-07-07 10:41:24",
+        "email_verified_at": "2026-07-08 10:41:24",
+        "timezone": "Asia/Seoul",
+        "roles": [
+            {
+                "id": 1,
+                "identifier": "admin",
+                "name": "관리자"
+            },
+            {
+                "id": 4,
+                "identifier": "apidoc-sample-role",
+                "name": "API 문서 샘플 역할"
+            }
+        ],
+        "permissions": [
+            {
+                "id": 5,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.posts.read",
+                "name": "게시글 조회 (관리자)"
+            },
+            {
+                "id": 6,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.posts.write",
+                "name": "게시글 작성/수정/삭제 (관리자)"
+            },
+            {
+                "id": 7,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.posts.read-secret",
+                "name": "비밀글 조회 (관리자)"
+            },
+            {
+                "id": 8,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.comments.read",
+                "name": "댓글 조회 (관리자)"
+            },
+            {
+                "id": 9,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.comments.write",
+                "name": "댓글 작성/수정/삭제 (관리자)"
+            },
+            {
+                "id": 10,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.attachments.upload",
+                "name": "파일 업로드/삭제 (관리자)"
+            },
+            {
+                "id": 11,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.attachments.download",
+                "name": "파일 다운로드 (관리자)"
+            },
+            {
+                "id": 12,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.manage",
+                "name": "게시판 관리 (관리자)"
+            },
+            {
+                "id": 13,
+                "identifier": "sirsoft-board.apidoc-sample-board.posts.read",
+                "name": "게시글 조회"
+            },
+            {
+                "id": 14,
+                "identifier": "sirsoft-board.apidoc-sample-board.posts.write",
+                "name": "게시글 작성/수정/삭제"
+            },
+            {
+                "id": 15,
+                "identifier": "sirsoft-board.apidoc-sample-board.posts.read-secret",
+                "name": "비밀글 조회"
+            },
+            {
+                "id": 16,
+                "identifier": "sirsoft-board.apidoc-sample-board.comments.read",
+                "name": "댓글 조회"
+            },
+            {
+                "id": 17,
+                "identifier": "sirsoft-board.apidoc-sample-board.comments.write",
+                "name": "댓글 작성/수정/삭제"
+            },
+            {
+                "id": 18,
+                "identifier": "sirsoft-board.apidoc-sample-board.attachments.upload",
+                "name": "파일 업로드/삭제"
+            },
+            {
+                "id": 19,
+                "identifier": "sirsoft-board.apidoc-sample-board.attachments.download",
+                "name": "파일 다운로드"
+            },
+            {
+                "id": 20,
+                "identifier": "sirsoft-board.apidoc-sample-board.manager",
+                "name": "게시판 관리 (사용자)"
+            },
+            {
+                "id": 81,
+                "identifier": "sirsoft-ecommerce.user-products.read",
+                "name": "상품 조회"
+            },
+            {
+                "id": 83,
+                "identifier": "sirsoft-ecommerce.user-orders.create",
+                "name": "주문하기"
+            },
+            {
+                "id": 84,
+                "identifier": "sirsoft-ecommerce.user-orders.cancel",
+                "name": "주문 취소"
+            },
+            {
+                "id": 85,
+                "identifier": "sirsoft-ecommerce.user-orders.confirm",
+                "name": "구매확정"
+            },
+            {
+                "id": 87,
+                "identifier": "sirsoft-ecommerce.user-reviews.write",
+                "name": "리뷰 작성"
+            },
+            {
+                "id": 23,
+                "identifier": "sirsoft-ecommerce.products.read",
+                "name": "상품 조회"
+            },
+            {
+                "id": 24,
+                "identifier": "sirsoft-ecommerce.products.create",
+                "name": "상품 생성"
+            },
+            {
+                "id": 25,
+                "identifier": "sirsoft-ecommerce.products.update",
+                "name": "상품 수정"
+            },
+            {
+                "id": 26,
+                "identifier": "sirsoft-ecommerce.products.delete",
+                "name": "상품 삭제"
+            },
+            {
+                "id": 28,
+                "identifier": "sirsoft-ecommerce.orders.read",
+                "name": "주문 조회"
+            },
+            {
+                "id": 29,
+                "identifier": "sirsoft-ecommerce.orders.update",
+                "name": "주문 수정"
+            },
+            {
+                "id": 31,
+                "identifier": "sirsoft-ecommerce.categories.read",
+                "name": "카테고리 조회"
+            },
+            {
+                "id": 32,
+                "identifier": "sirsoft-ecommerce.categories.create",
+                "name": "카테고리 생성"
+            },
+            {
+                "id": 33,
+                "identifier": "sirsoft-ecommerce.categories.update",
+                "name": "카테고리 수정"
+            },
+            {
+                "id": 34,
+                "identifier": "sirsoft-ecommerce.categories.delete",
+                "name": "카테고리 삭제"
+            },
+            {
+                "id": 36,
+                "identifier": "sirsoft-ecommerce.brands.read",
+                "name": "브랜드 조회"
+            },
+            {
+                "id": 37,
+                "identifier": "sirsoft-ecommerce.brands.create",
+                "name": "브랜드 생성"
+            },
+            {
+                "id": 38,
+                "identifier": "sirsoft-ecommerce.brands.update",
+                "name": "브랜드 수정"
+            },
+            {
+                "id": 39,
+                "identifier": "sirsoft-ecommerce.brands.delete",
+                "name": "브랜드 삭제"
+            },
+            {
+                "id": 41,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.read",
+                "name": "조회"
+            },
+            {
+                "id": 42,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.create",
+                "name": "생성"
+            },
+            {
+                "id": 43,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.update",
+                "name": "수정"
+            },
+            {
+                "id": 44,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.delete",
+                "name": "삭제"
+            },
+            {
+                "id": 46,
+                "identifier": "sirsoft-ecommerce.product-common-infos.read",
+                "name": "조회"
+            },
+            {
+                "id": 47,
+                "identifier": "sirsoft-ecommerce.product-common-infos.create",
+                "name": "생성"
+            },
+            {
+                "id": 48,
+                "identifier": "sirsoft-ecommerce.product-common-infos.update",
+                "name": "수정"
+            },
+            {
+                "id": 49,
+                "identifier": "sirsoft-ecommerce.product-common-infos.delete",
+                "name": "삭제"
+            },
+            {
+                "id": 51,
+                "identifier": "sirsoft-ecommerce.settings.read",
+                "name": "환경설정 조회"
+            },
+            {
+                "id": 52,
+                "identifier": "sirsoft-ecommerce.settings.update",
+                "name": "환경설정 수정"
+            },
+            {
+                "id": 54,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.read",
+                "name": "쿠폰 조회"
+            },
+            {
+                "id": 55,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.create",
+                "name": "쿠폰 생성"
+            },
+            {
+                "id": 56,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.update",
+                "name": "쿠폰 수정"
+            },
+            {
+                "id": 57,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.delete",
+                "name": "쿠폰 삭제"
+            },
+            {
+                "id": 59,
+                "identifier": "sirsoft-ecommerce.shipping-policies.read",
+                "name": "배송정책 조회"
+            },
+            {
+                "id": 60,
+                "identifier": "sirsoft-ecommerce.shipping-policies.create",
+                "name": "배송정책 생성"
+            },
+            {
+                "id": 61,
+                "identifier": "sirsoft-ecommerce.shipping-policies.update",
+                "name": "배송정책 수정"
+            },
+            {
+                "id": 62,
+                "identifier": "sirsoft-ecommerce.shipping-policies.delete",
+                "name": "배송정책 삭제"
+            },
+            {
+                "id": 64,
+                "identifier": "sirsoft-ecommerce.product-labels.read",
+                "name": "상품 라벨 조회"
+            },
+            {
+                "id": 65,
+                "identifier": "sirsoft-ecommerce.product-labels.create",
+                "name": "상품 라벨 생성"
+            },
+            {
+                "id": 66,
+                "identifier": "sirsoft-ecommerce.product-labels.update",
+                "name": "상품 라벨 수정"
+            },
+            {
+                "id": 67,
+                "identifier": "sirsoft-ecommerce.product-labels.delete",
+                "name": "상품 라벨 삭제"
+            },
+            {
+                "id": 69,
+                "identifier": "sirsoft-ecommerce.identity.policies.read",
+                "name": "본인인증 정책 조회"
+            },
+            {
+                "id": 70,
+                "identifier": "sirsoft-ecommerce.identity.policies.update",
+                "name": "본인인증 정책 수정"
+            },
+            {
+                "id": 72,
+                "identifier": "sirsoft-ecommerce.reviews.read",
+                "name": "리뷰 조회"
+            },
+            {
+                "id": 73,
+                "identifier": "sirsoft-ecommerce.reviews.update",
+                "name": "리뷰 처리"
+            },
+            {
+                "id": 74,
+                "identifier": "sirsoft-ecommerce.reviews.delete",
+                "name": "리뷰 삭제"
+            },
+            {
+                "id": 76,
+                "identifier": "sirsoft-ecommerce.inquiries.update",
+                "name": "문의 처리"
+            },
+            {
+                "id": 77,
+                "identifier": "sirsoft-ecommerce.inquiries.delete",
+                "name": "문의 삭제"
+            },
+            {
+                "id": 79,
+                "identifier": "sirsoft-ecommerce.dashboard.view",
+                "name": "대시보드 조회"
+            },
+            {
+                "id": 89,
+                "identifier": "sirsoft-ecommerce.mileage.read",
+                "name": "마일리지 내역 조회"
+            },
+            {
+                "id": 90,
+                "identifier": "sirsoft-ecommerce.mileage.manage",
+                "name": "마일리지 수동 처리"
+            },
+            {
+                "id": 92,
+                "identifier": "sirsoft-ecommerce.user-currency.manage",
+                "name": "회원 결제 통화 변경"
+            },
+            {
+                "id": 94,
+                "identifier": "sirsoft-ecommerce.user-shipping-country.manage",
+                "name": "회원 배송국가 변경"
+            },
+            {
+                "id": 96,
+                "identifier": "sirsoft-board.boards.read",
+                "name": "게시판 조회"
+            },
+            {
+                "id": 97,
+                "identifier": "sirsoft-board.boards.create",
+                "name": "게시판 생성"
+            },
+            {
+                "id": 98,
+                "identifier": "sirsoft-board.boards.update",
+                "name": "게시판 수정"
+            },
+            {
+                "id": 99,
+                "identifier": "sirsoft-board.boards.delete",
+                "name": "게시판 삭제"
+            },
+            {
+                "id": 101,
+                "identifier": "sirsoft-board.settings.read",
+                "name": "환경설정 조회"
+            },
+            {
+                "id": 102,
+                "identifier": "sirsoft-board.settings.update",
+                "name": "환경설정 수정"
+            },
+            {
+                "id": 104,
+                "identifier": "sirsoft-board.identity.policies.read",
+                "name": "본인인증 정책 조회"
+            },
+            {
+                "id": 105,
+                "identifier": "sirsoft-board.identity.policies.update",
+                "name": "본인인증 정책 수정"
+            },
+            {
+                "id": 107,
+                "identifier": "sirsoft-board.reports.view",
+                "name": "신고 조회"
+            },
+            {
+                "id": 108,
+                "identifier": "sirsoft-board.reports.manage",
+                "name": "신고 처리"
+            },
+            {
+                "id": 111,
+                "identifier": "sirsoft-page.pages.read",
+                "name": "페이지 조회"
+            },
+            {
+                "id": 112,
+                "identifier": "sirsoft-page.pages.create",
+                "name": "페이지 생성"
+            },
+            {
+                "id": 113,
+                "identifier": "sirsoft-page.pages.update",
+                "name": "페이지 수정"
+            },
+            {
+                "id": 114,
+                "identifier": "sirsoft-page.pages.delete",
+                "name": "페이지 삭제"
+            },
+            {
+                "id": 117,
+                "identifier": "core.users.read",
+                "name": "사용자 조회"
+            },
+            {
+                "id": 118,
+                "identifier": "core.users.create",
+                "name": "사용자 생성"
+            },
+            {
+                "id": 119,
+                "identifier": "core.users.update",
+                "name": "사용자 수정"
+            },
+            {
+                "id": 120,
+                "identifier": "core.users.delete",
+                "name": "사용자 삭제"
+            },
+            {
+                "id": 122,
+                "identifier": "core.menus.read",
+                "name": "메뉴 조회"
+            },
+            {
+                "id": 123,
+                "identifier": "core.menus.create",
+                "name": "메뉴 생성"
+            },
+            {
+                "id": 124,
+                "identifier": "core.menus.update",
+                "name": "메뉴 수정"
+            },
+            {
+                "id": 125,
+                "identifier": "core.menus.delete",
+                "name": "메뉴 삭제"
+            },
+            {
+                "id": 127,
+                "identifier": "core.modules.read",
+                "name": "모듈 조회"
+            },
+            {
+                "id": 128,
+                "identifier": "core.modules.install",
+                "name": "모듈 설치"
+            },
+            {
+                "id": 129,
+                "identifier": "core.modules.activate",
+                "name": "모듈 활성화"
+            },
+            {
+                "id": 130,
+                "identifier": "core.modules.uninstall",
+                "name": "모듈 삭제"
+            },
+            {
+                "id": 132,
+                "identifier": "core.plugins.read",
+                "name": "플러그인 조회"
+            },
+            {
+                "id": 133,
+                "identifier": "core.plugins.install",
+                "name": "플러그인 설치"
+            },
+            {
+                "id": 134,
+                "identifier": "core.plugins.activate",
+                "name": "플러그인 활성화"
+            },
+            {
+                "id": 135,
+                "identifier": "core.plugins.update",
+                "name": "플러그인 설정"
+            },
+            {
+                "id": 136,
+                "identifier": "core.plugins.uninstall",
+                "name": "플러그인 삭제"
+            },
+            {
+                "id": 138,
+                "identifier": "core.templates.read",
+                "name": "템플릿 조회"
+            },
+            {
+                "id": 139,
+                "identifier": "core.templates.install",
+                "name": "템플릿 설치"
+            },
+            {
+                "id": 140,
+                "identifier": "core.templates.activate",
+                "name": "템플릿 활성화"
+            },
+            {
+                "id": 141,
+                "identifier": "core.templates.uninstall",
+                "name": "템플릿 삭제"
+            },
+            {
+                "id": 142,
+                "identifier": "core.templates.layouts.edit",
+                "name": "레이아웃 편집"
+            },
+            {
+                "id": 144,
+                "identifier": "core.permissions.read",
+                "name": "권한 조회"
+            },
+            {
+                "id": 145,
+                "identifier": "core.permissions.create",
+                "name": "역할 생성"
+            },
+            {
+                "id": 146,
+                "identifier": "core.permissions.update",
+                "name": "역할 수정"
+            },
+            {
+                "id": 147,
+                "identifier": "core.permissions.delete",
+                "name": "역할 삭제"
+            },
+            {
+                "id": 149,
+                "identifier": "core.notification-logs.read",
+                "name": "발송 이력 조회"
+            },
+            {
+                "id": 150,
+                "identifier": "core.notification-logs.delete",
+                "name": "발송 이력 삭제"
+            },
+            {
+                "id": 152,
+                "identifier": "core.notifications.read",
+                "name": "알림 조회"
+            },
+            {
+                "id": 153,
+                "identifier": "core.notifications.update",
+                "name": "알림 읽음 처리"
+            },
+            {
+                "id": 154,
+                "identifier": "core.notifications.delete",
+                "name": "알림 삭제"
+            },
+            {
+                "id": 156,
+                "identifier": "core.user-notifications.read",
+                "name": "알림 조회"
+            },
+            {
+                "id": 157,
+                "identifier": "core.user-notifications.update",
+                "name": "알림 읽음 처리"
+            },
+            {
+                "id": 158,
+                "identifier": "core.user-notifications.delete",
+                "name": "알림 삭제"
+            },
+            {
+                "id": 160,
+                "identifier": "core.identity.request",
+                "name": "IDV 요청"
+            },
+            {
+                "id": 161,
+                "identifier": "core.identity.verify",
+                "name": "IDV 검증"
+            },
+            {
+                "id": 162,
+                "identifier": "core.identity.cancel",
+                "name": "IDV 취소"
+            },
+            {
+                "id": 164,
+                "identifier": "core.admin.identity.providers.read",
+                "name": "프로바이더 설정 조회"
+            },
+            {
+                "id": 165,
+                "identifier": "core.admin.identity.providers.update",
+                "name": "프로바이더 설정 수정"
+            },
+            {
+                "id": 166,
+                "identifier": "core.admin.identity.policies.read",
+                "name": "정책 조회"
+            },
+            {
+                "id": 167,
+                "identifier": "core.admin.identity.policies.update",
+                "name": "정책 수정"
+            },
+            {
+                "id": 168,
+                "identifier": "core.admin.identity.logs.read",
+                "name": "로그 열람"
+            },
+            {
+                "id": 169,
+                "identifier": "core.admin.identity.logs.purge",
+                "name": "로그 파기"
+            },
+            {
+                "id": 170,
+                "identifier": "core.admin.identity.messages.read",
+                "name": "메시지 템플릿 조회"
+            },
+            {
+                "id": 171,
+                "identifier": "core.admin.identity.messages.update",
+                "name": "메시지 템플릿 수정"
+            },
+            {
+                "id": 173,
+                "identifier": "core.settings.read",
+                "name": "설정 조회"
+            },
+            {
+                "id": 174,
+                "identifier": "core.settings.update",
+                "name": "설정 수정"
+            },
+            {
+                "id": 176,
+                "identifier": "core.dashboard.read",
+                "name": "대시보드 조회"
+            },
+            {
+                "id": 177,
+                "identifier": "core.dashboard.system-status",
+                "name": "시스템 상태"
+            },
+            {
+                "id": 178,
+                "identifier": "core.dashboard.resources",
+                "name": "시스템 리소스"
+            },
+            {
+                "id": 179,
+                "identifier": "core.dashboard.activities",
+                "name": "최근 활동"
+            },
+            {
+                "id": 180,
+                "identifier": "core.dashboard.alerts",
+                "name": "시스템 알림"
+            },
+            {
+                "id": 182,
+                "identifier": "core.activities.read",
+                "name": "활동 로그 조회"
+            },
+            {
+                "id": 183,
+                "identifier": "core.activities.delete",
+                "name": "활동 로그 삭제"
+            },
+            {
+                "id": 185,
+                "identifier": "core.attachments.create",
+                "name": "첨부파일 업로드"
+            },
+            {
+                "id": 186,
+                "identifier": "core.attachments.update",
+                "name": "첨부파일 수정"
+            },
+            {
+                "id": 187,
+                "identifier": "core.attachments.delete",
+                "name": "첨부파일 삭제"
+            },
+            {
+                "id": 189,
+                "identifier": "core.schedules.read",
+                "name": "스케줄 조회"
+            },
+            {
+                "id": 190,
+                "identifier": "core.schedules.create",
+                "name": "스케줄 생성"
+            },
+            {
+                "id": 191,
+                "identifier": "core.schedules.update",
+                "name": "스케줄 수정"
+            },
+            {
+                "id": 192,
+                "identifier": "core.schedules.delete",
+                "name": "스케줄 삭제"
+            },
+            {
+                "id": 193,
+                "identifier": "core.schedules.run",
+                "name": "스케줄 실행"
+            },
+            {
+                "id": 195,
+                "identifier": "core.language_packs.read",
+                "name": "언어팩 조회"
+            },
+            {
+                "id": 196,
+                "identifier": "core.language_packs.install",
+                "name": "언어팩 설치"
+            },
+            {
+                "id": 197,
+                "identifier": "core.language_packs.manage",
+                "name": "언어팩 관리"
+            },
+            {
+                "id": 198,
+                "identifier": "core.language_packs.update",
+                "name": "언어팩 업데이트"
+            },
+            {
+                "id": 1,
+                "identifier": "apidoc-sample.parent",
+                "name": "API 문서 샘플 권한"
+            },
+            {
+                "id": 2,
+                "identifier": "apidoc-sample.child",
+                "name": "하위 권한"
+            },
+            {
+                "id": 3,
+                "identifier": "sirsoft-board",
+                "name": "게시판"
+            },
+            {
+                "id": 21,
+                "identifier": "sirsoft-ecommerce",
+                "name": "이커머스"
+            },
+            {
+                "id": 109,
+                "identifier": "sirsoft-page",
+                "name": "페이지"
+            },
+            {
+                "id": 4,
+                "identifier": "sirsoft-board.apidoc-sample-board",
+                "name": "API 문서 샘플 게시판 게시판"
+            },
+            {
+                "id": 95,
+                "identifier": "sirsoft-board.boards",
+                "name": "게시판 관리"
+            },
+            {
+                "id": 100,
+                "identifier": "sirsoft-board.settings",
+                "name": "환경설정"
+            },
+            {
+                "id": 103,
+                "identifier": "sirsoft-board.identity.policies",
+                "name": "게시판 본인인증 정책"
+            },
+            {
+                "id": 106,
+                "identifier": "sirsoft-board.reports",
+                "name": "게시판 신고 관리"
+            },
+            {
+                "id": 22,
+                "identifier": "sirsoft-ecommerce.products",
+                "name": "상품 관리"
+            },
+            {
+                "id": 27,
+                "identifier": "sirsoft-ecommerce.orders",
+                "name": "주문 관리"
+            },
+            {
+                "id": 30,
+                "identifier": "sirsoft-ecommerce.categories",
+                "name": "카테고리 관리"
+            },
+            {
+                "id": 35,
+                "identifier": "sirsoft-ecommerce.brands",
+                "name": "브랜드 관리"
+            },
+            {
+                "id": 40,
+                "identifier": "sirsoft-ecommerce.product-notice-templates",
+                "name": "상품정보제공고시 관리"
+            },
+            {
+                "id": 45,
+                "identifier": "sirsoft-ecommerce.product-common-infos",
+                "name": "공통정보 관리"
+            },
+            {
+                "id": 50,
+                "identifier": "sirsoft-ecommerce.settings",
+                "name": "환경설정"
+            },
+            {
+                "id": 53,
+                "identifier": "sirsoft-ecommerce.promotion-coupon",
+                "name": "쿠폰 관리"
+            },
+            {
+                "id": 58,
+                "identifier": "sirsoft-ecommerce.shipping-policies",
+                "name": "배송정책 관리"
+            },
+            {
+                "id": 63,
+                "identifier": "sirsoft-ecommerce.product-labels",
+                "name": "상품 라벨 관리"
+            },
+            {
+                "id": 68,
+                "identifier": "sirsoft-ecommerce.identity.policies",
+                "name": "이커머스 본인인증 정책"
+            },
+            {
+                "id": 71,
+                "identifier": "sirsoft-ecommerce.reviews",
+                "name": "리뷰 관리"
+            },
+            {
+                "id": 75,
+                "identifier": "sirsoft-ecommerce.inquiries",
+                "name": "문의 관리"
+            },
+            {
+                "id": 78,
+                "identifier": "sirsoft-ecommerce.dashboard",
+                "name": "대시보드"
+            },
+            {
+                "id": 80,
+                "identifier": "sirsoft-ecommerce.user-products",
+                "name": "사용자 상품"
+            },
+            {
+                "id": 82,
+                "identifier": "sirsoft-ecommerce.user-orders",
+                "name": "사용자 주문"
+            },
+            {
+                "id": 86,
+                "identifier": "sirsoft-ecommerce.user-reviews",
+                "name": "사용자 리뷰"
+            },
+            {
+                "id": 88,
+                "identifier": "sirsoft-ecommerce.mileage",
+                "name": "마일리지 관리"
+            },
+            {
+                "id": 91,
+                "identifier": "sirsoft-ecommerce.user-currency",
+                "name": "회원 결제 통화 관리"
+            },
+            {
+                "id": 93,
+                "identifier": "sirsoft-ecommerce.user-shipping-country",
+                "name": "회원 배송국가 관리"
+            },
+            {
+                "id": 110,
+                "identifier": "sirsoft-page.pages",
+                "name": "페이지 관리"
+            },
+            {
+                "id": 115,
+                "identifier": "core",
+                "name": "코어"
+            },
+            {
+                "id": 116,
+                "identifier": "core.users",
+                "name": "사용자 관리"
+            },
+            {
+                "id": 121,
+                "identifier": "core.menus",
+                "name": "메뉴 관리"
+            },
+            {
+                "id": 126,
+                "identifier": "core.modules",
+                "name": "모듈 관리"
+            },
+            {
+                "id": 131,
+                "identifier": "core.plugins",
+                "name": "플러그인 관리"
+            },
+            {
+                "id": 137,
+                "identifier": "core.templates",
+                "name": "템플릿 관리"
+            },
+            {
+                "id": 143,
+                "identifier": "core.permissions",
+                "name": "권한 관리"
+            },
+            {
+                "id": 148,
+                "identifier": "core.notification-logs",
+                "name": "알림 발송 이력"
+            },
+            {
+                "id": 151,
+                "identifier": "core.notifications",
+                "name": "알림 (관리자)"
+            },
+            {
+                "id": 155,
+                "identifier": "core.user-notifications",
+                "name": "알림 (사용자)"
+            },
+            {
+                "id": 159,
+                "identifier": "core.identity",
+                "name": "본인인증 (사용자)"
+            },
+            {
+                "id": 163,
+                "identifier": "core.admin.identity",
+                "name": "본인인증 관리 (관리자)"
+            },
+            {
+                "id": 172,
+                "identifier": "core.settings",
+                "name": "환경설정"
+            },
+            {
+                "id": 175,
+                "identifier": "core.dashboard",
+                "name": "대시보드"
+            },
+            {
+                "id": 181,
+                "identifier": "core.activities",
+                "name": "활동 로그"
+            },
+            {
+                "id": 184,
+                "identifier": "core.attachments",
+                "name": "첨부파일 관리"
+            },
+            {
+                "id": 188,
+                "identifier": "core.schedules",
+                "name": "스케줄 관리"
+            },
+            {
+                "id": 194,
+                "identifier": "core.language_packs",
+                "name": "언어팩 관리"
+            }
+        ],
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 10:41:24",
+        "is_owner": true,
+        "abilities": {
+            "can_read": true,
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_assign_roles": true
+        }
+    }
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -147,9 +1300,27 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.login_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/auth/admin/login HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "Password123!"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-500 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -179,9 +1350,27 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.forgot_password_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/auth/forgot-password HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "redirect_prefix": "admin"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -211,9 +1400,27 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.login_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/auth/login HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "Password123!"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-500 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -238,9 +1445,34 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/auth/logout HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "로그아웃이 성공했습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 
@@ -281,9 +1513,34 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.register_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/auth/register HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "nickname": "예시 이름",
+    "email": "user@example.com",
+    "password": "Password123!",
+    "language": "ko",
+    "agree_terms": "예시값",
+    "agree_privacy": "예시값",
+    "preferred_currency": "예시값",
+    "preferred_shipping_country": "KR"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -314,9 +1571,28 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.reset_password_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/auth/reset-password HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Content-Type: application/json
+
+{
+    "token": "{YOUR_TOKEN}",
+    "email": "user@example.com",
+    "password": "Password123!"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -340,6 +1616,15 @@ _요청 파라미터 없음._
 **요청 파라미터**
 
 _요청 파라미터 없음._
+
+**요청 예시**
+
+```http
+GET /api/auth/user HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -416,6 +1701,1077 @@ _단건 응답: `data` 객체의 필드._
 | ecommerce_preferred_shipping_country | null | `null` | 선호 배송 국가 코드 (ecommerce 모듈 주입, 미설정 시 null) |
 | ecommerce_preferred_shipping_country_name | null | `null` | 선호 배송 국가 이름 (국가 코드에서 현지화 파생 — ecommerce 모듈 주입, 미설정 시 null) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "성공적으로 처리되었습니다.",
+    "data": {
+        "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "name": "API 문서 샘플 사용자",
+        "nickname": "song.hyunji",
+        "email": "apidoc-sample-user@example.com",
+        "avatar": null,
+        "language": "ko",
+        "language_label": "한국어",
+        "country": "KR",
+        "status": "active",
+        "status_label": "활성",
+        "status_variant": "success",
+        "is_admin": true,
+        "homepage": "https://example.com",
+        "mobile": "010-9595-2897",
+        "phone": "02-637-5618",
+        "zipcode": "16505",
+        "address": "경기도 안양시 봉은사로 2918",
+        "address_detail": "48동 718호",
+        "signature": "Fugit consequuntur repellendus sed.",
+        "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+        "last_login_at": "2026-07-07 10:41:24",
+        "email_verified_at": "2026-07-08 10:41:24",
+        "timezone": "Asia/Seoul",
+        "modules_count": [],
+        "plugins_count": [],
+        "menus_count": [],
+        "modules": [],
+        "plugins": [],
+        "menus": [],
+        "roles": [
+            {
+                "id": 1,
+                "identifier": "admin",
+                "name": "관리자"
+            },
+            {
+                "id": 4,
+                "identifier": "apidoc-sample-role",
+                "name": "API 문서 샘플 역할"
+            }
+        ],
+        "permissions": [
+            {
+                "id": 5,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.posts.read",
+                "name": "게시글 조회 (관리자)"
+            },
+            {
+                "id": 6,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.posts.write",
+                "name": "게시글 작성/수정/삭제 (관리자)"
+            },
+            {
+                "id": 7,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.posts.read-secret",
+                "name": "비밀글 조회 (관리자)"
+            },
+            {
+                "id": 8,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.comments.read",
+                "name": "댓글 조회 (관리자)"
+            },
+            {
+                "id": 9,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.comments.write",
+                "name": "댓글 작성/수정/삭제 (관리자)"
+            },
+            {
+                "id": 10,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.attachments.upload",
+                "name": "파일 업로드/삭제 (관리자)"
+            },
+            {
+                "id": 11,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.attachments.download",
+                "name": "파일 다운로드 (관리자)"
+            },
+            {
+                "id": 12,
+                "identifier": "sirsoft-board.apidoc-sample-board.admin.manage",
+                "name": "게시판 관리 (관리자)"
+            },
+            {
+                "id": 13,
+                "identifier": "sirsoft-board.apidoc-sample-board.posts.read",
+                "name": "게시글 조회"
+            },
+            {
+                "id": 14,
+                "identifier": "sirsoft-board.apidoc-sample-board.posts.write",
+                "name": "게시글 작성/수정/삭제"
+            },
+            {
+                "id": 15,
+                "identifier": "sirsoft-board.apidoc-sample-board.posts.read-secret",
+                "name": "비밀글 조회"
+            },
+            {
+                "id": 16,
+                "identifier": "sirsoft-board.apidoc-sample-board.comments.read",
+                "name": "댓글 조회"
+            },
+            {
+                "id": 17,
+                "identifier": "sirsoft-board.apidoc-sample-board.comments.write",
+                "name": "댓글 작성/수정/삭제"
+            },
+            {
+                "id": 18,
+                "identifier": "sirsoft-board.apidoc-sample-board.attachments.upload",
+                "name": "파일 업로드/삭제"
+            },
+            {
+                "id": 19,
+                "identifier": "sirsoft-board.apidoc-sample-board.attachments.download",
+                "name": "파일 다운로드"
+            },
+            {
+                "id": 20,
+                "identifier": "sirsoft-board.apidoc-sample-board.manager",
+                "name": "게시판 관리 (사용자)"
+            },
+            {
+                "id": 81,
+                "identifier": "sirsoft-ecommerce.user-products.read",
+                "name": "상품 조회"
+            },
+            {
+                "id": 83,
+                "identifier": "sirsoft-ecommerce.user-orders.create",
+                "name": "주문하기"
+            },
+            {
+                "id": 84,
+                "identifier": "sirsoft-ecommerce.user-orders.cancel",
+                "name": "주문 취소"
+            },
+            {
+                "id": 85,
+                "identifier": "sirsoft-ecommerce.user-orders.confirm",
+                "name": "구매확정"
+            },
+            {
+                "id": 87,
+                "identifier": "sirsoft-ecommerce.user-reviews.write",
+                "name": "리뷰 작성"
+            },
+            {
+                "id": 23,
+                "identifier": "sirsoft-ecommerce.products.read",
+                "name": "상품 조회"
+            },
+            {
+                "id": 24,
+                "identifier": "sirsoft-ecommerce.products.create",
+                "name": "상품 생성"
+            },
+            {
+                "id": 25,
+                "identifier": "sirsoft-ecommerce.products.update",
+                "name": "상품 수정"
+            },
+            {
+                "id": 26,
+                "identifier": "sirsoft-ecommerce.products.delete",
+                "name": "상품 삭제"
+            },
+            {
+                "id": 28,
+                "identifier": "sirsoft-ecommerce.orders.read",
+                "name": "주문 조회"
+            },
+            {
+                "id": 29,
+                "identifier": "sirsoft-ecommerce.orders.update",
+                "name": "주문 수정"
+            },
+            {
+                "id": 31,
+                "identifier": "sirsoft-ecommerce.categories.read",
+                "name": "카테고리 조회"
+            },
+            {
+                "id": 32,
+                "identifier": "sirsoft-ecommerce.categories.create",
+                "name": "카테고리 생성"
+            },
+            {
+                "id": 33,
+                "identifier": "sirsoft-ecommerce.categories.update",
+                "name": "카테고리 수정"
+            },
+            {
+                "id": 34,
+                "identifier": "sirsoft-ecommerce.categories.delete",
+                "name": "카테고리 삭제"
+            },
+            {
+                "id": 36,
+                "identifier": "sirsoft-ecommerce.brands.read",
+                "name": "브랜드 조회"
+            },
+            {
+                "id": 37,
+                "identifier": "sirsoft-ecommerce.brands.create",
+                "name": "브랜드 생성"
+            },
+            {
+                "id": 38,
+                "identifier": "sirsoft-ecommerce.brands.update",
+                "name": "브랜드 수정"
+            },
+            {
+                "id": 39,
+                "identifier": "sirsoft-ecommerce.brands.delete",
+                "name": "브랜드 삭제"
+            },
+            {
+                "id": 41,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.read",
+                "name": "조회"
+            },
+            {
+                "id": 42,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.create",
+                "name": "생성"
+            },
+            {
+                "id": 43,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.update",
+                "name": "수정"
+            },
+            {
+                "id": 44,
+                "identifier": "sirsoft-ecommerce.product-notice-templates.delete",
+                "name": "삭제"
+            },
+            {
+                "id": 46,
+                "identifier": "sirsoft-ecommerce.product-common-infos.read",
+                "name": "조회"
+            },
+            {
+                "id": 47,
+                "identifier": "sirsoft-ecommerce.product-common-infos.create",
+                "name": "생성"
+            },
+            {
+                "id": 48,
+                "identifier": "sirsoft-ecommerce.product-common-infos.update",
+                "name": "수정"
+            },
+            {
+                "id": 49,
+                "identifier": "sirsoft-ecommerce.product-common-infos.delete",
+                "name": "삭제"
+            },
+            {
+                "id": 51,
+                "identifier": "sirsoft-ecommerce.settings.read",
+                "name": "환경설정 조회"
+            },
+            {
+                "id": 52,
+                "identifier": "sirsoft-ecommerce.settings.update",
+                "name": "환경설정 수정"
+            },
+            {
+                "id": 54,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.read",
+                "name": "쿠폰 조회"
+            },
+            {
+                "id": 55,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.create",
+                "name": "쿠폰 생성"
+            },
+            {
+                "id": 56,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.update",
+                "name": "쿠폰 수정"
+            },
+            {
+                "id": 57,
+                "identifier": "sirsoft-ecommerce.promotion-coupon.delete",
+                "name": "쿠폰 삭제"
+            },
+            {
+                "id": 59,
+                "identifier": "sirsoft-ecommerce.shipping-policies.read",
+                "name": "배송정책 조회"
+            },
+            {
+                "id": 60,
+                "identifier": "sirsoft-ecommerce.shipping-policies.create",
+                "name": "배송정책 생성"
+            },
+            {
+                "id": 61,
+                "identifier": "sirsoft-ecommerce.shipping-policies.update",
+                "name": "배송정책 수정"
+            },
+            {
+                "id": 62,
+                "identifier": "sirsoft-ecommerce.shipping-policies.delete",
+                "name": "배송정책 삭제"
+            },
+            {
+                "id": 64,
+                "identifier": "sirsoft-ecommerce.product-labels.read",
+                "name": "상품 라벨 조회"
+            },
+            {
+                "id": 65,
+                "identifier": "sirsoft-ecommerce.product-labels.create",
+                "name": "상품 라벨 생성"
+            },
+            {
+                "id": 66,
+                "identifier": "sirsoft-ecommerce.product-labels.update",
+                "name": "상품 라벨 수정"
+            },
+            {
+                "id": 67,
+                "identifier": "sirsoft-ecommerce.product-labels.delete",
+                "name": "상품 라벨 삭제"
+            },
+            {
+                "id": 69,
+                "identifier": "sirsoft-ecommerce.identity.policies.read",
+                "name": "본인인증 정책 조회"
+            },
+            {
+                "id": 70,
+                "identifier": "sirsoft-ecommerce.identity.policies.update",
+                "name": "본인인증 정책 수정"
+            },
+            {
+                "id": 72,
+                "identifier": "sirsoft-ecommerce.reviews.read",
+                "name": "리뷰 조회"
+            },
+            {
+                "id": 73,
+                "identifier": "sirsoft-ecommerce.reviews.update",
+                "name": "리뷰 처리"
+            },
+            {
+                "id": 74,
+                "identifier": "sirsoft-ecommerce.reviews.delete",
+                "name": "리뷰 삭제"
+            },
+            {
+                "id": 76,
+                "identifier": "sirsoft-ecommerce.inquiries.update",
+                "name": "문의 처리"
+            },
+            {
+                "id": 77,
+                "identifier": "sirsoft-ecommerce.inquiries.delete",
+                "name": "문의 삭제"
+            },
+            {
+                "id": 79,
+                "identifier": "sirsoft-ecommerce.dashboard.view",
+                "name": "대시보드 조회"
+            },
+            {
+                "id": 89,
+                "identifier": "sirsoft-ecommerce.mileage.read",
+                "name": "마일리지 내역 조회"
+            },
+            {
+                "id": 90,
+                "identifier": "sirsoft-ecommerce.mileage.manage",
+                "name": "마일리지 수동 처리"
+            },
+            {
+                "id": 92,
+                "identifier": "sirsoft-ecommerce.user-currency.manage",
+                "name": "회원 결제 통화 변경"
+            },
+            {
+                "id": 94,
+                "identifier": "sirsoft-ecommerce.user-shipping-country.manage",
+                "name": "회원 배송국가 변경"
+            },
+            {
+                "id": 96,
+                "identifier": "sirsoft-board.boards.read",
+                "name": "게시판 조회"
+            },
+            {
+                "id": 97,
+                "identifier": "sirsoft-board.boards.create",
+                "name": "게시판 생성"
+            },
+            {
+                "id": 98,
+                "identifier": "sirsoft-board.boards.update",
+                "name": "게시판 수정"
+            },
+            {
+                "id": 99,
+                "identifier": "sirsoft-board.boards.delete",
+                "name": "게시판 삭제"
+            },
+            {
+                "id": 101,
+                "identifier": "sirsoft-board.settings.read",
+                "name": "환경설정 조회"
+            },
+            {
+                "id": 102,
+                "identifier": "sirsoft-board.settings.update",
+                "name": "환경설정 수정"
+            },
+            {
+                "id": 104,
+                "identifier": "sirsoft-board.identity.policies.read",
+                "name": "본인인증 정책 조회"
+            },
+            {
+                "id": 105,
+                "identifier": "sirsoft-board.identity.policies.update",
+                "name": "본인인증 정책 수정"
+            },
+            {
+                "id": 107,
+                "identifier": "sirsoft-board.reports.view",
+                "name": "신고 조회"
+            },
+            {
+                "id": 108,
+                "identifier": "sirsoft-board.reports.manage",
+                "name": "신고 처리"
+            },
+            {
+                "id": 111,
+                "identifier": "sirsoft-page.pages.read",
+                "name": "페이지 조회"
+            },
+            {
+                "id": 112,
+                "identifier": "sirsoft-page.pages.create",
+                "name": "페이지 생성"
+            },
+            {
+                "id": 113,
+                "identifier": "sirsoft-page.pages.update",
+                "name": "페이지 수정"
+            },
+            {
+                "id": 114,
+                "identifier": "sirsoft-page.pages.delete",
+                "name": "페이지 삭제"
+            },
+            {
+                "id": 117,
+                "identifier": "core.users.read",
+                "name": "사용자 조회"
+            },
+            {
+                "id": 118,
+                "identifier": "core.users.create",
+                "name": "사용자 생성"
+            },
+            {
+                "id": 119,
+                "identifier": "core.users.update",
+                "name": "사용자 수정"
+            },
+            {
+                "id": 120,
+                "identifier": "core.users.delete",
+                "name": "사용자 삭제"
+            },
+            {
+                "id": 122,
+                "identifier": "core.menus.read",
+                "name": "메뉴 조회"
+            },
+            {
+                "id": 123,
+                "identifier": "core.menus.create",
+                "name": "메뉴 생성"
+            },
+            {
+                "id": 124,
+                "identifier": "core.menus.update",
+                "name": "메뉴 수정"
+            },
+            {
+                "id": 125,
+                "identifier": "core.menus.delete",
+                "name": "메뉴 삭제"
+            },
+            {
+                "id": 127,
+                "identifier": "core.modules.read",
+                "name": "모듈 조회"
+            },
+            {
+                "id": 128,
+                "identifier": "core.modules.install",
+                "name": "모듈 설치"
+            },
+            {
+                "id": 129,
+                "identifier": "core.modules.activate",
+                "name": "모듈 활성화"
+            },
+            {
+                "id": 130,
+                "identifier": "core.modules.uninstall",
+                "name": "모듈 삭제"
+            },
+            {
+                "id": 132,
+                "identifier": "core.plugins.read",
+                "name": "플러그인 조회"
+            },
+            {
+                "id": 133,
+                "identifier": "core.plugins.install",
+                "name": "플러그인 설치"
+            },
+            {
+                "id": 134,
+                "identifier": "core.plugins.activate",
+                "name": "플러그인 활성화"
+            },
+            {
+                "id": 135,
+                "identifier": "core.plugins.update",
+                "name": "플러그인 설정"
+            },
+            {
+                "id": 136,
+                "identifier": "core.plugins.uninstall",
+                "name": "플러그인 삭제"
+            },
+            {
+                "id": 138,
+                "identifier": "core.templates.read",
+                "name": "템플릿 조회"
+            },
+            {
+                "id": 139,
+                "identifier": "core.templates.install",
+                "name": "템플릿 설치"
+            },
+            {
+                "id": 140,
+                "identifier": "core.templates.activate",
+                "name": "템플릿 활성화"
+            },
+            {
+                "id": 141,
+                "identifier": "core.templates.uninstall",
+                "name": "템플릿 삭제"
+            },
+            {
+                "id": 142,
+                "identifier": "core.templates.layouts.edit",
+                "name": "레이아웃 편집"
+            },
+            {
+                "id": 144,
+                "identifier": "core.permissions.read",
+                "name": "권한 조회"
+            },
+            {
+                "id": 145,
+                "identifier": "core.permissions.create",
+                "name": "역할 생성"
+            },
+            {
+                "id": 146,
+                "identifier": "core.permissions.update",
+                "name": "역할 수정"
+            },
+            {
+                "id": 147,
+                "identifier": "core.permissions.delete",
+                "name": "역할 삭제"
+            },
+            {
+                "id": 149,
+                "identifier": "core.notification-logs.read",
+                "name": "발송 이력 조회"
+            },
+            {
+                "id": 150,
+                "identifier": "core.notification-logs.delete",
+                "name": "발송 이력 삭제"
+            },
+            {
+                "id": 152,
+                "identifier": "core.notifications.read",
+                "name": "알림 조회"
+            },
+            {
+                "id": 153,
+                "identifier": "core.notifications.update",
+                "name": "알림 읽음 처리"
+            },
+            {
+                "id": 154,
+                "identifier": "core.notifications.delete",
+                "name": "알림 삭제"
+            },
+            {
+                "id": 156,
+                "identifier": "core.user-notifications.read",
+                "name": "알림 조회"
+            },
+            {
+                "id": 157,
+                "identifier": "core.user-notifications.update",
+                "name": "알림 읽음 처리"
+            },
+            {
+                "id": 158,
+                "identifier": "core.user-notifications.delete",
+                "name": "알림 삭제"
+            },
+            {
+                "id": 160,
+                "identifier": "core.identity.request",
+                "name": "IDV 요청"
+            },
+            {
+                "id": 161,
+                "identifier": "core.identity.verify",
+                "name": "IDV 검증"
+            },
+            {
+                "id": 162,
+                "identifier": "core.identity.cancel",
+                "name": "IDV 취소"
+            },
+            {
+                "id": 164,
+                "identifier": "core.admin.identity.providers.read",
+                "name": "프로바이더 설정 조회"
+            },
+            {
+                "id": 165,
+                "identifier": "core.admin.identity.providers.update",
+                "name": "프로바이더 설정 수정"
+            },
+            {
+                "id": 166,
+                "identifier": "core.admin.identity.policies.read",
+                "name": "정책 조회"
+            },
+            {
+                "id": 167,
+                "identifier": "core.admin.identity.policies.update",
+                "name": "정책 수정"
+            },
+            {
+                "id": 168,
+                "identifier": "core.admin.identity.logs.read",
+                "name": "로그 열람"
+            },
+            {
+                "id": 169,
+                "identifier": "core.admin.identity.logs.purge",
+                "name": "로그 파기"
+            },
+            {
+                "id": 170,
+                "identifier": "core.admin.identity.messages.read",
+                "name": "메시지 템플릿 조회"
+            },
+            {
+                "id": 171,
+                "identifier": "core.admin.identity.messages.update",
+                "name": "메시지 템플릿 수정"
+            },
+            {
+                "id": 173,
+                "identifier": "core.settings.read",
+                "name": "설정 조회"
+            },
+            {
+                "id": 174,
+                "identifier": "core.settings.update",
+                "name": "설정 수정"
+            },
+            {
+                "id": 176,
+                "identifier": "core.dashboard.read",
+                "name": "대시보드 조회"
+            },
+            {
+                "id": 177,
+                "identifier": "core.dashboard.system-status",
+                "name": "시스템 상태"
+            },
+            {
+                "id": 178,
+                "identifier": "core.dashboard.resources",
+                "name": "시스템 리소스"
+            },
+            {
+                "id": 179,
+                "identifier": "core.dashboard.activities",
+                "name": "최근 활동"
+            },
+            {
+                "id": 180,
+                "identifier": "core.dashboard.alerts",
+                "name": "시스템 알림"
+            },
+            {
+                "id": 182,
+                "identifier": "core.activities.read",
+                "name": "활동 로그 조회"
+            },
+            {
+                "id": 183,
+                "identifier": "core.activities.delete",
+                "name": "활동 로그 삭제"
+            },
+            {
+                "id": 185,
+                "identifier": "core.attachments.create",
+                "name": "첨부파일 업로드"
+            },
+            {
+                "id": 186,
+                "identifier": "core.attachments.update",
+                "name": "첨부파일 수정"
+            },
+            {
+                "id": 187,
+                "identifier": "core.attachments.delete",
+                "name": "첨부파일 삭제"
+            },
+            {
+                "id": 189,
+                "identifier": "core.schedules.read",
+                "name": "스케줄 조회"
+            },
+            {
+                "id": 190,
+                "identifier": "core.schedules.create",
+                "name": "스케줄 생성"
+            },
+            {
+                "id": 191,
+                "identifier": "core.schedules.update",
+                "name": "스케줄 수정"
+            },
+            {
+                "id": 192,
+                "identifier": "core.schedules.delete",
+                "name": "스케줄 삭제"
+            },
+            {
+                "id": 193,
+                "identifier": "core.schedules.run",
+                "name": "스케줄 실행"
+            },
+            {
+                "id": 195,
+                "identifier": "core.language_packs.read",
+                "name": "언어팩 조회"
+            },
+            {
+                "id": 196,
+                "identifier": "core.language_packs.install",
+                "name": "언어팩 설치"
+            },
+            {
+                "id": 197,
+                "identifier": "core.language_packs.manage",
+                "name": "언어팩 관리"
+            },
+            {
+                "id": 198,
+                "identifier": "core.language_packs.update",
+                "name": "언어팩 업데이트"
+            },
+            {
+                "id": 1,
+                "identifier": "apidoc-sample.parent",
+                "name": "API 문서 샘플 권한"
+            },
+            {
+                "id": 2,
+                "identifier": "apidoc-sample.child",
+                "name": "하위 권한"
+            },
+            {
+                "id": 3,
+                "identifier": "sirsoft-board",
+                "name": "게시판"
+            },
+            {
+                "id": 21,
+                "identifier": "sirsoft-ecommerce",
+                "name": "이커머스"
+            },
+            {
+                "id": 109,
+                "identifier": "sirsoft-page",
+                "name": "페이지"
+            },
+            {
+                "id": 4,
+                "identifier": "sirsoft-board.apidoc-sample-board",
+                "name": "API 문서 샘플 게시판 게시판"
+            },
+            {
+                "id": 95,
+                "identifier": "sirsoft-board.boards",
+                "name": "게시판 관리"
+            },
+            {
+                "id": 100,
+                "identifier": "sirsoft-board.settings",
+                "name": "환경설정"
+            },
+            {
+                "id": 103,
+                "identifier": "sirsoft-board.identity.policies",
+                "name": "게시판 본인인증 정책"
+            },
+            {
+                "id": 106,
+                "identifier": "sirsoft-board.reports",
+                "name": "게시판 신고 관리"
+            },
+            {
+                "id": 22,
+                "identifier": "sirsoft-ecommerce.products",
+                "name": "상품 관리"
+            },
+            {
+                "id": 27,
+                "identifier": "sirsoft-ecommerce.orders",
+                "name": "주문 관리"
+            },
+            {
+                "id": 30,
+                "identifier": "sirsoft-ecommerce.categories",
+                "name": "카테고리 관리"
+            },
+            {
+                "id": 35,
+                "identifier": "sirsoft-ecommerce.brands",
+                "name": "브랜드 관리"
+            },
+            {
+                "id": 40,
+                "identifier": "sirsoft-ecommerce.product-notice-templates",
+                "name": "상품정보제공고시 관리"
+            },
+            {
+                "id": 45,
+                "identifier": "sirsoft-ecommerce.product-common-infos",
+                "name": "공통정보 관리"
+            },
+            {
+                "id": 50,
+                "identifier": "sirsoft-ecommerce.settings",
+                "name": "환경설정"
+            },
+            {
+                "id": 53,
+                "identifier": "sirsoft-ecommerce.promotion-coupon",
+                "name": "쿠폰 관리"
+            },
+            {
+                "id": 58,
+                "identifier": "sirsoft-ecommerce.shipping-policies",
+                "name": "배송정책 관리"
+            },
+            {
+                "id": 63,
+                "identifier": "sirsoft-ecommerce.product-labels",
+                "name": "상품 라벨 관리"
+            },
+            {
+                "id": 68,
+                "identifier": "sirsoft-ecommerce.identity.policies",
+                "name": "이커머스 본인인증 정책"
+            },
+            {
+                "id": 71,
+                "identifier": "sirsoft-ecommerce.reviews",
+                "name": "리뷰 관리"
+            },
+            {
+                "id": 75,
+                "identifier": "sirsoft-ecommerce.inquiries",
+                "name": "문의 관리"
+            },
+            {
+                "id": 78,
+                "identifier": "sirsoft-ecommerce.dashboard",
+                "name": "대시보드"
+            },
+            {
+                "id": 80,
+                "identifier": "sirsoft-ecommerce.user-products",
+                "name": "사용자 상품"
+            },
+            {
+                "id": 82,
+                "identifier": "sirsoft-ecommerce.user-orders",
+                "name": "사용자 주문"
+            },
+            {
+                "id": 86,
+                "identifier": "sirsoft-ecommerce.user-reviews",
+                "name": "사용자 리뷰"
+            },
+            {
+                "id": 88,
+                "identifier": "sirsoft-ecommerce.mileage",
+                "name": "마일리지 관리"
+            },
+            {
+                "id": 91,
+                "identifier": "sirsoft-ecommerce.user-currency",
+                "name": "회원 결제 통화 관리"
+            },
+            {
+                "id": 93,
+                "identifier": "sirsoft-ecommerce.user-shipping-country",
+                "name": "회원 배송국가 관리"
+            },
+            {
+                "id": 110,
+                "identifier": "sirsoft-page.pages",
+                "name": "페이지 관리"
+            },
+            {
+                "id": 115,
+                "identifier": "core",
+                "name": "코어"
+            },
+            {
+                "id": 116,
+                "identifier": "core.users",
+                "name": "사용자 관리"
+            },
+            {
+                "id": 121,
+                "identifier": "core.menus",
+                "name": "메뉴 관리"
+            },
+            {
+                "id": 126,
+                "identifier": "core.modules",
+                "name": "모듈 관리"
+            },
+            {
+                "id": 131,
+                "identifier": "core.plugins",
+                "name": "플러그인 관리"
+            },
+            {
+                "id": 137,
+                "identifier": "core.templates",
+                "name": "템플릿 관리"
+            },
+            {
+                "id": 143,
+                "identifier": "core.permissions",
+                "name": "권한 관리"
+            },
+            {
+                "id": 148,
+                "identifier": "core.notification-logs",
+                "name": "알림 발송 이력"
+            },
+            {
+                "id": 151,
+                "identifier": "core.notifications",
+                "name": "알림 (관리자)"
+            },
+            {
+                "id": 155,
+                "identifier": "core.user-notifications",
+                "name": "알림 (사용자)"
+            },
+            {
+                "id": 159,
+                "identifier": "core.identity",
+                "name": "본인인증 (사용자)"
+            },
+            {
+                "id": 163,
+                "identifier": "core.admin.identity",
+                "name": "본인인증 관리 (관리자)"
+            },
+            {
+                "id": 172,
+                "identifier": "core.settings",
+                "name": "환경설정"
+            },
+            {
+                "id": 175,
+                "identifier": "core.dashboard",
+                "name": "대시보드"
+            },
+            {
+                "id": 181,
+                "identifier": "core.activities",
+                "name": "활동 로그"
+            },
+            {
+                "id": 184,
+                "identifier": "core.attachments",
+                "name": "첨부파일 관리"
+            },
+            {
+                "id": 188,
+                "identifier": "core.schedules",
+                "name": "스케줄 관리"
+            },
+            {
+                "id": 194,
+                "identifier": "core.language_packs",
+                "name": "언어팩 관리"
+            }
+        ],
+        "consents": [],
+        "terms_consent": [],
+        "privacy_consent": [],
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 10:41:24",
+        "is_owner": true,
+        "abilities": {
+            "can_read": true,
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_assign_roles": true
+        },
+        "notify_post_complete": false,
+        "notify_post_reply": false,
+        "notify_comment": false,
+        "notify_reply_comment": false,
+        "ecommerce_mileage": {
+            "enabled": false
+        },
+        "ecommerce_preferred_currency": null,
+        "ecommerce_preferred_shipping_country": null,
+        "ecommerce_preferred_shipping_country_name": null
+    }
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -446,9 +2802,27 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.validate_reset_token_rules`, `core.auth.validate_reset_token_messages`).
 
+**요청 예시**
+
+```http
+POST /api/auth/validate-reset-token HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Content-Type: application/json
+
+{
+    "token": "{YOUR_TOKEN}",
+    "email": "user@example.com"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -473,9 +2847,22 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/user/auth/logout HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -500,9 +2887,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/user/auth/logout-all-devices HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -527,9 +2927,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/user/auth/refresh HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -554,9 +2967,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/user/auth/user HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: http-403 — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

@@ -37,6 +37,15 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.index_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/templates?type=user&search=%EC%98%88%EC%8B%9C%EA%B0%92&filters=%EC%98%88%EC%8B%9C%EA%B0%92&status=installed&per_page=1&page=1&include_hidden=1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -64,6 +73,125 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | deactivated_at | null | `null` | deactivated 일시 |
 | incompatible_required_version | null | `null` | 요구 코어 버전 미충족 시 필요한 버전 (호환되면 null) |
 | abilities | object | `{"can_install":true,"can_activate":true,"can_uninstall":t…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "템플릿 정보를 성공적으로 가져왔습니다.",
+    "data": {
+        "data": [
+            {
+                "identifier": "sirsoft-admin_basic",
+                "vendor": "sirsoft",
+                "name": "Admin Basic",
+                "version": "1.0.0",
+                "type": "admin",
+                "status": "uninstalled",
+                "description": "그누보드7 기본 관리자 템플릿",
+                "dependencies": {
+                    "modules": [],
+                    "plugins": []
+                },
+                "dependencies_met": true,
+                "update_available": false,
+                "update_source": null,
+                "latest_version": null,
+                "file_version": null,
+                "github_url": null,
+                "github_changelog_url": null,
+                "is_pending": false,
+                "is_bundled": false,
+                "deactivated_reason": null,
+                "deactivated_at": null,
+                "incompatible_required_version": null,
+                "abilities": {
+                    "can_install": true,
+                    "can_activate": true,
+                    "can_uninstall": true,
+                    "can_edit_layouts": true
+                }
+            },
+            {
+                "identifier": "sirsoft-basic",
+                "vendor": "sirsoft",
+                "name": "Basic",
+                "version": "1.0.0",
+                "type": "user",
+                "status": "uninstalled",
+                "description": "그누보드7 기본 사용자 템플릿",
+                "dependencies": {
+                    "modules": [
+                        {
+                            "identifier": "sirsoft-board",
+                            "name": "게시판",
+                            "type": "module"
+                        },
+                        {
+                            "identifier": "sirsoft-ecommerce",
+                            "name": "이커머스",
+                            "type": "module"
+                        },
+                        {
+                            "identifier": "sirsoft-page",
+                            "name": "페이지",
+                            "type": "module"
+                        }
+                    ],
+                    "plugins": [
+                        {
+                            "identifier": "sirsoft-daum_postcode",
+                            "name": "sirsoft-daum_postcode",
+                            "type": "plugin"
+                        }
+                    ]
+                },
+                "dependencies_met": false,
+                "update_available": false,
+                "update_source": null,
+                "latest_version": null,
+                "file_version": null,
+                "github_url": null,
+                "github_changelog_url": null,
+                "is_pending": false,
+                "is_bundled": false,
+                "deactivated_reason": null,
+                "deactivated_at": null,
+                "incompatible_required_version": null,
+                "abilities": {
+                    "can_install": true,
+                    "can_activate": true,
+                    "can_uninstall": true,
+                    "can_edit_layouts": true
+                }
+            }
+        ],
+        "pagination": {
+            "total": 2,
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25
+        },
+        "meta": {
+            "total_templates": 2,
+            "active_templates": 0,
+            "admin_templates": 1,
+            "user_templates": 1,
+            "installed_templates": 2
+        },
+        "abilities": {
+            "can_install": true,
+            "can_activate": true,
+            "can_uninstall": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -93,9 +221,28 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.activate_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/activate HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "template_name": "예시 이름",
+    "force": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -120,9 +267,22 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/check-updates HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -150,9 +310,27 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.deactivate_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/deactivate HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "template_name": "예시 이름"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -183,9 +361,33 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.install_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/install HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "template_name": "예시 이름",
+    "dependencies": [
+        "예시값"
+    ],
+    "language_packs": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -214,9 +416,30 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.install_from_file_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/install-from-file HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: multipart/form-data; boundary=----G7ExampleBoundary
+
+------G7ExampleBoundary
+Content-Disposition: form-data; name="file"; filename="example.pdf"
+Content-Type: application/octet-stream
+
+(바이너리 파일 내용)
+------G7ExampleBoundary--
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -245,9 +468,27 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.install_from_github_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/install-from-github HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "github_url": "https://example.com"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -274,9 +515,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | attachment | path | string | 예 | — | 대상 attachment의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/templates/layout-attachments/{attachment} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -303,9 +557,30 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | file | body | file | 예 | max 51200 | 업로드 파일 |
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/manifest-preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: multipart/form-data; boundary=----G7ExampleBoundary
+
+------G7ExampleBoundary
+Content-Disposition: form-data; name="file"; filename="example.pdf"
+Content-Type: application/octet-stream
+
+(바이너리 파일 내용)
+------G7ExampleBoundary--
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -334,9 +609,27 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.refresh_layouts_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/refresh-layouts HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "template_name": "예시 이름"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -366,9 +659,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.uninstall_validation_rules`).
 
+**요청 예시**
+
+```http
+DELETE /api/admin/templates/uninstall?template_name=%EC%98%88%EC%8B%9C%20%EC%9D%B4%EB%A6%84&delete_data=1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -400,9 +706,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.extension.changelog_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/changelog?source=active&from_version=%EC%98%88%EC%8B%9C%EA%B0%92&to_version=%EC%98%88%EC%8B%9C%EA%B0%92 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -430,9 +749,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor-assets HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -459,9 +791,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/broadcast-catalog.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -488,9 +833,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/components.css HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -517,9 +875,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/components.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -546,9 +917,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/editor-spec.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -576,9 +960,22 @@ _요청 파라미터 없음._
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 | locale | path | string | 예 | — | 로케일 코드 (표시 언어/지역) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/lang/{locale}.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -605,9 +1002,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/permission-candidates.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -634,9 +1044,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/routes.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -672,9 +1095,39 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.seo_bot_preview.show_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{identifier}/editor/seo-bot-preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "layout": [
+        "예시값"
+    ],
+    "route_params": [
+        "예시값"
+    ],
+    "url": "https://example.com",
+    "locale": "ko",
+    "module_id": "예시값",
+    "plugin_id": "예시값",
+    "seed_context": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -706,9 +1159,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.seo_candidate.index_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/editor/seo-candidates.json?extensions=%EC%98%88%EC%8B%9C%EA%B0%92&page_type=%EC%98%88%EC%8B%9C%EA%B0%92 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -742,9 +1208,38 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.seo_og_preview.show_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{identifier}/editor/seo-og-preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "seo": [
+        "예시값"
+    ],
+    "own_seo": [
+        "예시값"
+    ],
+    "seed_context": [
+        "예시값"
+    ],
+    "route_params": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -775,9 +1270,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template_layout_attachment.list_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/layout-attachments?layout_name=%EC%98%88%EC%8B%9C%20%EC%9D%B4%EB%A6%84 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -809,9 +1317,34 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template_layout_attachment.upload_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{identifier}/layout-attachments HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: multipart/form-data; boundary=----G7ExampleBoundary
+
+------G7ExampleBoundary
+Content-Disposition: form-data; name="file"; filename="example.pdf"
+Content-Type: application/octet-stream
+
+(바이너리 파일 내용)
+------G7ExampleBoundary
+Content-Disposition: form-data; name="layout_name"
+
+예시 이름
+------G7ExampleBoundary--
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -839,9 +1372,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{identifier}/license HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -868,9 +1414,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -897,9 +1456,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/check-modified-layouts HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -929,9 +1501,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.custom_translation.bulk_destroy_validation_rules`).
 
+**요청 예시**
+
+```http
+DELETE /api/admin/templates/{templateName}/custom-translations?ids=%EC%98%88%EC%8B%9C%EA%B0%92 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -963,9 +1548,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.custom_translation.index_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/custom-translations?layout_name=%EC%98%88%EC%8B%9C%20%EC%9D%B4%EB%A6%84&status=active HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -998,9 +1596,29 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.custom_translation.store_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{templateName}/custom-translations HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "layout_name": "예시 이름",
+    "locale": "ko",
+    "value": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1029,9 +1647,22 @@ _요청 파라미터 없음._
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 | id | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/templates/{templateName}/custom-translations/{id} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1063,9 +1694,30 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.custom_translation.update_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/templates/{templateName}/custom-translations/{id} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "values": [
+        "예시값"
+    ],
+    "expected_lock_version": 1
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1093,9 +1745,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/install-preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1122,9 +1787,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layout-extensions HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1152,9 +1830,22 @@ _요청 파라미터 없음._
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 | extensionId | path | string | 예 | — | 대상 extension의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layout-extensions/{extensionId} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1187,9 +1878,31 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.layout_extension.update_content_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/templates/{templateName}/layout-extensions/{extensionId} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "expected_lock_version": 1,
+    "content": [
+        "예시 내용입니다."
+    ],
+    "priority": 1
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1222,9 +1935,30 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.layout_extension.store_preview_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{templateName}/layout-extensions/{extensionId}/preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "content": [
+        "예시 내용입니다."
+    ],
+    "preview_layout": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1253,9 +1987,22 @@ _요청 파라미터 없음._
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 | extensionId | path | string | 예 | — | 대상 extension의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layout-extensions/{extensionId}/versions HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1284,9 +2031,22 @@ _요청 파라미터 없음._
 | extensionId | path | string | 예 | — | 대상 extension의 식별자 |
 | versionId | path | string | 예 | — | 대상 version의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{templateName}/layout-extensions/{extensionId}/versions/{versionId}/restore HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1315,9 +2075,22 @@ _요청 파라미터 없음._
 | extensionId | path | string | 예 | — | 대상 extension의 식별자 |
 | version | path | string | 예 | — | 대상 버전 (버전 문자열) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layout-extensions/{extensionId}/versions/{version} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1344,9 +2117,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layouts HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1374,9 +2160,22 @@ _요청 파라미터 없음._
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 | name | path | string | 예 | — | 대상의 이름/명칭 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layouts/{name} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1408,9 +2207,30 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.layout.update_content_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/templates/{templateName}/layouts/{name} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "expected_lock_version": 1,
+    "content": [
+        "예시 내용입니다."
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1440,9 +2260,29 @@ _요청 파라미터 없음._
 | name | path | string | 예 | — | 대상의 이름/명칭 |
 | content | body | array | 예 | — | 본문 내용 |
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{templateName}/layouts/{name}/preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "content": [
+        "예시 내용입니다."
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1471,9 +2311,22 @@ _요청 파라미터 없음._
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 | name | path | string | 예 | — | 대상의 이름/명칭 |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layouts/{name}/versions HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1502,9 +2355,22 @@ _요청 파라미터 없음._
 | name | path | string | 예 | — | 대상의 이름/명칭 |
 | versionId | path | string | 예 | — | 대상 version의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{templateName}/layouts/{name}/versions/{versionId}/restore HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1533,9 +2399,22 @@ _요청 파라미터 없음._
 | name | path | string | 예 | — | 대상의 이름/명칭 |
 | version | path | string | 예 | — | 대상 버전 (버전 문자열) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/layouts/{name}/versions/{version} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1562,9 +2441,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | templateName | path | string | 예 | — | 대상 template의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/admin/templates/{templateName}/uninstall-info HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1595,9 +2487,28 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.template.perform_update_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/templates/{templateName}/update HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "layout_strategy": "overwrite",
+    "force": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1625,12 +2536,22 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 | path | path | string | 예 | — | 경로 |
-| identifier | query | string | 예 | — | 대상 확장/리소스의 식별자 |
-| path | query | string | 예 | — | 경로 |
+
+**요청 예시**
+
+```http
+GET /api/templates/assets/{identifier}/{path} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
 
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1656,9 +2577,21 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/templates/{identifier}/components.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1683,9 +2616,21 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/templates/{identifier}/config.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1710,9 +2655,21 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/templates/{identifier}/editor-spec HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1738,9 +2695,21 @@ _요청 파라미터 없음._
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 | locale | path | string | 예 | — | 로케일 코드 (표시 언어/지역) |
 
+**요청 예시**
+
+```http
+GET /api/templates/{identifier}/lang/{locale}.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1766,9 +2735,21 @@ _요청 파라미터 없음._
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 | attachment | path | string | 예 | — | 대상 attachment의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/templates/{identifier}/layout-attachments/{attachment}/file HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -1793,9 +2774,21 @@ _요청 파라미터 없음._
 | --- | --- | --- | --- | --- | --- |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/templates/{identifier}/routes.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

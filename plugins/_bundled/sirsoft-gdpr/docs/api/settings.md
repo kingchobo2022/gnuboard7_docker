@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/admin/settings HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -34,6 +43,90 @@ _단건 응답: `data` 객체의 필드._
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
 | --- | --- | --- | --- |
 | settings | object | `{"privacy_policy_slug":"privacy","legal_entity_name":"","…` | GDPR 플러그인의 관리자 설정 전체 객체. 정책 메타데이터(slug/법인명/저장 위치), 배너 설정, 쿠키 카테고리 카탈로그, 차단 도메인을 담으며 `cookie_categories` 등 JSON 필드는 디코드되어 객체/배열로 노출됩니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "settings": {
+            "privacy_policy_slug": "privacy",
+            "legal_entity_name": "",
+            "data_storage_location": "",
+            "banner_enabled": true,
+            "banner_position": "bottom_bar",
+            "blocked_domains": {
+                "functional": [
+                    "*.crisp.chat",
+                    "widget.intercom.io"
+                ],
+                "analytics": [
+                    "google-analytics.com"
+                ],
+                "marketing": [
+                    "facebook.com"
+                ]
+            },
+            "cookie_categories": [
+                {
+                    "key": "necessary",
+                    "required": true,
+                    "label": {
+                        "ko": "필수 쿠키",
+                        "en": "Strictly Necessary"
+                    },
+                    "description": {
+                        "ko": "세션·CSRF·로그인 토큰, 장바구니 식별자, 사용자가 가입 시 선택한 언어 설정, 쿠키 동의 기록 등 사이트 운영에 반드시 필요한 항목입니다. 비활성화할 수 없습니다.",
+                        "en": "Strictly necessary for site operation: session/CSRF/auth tokens, shopping basket identifier, user-selected language preference at registration, cookie consent record. Cannot be disabled."
+                    }
+                },
+                {
+                    "key": "functional",
+                    "required": false,
+                    "label": {
+                        "ko": "기능 쿠키",
+                        "en": "Functional"
+                    },
+                    "description": {
+                        "ko": "사용자 선호도(다크모드, 표시 통화 등)를 기억하는 쿠키입니다. 거부 시 매 방문마다 기본값으로 표시됩니다.",
+                        "en": "Cookies that remember user preferences such as dark mode and display currency. If declined, defaults are used on every visit."
+                    }
+                },
+                {
+                    "key": "analytics",
+                    "required": false,
+                    "label": {
+                        "ko": "분석 쿠키",
+                        "en": "Analytics"
+                    },
+                    "description": {
+                        "ko": "방문자가 사이트를 어떻게 이용하는지 익명으로 측정해 더 나은 서비스를 만드는 데 사용됩니다. (예: Google Analytics, Hotjar)",
+                        "en": "Used to anonymously measure how visitors use the site so we can improve it. (e.g. Google Analytics, Hotjar)"
+                    }
+                },
+                {
+                    "key": "marketing",
+                    "required": false,
+                    "label": {
+                        "ko": "마케팅 쿠키",
+                        "en": "Marketing"
+                    },
+                    "description": {
+                        "ko": "관심사에 맞는 광고를 보여주거나, 광고가 얼마나 효과적이었는지 측정하는 데 사용됩니다. SNS 영상 임베드 등도 포함됩니다. (예: Facebook 픽셀, Google 광고, YouTube 영상)",
+                        "en": "Used to show ads relevant to your interests, measure ad performance, and embed social media content. (e.g. Facebook Pixel, Google Ads, YouTube embeds)"
+                    }
+                }
+            ]
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -65,9 +158,35 @@ _단건 응답: `data` 객체의 필드._
 | cookie_categories | body | string | 아니오 | — | 쿠키 카테고리 카탈로그(JSON 문자열 또는 배열). 각 항목의 `key`는 necessary/functional/analytics/marketing 중 하나이며 `label.ko`/`label.en`이 필수입니다 |
 | blocked_domains | body | array | 아니오 | — | 카테고리별 차단 도메인 패턴 배열(necessary 제외). FQDN 및 `*.` 와일드카드 prefix만 허용되며 textarea 줄바꿈 입력도 배열로 정규화됩니다 |
 
+**요청 예시**
+
+```http
+PUT /api/plugins/sirsoft-gdpr/admin/settings HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "privacy_policy_slug": "example-key",
+    "legal_entity_name": "예시 이름",
+    "data_storage_location": "예시값",
+    "banner_enabled": true,
+    "banner_position": "bottom_bar",
+    "cookie_categories": "예시값",
+    "blocked_domains": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -92,6 +211,14 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/settings HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -108,6 +235,144 @@ _단건 응답: `data` 객체의 필드._
 | cookie_categories | array | `[{"key":"necessary","required":true,"label":{"ko":"필수 쿠키"…` | 배너·마이페이지 렌더링용 쿠키 카테고리 카탈로그 배열. 각 항목은 `key`, `required`(필수 여부), 다국어 `label`/`description`을 담습니다 |
 | blocked_domains | object | `{"functional":["*.crisp.chat","widget.intercom.io"],"anal…` | 현재 설정된 카테고리별 차단 도메인 패턴(키→도메인 배열). 게스트도 차단이 동작해야 하므로 공개 응답에 노출되며 본 컨트롤러가 노출 SSoT입니다 |
 | default_blocked_domains_preview | object | `{"functional":["*.crisp.chat","client.crisp.chat","*.inte…` | 플러그인 기본 차단 도메인 카탈로그 미리보기(변경 불가 기본값). 관리자가 커스텀 차단 목록을 편집할 때 참고용 기본 패턴을 보여줍니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "cookie_policy_version": "1",
+        "privacy_policy_slug": "privacy",
+        "privacy_policy_available": true,
+        "legal_entity_name": "",
+        "data_storage_location": "",
+        "banner_enabled": true,
+        "banner_position": "bottom_bar",
+        "cookie_categories": [
+            {
+                "key": "necessary",
+                "required": true,
+                "label": {
+                    "ko": "필수 쿠키",
+                    "en": "Strictly Necessary"
+                },
+                "description": {
+                    "ko": "세션·CSRF·로그인 토큰, 장바구니 식별자, 사용자가 가입 시 선택한 언어 설정, 쿠키 동의 기록 등 사이트 운영에 반드시 필요한 항목입니다. 비활성화할 수 없습니다.",
+                    "en": "Strictly necessary for site operation: session/CSRF/auth tokens, shopping basket identifier, user-selected language preference at registration, cookie consent record. Cannot be disabled."
+                }
+            },
+            {
+                "key": "functional",
+                "required": false,
+                "label": {
+                    "ko": "기능 쿠키",
+                    "en": "Functional"
+                },
+                "description": {
+                    "ko": "사용자 선호도(다크모드, 표시 통화 등)를 기억하는 쿠키입니다. 거부 시 매 방문마다 기본값으로 표시됩니다.",
+                    "en": "Cookies that remember user preferences such as dark mode and display currency. If declined, defaults are used on every visit."
+                }
+            },
+            {
+                "key": "analytics",
+                "required": false,
+                "label": {
+                    "ko": "분석 쿠키",
+                    "en": "Analytics"
+                },
+                "description": {
+                    "ko": "방문자가 사이트를 어떻게 이용하는지 익명으로 측정해 더 나은 서비스를 만드는 데 사용됩니다. (예: Google Analytics, Hotjar)",
+                    "en": "Used to anonymously measure how visitors use the site so we can improve it. (e.g. Google Analytics, Hotjar)"
+                }
+            },
+            {
+                "key": "marketing",
+                "required": false,
+                "label": {
+                    "ko": "마케팅 쿠키",
+                    "en": "Marketing"
+                },
+                "description": {
+                    "ko": "관심사에 맞는 광고를 보여주거나, 광고가 얼마나 효과적이었는지 측정하는 데 사용됩니다. SNS 영상 임베드 등도 포함됩니다. (예: Facebook 픽셀, Google 광고, YouTube 영상)",
+                    "en": "Used to show ads relevant to your interests, measure ad performance, and embed social media content. (e.g. Facebook Pixel, Google Ads, YouTube embeds)"
+                }
+            }
+        ],
+        "blocked_domains": {
+            "functional": [
+                "*.crisp.chat",
+                "widget.intercom.io"
+            ],
+            "analytics": [
+                "google-analytics.com"
+            ],
+            "marketing": [
+                "facebook.com"
+            ]
+        },
+        "default_blocked_domains_preview": {
+            "functional": [
+                "*.crisp.chat",
+                "client.crisp.chat",
+                "*.intercom.io",
+                "widget.intercom.io",
+                "*.tawk.to",
+                "embed.tawk.to",
+                "cdn.weglot.com",
+                "*.weglot.com",
+                "*.usercentrics.eu"
+            ],
+            "analytics": [
+                "google-analytics.com",
+                "*.google-analytics.com",
+                "googletagmanager.com",
+                "*.googletagmanager.com",
+                "ssl.google-analytics.com",
+                "*.hotjar.com",
+                "static.hotjar.com",
+                "*.mixpanel.com",
+                "cdn.mxpnl.com",
+                "*.amplitude.com",
+                "cdn.amplitude.com",
+                "*.segment.io",
+                "*.segment.com",
+                "wcs.naver.net",
+                "wcs.naver.com",
+                "*.beusable.net"
+            ],
+            "marketing": [
+                "facebook.net",
+                "connect.facebook.net",
+                "facebook.com",
+                "*.facebook.com",
+                "doubleclick.net",
+                "*.doubleclick.net",
+                "googleadservices.com",
+                "googlesyndication.com",
+                "ads.google.com",
+                "*.criteo.com",
+                "static.criteo.net",
+                "*.adnxs.com",
+                "*.taboola.com",
+                "cdn.taboola.com",
+                "*.outbrain.com",
+                "*.kakao.com",
+                "analytics.ad.daum.net",
+                "platform.twitter.com",
+                "*.twitter.com",
+                "platform.linkedin.com",
+                "*.linkedin.com"
+            ]
+        }
+    }
+}
+```
 
 **에러 응답**
 

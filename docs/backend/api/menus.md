@@ -34,6 +34,15 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.menu.list_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/menus?is_active=1&filters=%EC%98%88%EC%8B%9C%EA%B0%92&sort_by=created_at&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드._
@@ -57,6 +66,175 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | updated_at | string | `2026-05-27 15:21:38` | 최종 수정 일시 |
 | is_owner | boolean | `false` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "메뉴를 성공적으로 가져왔습니다.",
+    "data": {
+        "data": [
+            {
+                "id": 19,
+                "name": {
+                    "ko": "페이지 관리",
+                    "en": "Page Management"
+                },
+                "slug": "sirsoft-page",
+                "url": "/admin/pages",
+                "icon": "fas fa-file-alt",
+                "order": 25,
+                "is_active": true,
+                "parent_id": null,
+                "extension_type": "module",
+                "extension_identifier": "sirsoft-page",
+                "children": [],
+                "creator": null,
+                "roles": [
+                    {
+                        "id": 1,
+                        "name": {
+                            "ko": "관리자",
+                            "en": "Administrator"
+                        },
+                        "permission_type": "read"
+                    }
+                ],
+                "created_at": "2026-07-08 10:44:43",
+                "updated_at": "2026-07-08 10:44:43",
+                "is_owner": false,
+                "abilities": {
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true
+                }
+            },
+            {
+                "id": 15,
+                "name": {
+                    "ko": "게시판 관리",
+                    "en": "Board Management"
+                },
+                "slug": "sirsoft-board",
+                "url": null,
+                "icon": "fas fa-clipboard-list",
+                "order": 30,
+                "is_active": true,
+                "parent_id": null,
+                "extension_type": "module",
+                "extension_identifier": "sirsoft-board",
+                "children": [
+                    {
+                        "id": 16,
+                        "name": {
+                            "ko": "환경설정",
+                            "en": "Settings"
+                        },
+                        "slug": "sirsoft-board-settings",
+                        "url": "/admin/boards/settings",
+                        "icon": "fas fa-cog",
+                        "order": 1,
+                        "is_active": true,
+                        "parent_id": 15,
+                        "extension_type": "module",
+                        "extension_identifier": "sirsoft-board",
+                        "roles": [
+                            {
+                                "id": 1,
+                                "name": {
+                                    "ko": "관리자",
+                                    "en": "Administrator"
+                                },
+                                "permission_type": "read"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 17,
+                        "name": {
+                            "ko": "게시판 목록",
+                            "en": "Board List"
+                        },
+                        "slug": "sirsoft-board-list",
+                        "url": "/admin/boards",
+                        "icon": "fas fa-list",
+                        "order": 2,
+                        "is_active": true,
+                        "parent_id": 15,
+                        "extension_type": "module",
+                        "extension_identifier": "sirsoft-board",
+                        "roles": [
+                            {
+                                "id": 1,
+                                "name": {
+                                    "ko": "관리자",
+                                    "en": "Administrator"
+                                },
+                                "permission_type": "read"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 18,
+                        "name": {
+                            "ko": "게시판 신고현황",
+                            "en": "Board Reports"
+                        },
+                        "slug": "sirsoft-board-reports",
+                        "url": "/admin/boards/reports",
+                        "icon": "fas fa-flag",
+                        "order": 3,
+                        "is_active": true,
+                        "parent_id": 15,
+                        "extension_type": "module",
+                        "extension_identifier": "sirsoft-board",
+                        "roles": [
+                            {
+                                "id": 1,
+                                "name": {
+                                    "ko": "관리자",
+                                    "en": "Administrator"
+                                },
+                                "permission_type": "read"
+                            }
+                        ]
+                    }
+                ],
+                "creator": null,
+                "roles": [
+                    {
+                        "id": 1,
+                        "name": {
+                            "ko": "관리자",
+                            "en": "Administrator"
+                        },
+                        "permission_type": "read"
+                    }
+                ],
+                "created_at": "2026-07-08 10:44:35",
+                "updated_at": "2026-07-08 10:44:35",
+                "is_owner": false,
+                "abilities": {
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true
+                }
+            },
+            "... (총 3건 중 2건 표시)"
+        ],
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -96,9 +274,121 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.menu.create_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/menus HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "slug": "example-key",
+    "url": "https://example.com",
+    "icon": "예시값",
+    "parent_id": 1,
+    "order": 1,
+    "is_active": true,
+    "extension_type": "core",
+    "extension_identifier": "example-key",
+    "roles": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `26` | 기본 키 (내부 식별자) |
+| name | object | `{"ko":"실측 예시값","en":"실측 예시값","fr":"실측 예시값"}` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| slug | string | `probe_6a4dc09f5a6bd` | URL 친화 식별자 (slug) |
+| url | string | `https://example.com` | 메뉴 URL |
+| icon | string | `실측 예시값` | 아이콘 식별자 (아이콘 클래스/이름) |
+| order | integer | `1` | 메뉴 순서 |
+| is_active | boolean | `true` | active 여부 |
+| parent_id | integer | `1` | parent 식별자 (연관 리소스 참조) |
+| extension_type | string | `core` | 이 리소스를 소유한 확장의 타입 (core/module/plugin/template) |
+| extension_identifier | string | `probe_6a4dc09f5a6c3` | 이 리소스를 소유한 확장의 식별자 |
+| parent | object | `{"id":1,"name":{"ko":"API 문서 샘플 메뉴","en":"API Doc Sample …` | 상위 항목 객체 (parent 관계 파생) |
+| children | array | `[]` | 하위 항목 배열 (계층 트리 — children 관계 파생) |
+| creator | null | `null` | 생성자 정보 객체 (uuid/name/email — creator 관계 파생) |
+| roles | array | `[{"id":1,"name":{"ko":"관리자","en":"Administrator"},"permis…` | 보유 역할 목록 (각 원소 id/name/permissions — roles 관계 파생) |
+| created_at | string | `2026-07-08 12:14:39` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:39` | 최종 수정 일시 |
+| is_owner | boolean | `false` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
+| abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 201
+```
+
+```json
+{
+    "success": true,
+    "message": "메뉴가 성공적으로 생성되었습니다.",
+    "data": {
+        "id": 26,
+        "name": {
+            "ko": "실측 예시값",
+            "en": "실측 예시값",
+            "fr": "실측 예시값"
+        },
+        "slug": "probe_6a4dc09f5a6bd",
+        "url": "https://example.com",
+        "icon": "실측 예시값",
+        "order": 1,
+        "is_active": true,
+        "parent_id": 1,
+        "extension_type": "core",
+        "extension_identifier": "probe_6a4dc09f5a6c3",
+        "parent": {
+            "id": 1,
+            "name": {
+                "ko": "API 문서 샘플 메뉴",
+                "en": "API Doc Sample Menu"
+            },
+            "url": "/admin/apidoc-sample",
+            "icon": "fas fa-book"
+        },
+        "children": [],
+        "creator": null,
+        "roles": [
+            {
+                "id": 1,
+                "name": {
+                    "ko": "관리자",
+                    "en": "Administrator"
+                },
+                "permission_type": "read"
+            },
+            {
+                "id": 4,
+                "name": {
+                    "ko": "API 문서 샘플 역할",
+                    "en": "API Doc Sample Role"
+                },
+                "permission_type": "read"
+            }
+        ],
+        "created_at": "2026-07-08 12:14:39",
+        "updated_at": "2026-07-08 12:14:39",
+        "is_owner": false,
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -125,6 +415,15 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/menus/active HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
@@ -137,6 +436,272 @@ _요청 파라미터 없음._
 | order | integer | `1` | 메뉴 순서 |
 | is_active | boolean | `true` | active 여부 |
 | children | array | `[]` | 하위 항목 배열 (계층 트리 — children 관계 파생) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "메뉴를 성공적으로 가져왔습니다.",
+    "data": [
+        {
+            "id": 19,
+            "name": {
+                "ko": "페이지 관리",
+                "en": "Page Management"
+            },
+            "slug": "sirsoft-page",
+            "url": "/admin/pages",
+            "icon": "fas fa-file-alt",
+            "order": 25,
+            "is_active": true,
+            "children": []
+        },
+        {
+            "id": 15,
+            "name": {
+                "ko": "게시판 관리",
+                "en": "Board Management"
+            },
+            "slug": "sirsoft-board",
+            "url": null,
+            "icon": "fas fa-clipboard-list",
+            "order": 30,
+            "is_active": true,
+            "children": [
+                {
+                    "id": 16,
+                    "name": {
+                        "ko": "환경설정",
+                        "en": "Settings"
+                    },
+                    "slug": "sirsoft-board-settings",
+                    "url": "/admin/boards/settings",
+                    "icon": "fas fa-cog",
+                    "order": 1,
+                    "is_active": true,
+                    "parent_id": 15,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-board"
+                },
+                {
+                    "id": 17,
+                    "name": {
+                        "ko": "게시판 목록",
+                        "en": "Board List"
+                    },
+                    "slug": "sirsoft-board-list",
+                    "url": "/admin/boards",
+                    "icon": "fas fa-list",
+                    "order": 2,
+                    "is_active": true,
+                    "parent_id": 15,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-board"
+                },
+                {
+                    "id": 18,
+                    "name": {
+                        "ko": "게시판 신고현황",
+                        "en": "Board Reports"
+                    },
+                    "slug": "sirsoft-board-reports",
+                    "url": "/admin/boards/reports",
+                    "icon": "fas fa-flag",
+                    "order": 3,
+                    "is_active": true,
+                    "parent_id": 15,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-board"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": {
+                "ko": "이커머스",
+                "en": "Ecommerce"
+            },
+            "slug": "sirsoft-ecommerce",
+            "url": null,
+            "icon": "fas fa-shopping-cart",
+            "order": 40,
+            "is_active": true,
+            "children": [
+                {
+                    "id": 4,
+                    "name": {
+                        "ko": "환경설정",
+                        "en": "Settings"
+                    },
+                    "slug": "sirsoft-ecommerce-settings",
+                    "url": "/admin/ecommerce/settings",
+                    "icon": "fas fa-cog",
+                    "order": 1,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 5,
+                    "name": {
+                        "ko": "상품 관리",
+                        "en": "Products"
+                    },
+                    "slug": "sirsoft-ecommerce-products",
+                    "url": "/admin/ecommerce/products",
+                    "icon": "fas fa-box",
+                    "order": 2,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 6,
+                    "name": {
+                        "ko": "카테고리 관리",
+                        "en": "Categories"
+                    },
+                    "slug": "sirsoft-ecommerce-categories",
+                    "url": "/admin/ecommerce/categories",
+                    "icon": "fas fa-folder",
+                    "order": 3,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 7,
+                    "name": {
+                        "ko": "브랜드 관리",
+                        "en": "Brands"
+                    },
+                    "slug": "sirsoft-ecommerce-brands",
+                    "url": "/admin/ecommerce/brands",
+                    "icon": "fas fa-tag",
+                    "order": 4,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 8,
+                    "name": {
+                        "ko": "상품정보제공고시",
+                        "en": "Product Notice"
+                    },
+                    "slug": "sirsoft-ecommerce-product-notices",
+                    "url": "/admin/ecommerce/product-notices",
+                    "icon": "fas fa-file-alt",
+                    "order": 5,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 9,
+                    "name": {
+                        "ko": "공통정보 관리",
+                        "en": "Common Info"
+                    },
+                    "slug": "sirsoft-ecommerce-common-info",
+                    "url": "/admin/ecommerce/common-info",
+                    "icon": "fas fa-info-circle",
+                    "order": 6,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 10,
+                    "name": {
+                        "ko": "주문 관리",
+                        "en": "Orders"
+                    },
+                    "slug": "sirsoft-ecommerce-orders",
+                    "url": "/admin/ecommerce/orders",
+                    "icon": "fas fa-receipt",
+                    "order": 7,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 11,
+                    "name": {
+                        "ko": "쿠폰 관리",
+                        "en": "Coupons"
+                    },
+                    "slug": "sirsoft-ecommerce-promotion-coupons",
+                    "url": "/admin/ecommerce/promotion-coupons",
+                    "icon": "fas fa-ticket-alt",
+                    "order": 8,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 12,
+                    "name": {
+                        "ko": "배송정책",
+                        "en": "Shipping Policies"
+                    },
+                    "slug": "sirsoft-ecommerce-shipping-policies",
+                    "url": "/admin/ecommerce/shipping-policies",
+                    "icon": "fas fa-truck",
+                    "order": 9,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 13,
+                    "name": {
+                        "ko": "리뷰 관리",
+                        "en": "Reviews"
+                    },
+                    "slug": "sirsoft-ecommerce-reviews",
+                    "url": "/admin/ecommerce/reviews",
+                    "icon": "fas fa-star",
+                    "order": 10,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                },
+                {
+                    "id": 14,
+                    "name": {
+                        "ko": "마일리지 내역",
+                        "en": "Mileage History"
+                    },
+                    "slug": "sirsoft-ecommerce-mileage-transactions",
+                    "url": "/admin/ecommerce/mileage-transactions",
+                    "icon": "fas fa-coins",
+                    "order": 11,
+                    "is_active": true,
+                    "parent_id": 3,
+                    "extension_type": "module",
+                    "extension_identifier": "sirsoft-ecommerce"
+                }
+            ]
+        }
+    ]
+}
+```
 
 **에러 응답**
 
@@ -165,9 +730,22 @@ _요청 파라미터 없음._
 | type | path | string | 예 | — | 확장 소유 타입 (ExtensionOwnerType 으로 파싱 — module: 모듈, plugin: 플러그인. 미유효 값이면 422 menu.invalid_extension_type) |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/menus/extension/{type}/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -194,6 +772,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/menus/hierarchy HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드._
@@ -208,6 +795,96 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | order | integer | `1` | 메뉴 순서 |
 | is_active | boolean | `true` | active 여부 |
 | children | array | `[]` | 하위 항목 배열 (계층 트리 — children 관계 파생) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "메뉴를 성공적으로 가져왔습니다.",
+    "data": {
+        "data": [
+            {
+                "id": 19,
+                "name": {
+                    "ko": "페이지 관리",
+                    "en": "Page Management"
+                },
+                "slug": "sirsoft-page",
+                "url": "/admin/pages",
+                "icon": "fas fa-file-alt",
+                "order": 25,
+                "is_active": true,
+                "children": []
+            },
+            {
+                "id": 15,
+                "name": {
+                    "ko": "게시판 관리",
+                    "en": "Board Management"
+                },
+                "slug": "sirsoft-board",
+                "url": null,
+                "icon": "fas fa-clipboard-list",
+                "order": 30,
+                "is_active": true,
+                "children": [
+                    {
+                        "id": 16,
+                        "name": {
+                            "ko": "환경설정",
+                            "en": "Settings"
+                        },
+                        "slug": "sirsoft-board-settings",
+                        "url": "/admin/boards/settings",
+                        "icon": "fas fa-cog",
+                        "order": 1,
+                        "is_active": true,
+                        "parent_id": 15,
+                        "extension_type": "module",
+                        "extension_identifier": "sirsoft-board"
+                    },
+                    {
+                        "id": 17,
+                        "name": {
+                            "ko": "게시판 목록",
+                            "en": "Board List"
+                        },
+                        "slug": "sirsoft-board-list",
+                        "url": "/admin/boards",
+                        "icon": "fas fa-list",
+                        "order": 2,
+                        "is_active": true,
+                        "parent_id": 15,
+                        "extension_type": "module",
+                        "extension_identifier": "sirsoft-board"
+                    },
+                    {
+                        "id": 18,
+                        "name": {
+                            "ko": "게시판 신고현황",
+                            "en": "Board Reports"
+                        },
+                        "slug": "sirsoft-board-reports",
+                        "url": "/admin/boards/reports",
+                        "icon": "fas fa-flag",
+                        "order": 3,
+                        "is_active": true,
+                        "parent_id": 15,
+                        "extension_type": "module",
+                        "extension_identifier": "sirsoft-board"
+                    }
+                ]
+            },
+            "... (총 4건 중 2건 표시)"
+        ]
+    }
+}
+```
 
 **에러 응답**
 
@@ -239,9 +916,35 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.menu.update_order_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/menus/order HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "parent_menus": [
+        "예시값"
+    ],
+    "child_menus": [
+        "예시값"
+    ],
+    "moved_items": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -270,9 +973,22 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | --- | --- | --- | --- | --- | --- |
 | menu | path | string | 예 | — | 대상 menu의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/menus/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -301,6 +1017,15 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | --- | --- | --- | --- | --- | --- |
 | menu | path | string | 예 | — | 대상 menu의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/admin/menus/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -325,6 +1050,67 @@ _단건 응답: `data` 객체의 필드._
 | updated_at | string | `2026-07-06 19:15:16` | 최종 수정 일시 |
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "메뉴를 성공적으로 가져왔습니다.",
+    "data": {
+        "id": 1,
+        "name": {
+            "ko": "API 문서 샘플 메뉴",
+            "en": "API Doc Sample Menu"
+        },
+        "slug": "apidoc-sample-menu",
+        "url": "/admin/apidoc-sample",
+        "icon": "fas fa-book",
+        "order": 35,
+        "is_active": true,
+        "parent_id": null,
+        "extension_type": null,
+        "extension_identifier": null,
+        "parent": null,
+        "children": [
+            {
+                "id": 2,
+                "name": {
+                    "ko": "하위 메뉴",
+                    "en": "Child Menu"
+                },
+                "slug": "apidoc-sample-menu-child",
+                "url": "/admin/nihil-non-eos-doloribus-occaecati-optio",
+                "icon": "fas fa-chart",
+                "order": 38,
+                "is_active": true,
+                "parent_id": 1,
+                "extension_type": null,
+                "extension_identifier": null,
+                "roles": []
+            }
+        ],
+        "creator": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자",
+            "email": "apidoc-sample-user@example.com"
+        },
+        "roles": [],
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 10:41:24",
+        "is_owner": true,
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -365,9 +1151,38 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.menu.update_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/menus/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "slug": "example-key",
+    "url": "https://example.com",
+    "icon": "예시값",
+    "parent_id": 1,
+    "order": 1,
+    "is_active": true,
+    "extension_type": "core",
+    "extension_identifier": "example-key",
+    "roles": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -397,9 +1212,71 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | menu | path | string | 예 | — | 대상 menu의 식별자 |
 
+**요청 예시**
+
+```http
+PATCH /api/admin/menus/1/toggle-status HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `1` | 기본 키 (내부 식별자) |
+| name | object | `{"ko":"API 문서 샘플 메뉴","en":"API Doc Sample Menu"}` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| slug | string | `apidoc-sample-menu` | URL 친화 식별자 (slug) |
+| url | string | `/admin/apidoc-sample` | 메뉴 URL |
+| icon | string | `fas fa-book` | 아이콘 식별자 (아이콘 클래스/이름) |
+| order | integer | `35` | 메뉴 순서 |
+| is_active | boolean | `false` | active 여부 |
+| parent_id | null | `null` | parent 식별자 (연관 리소스 참조) |
+| extension_type | null | `null` | 이 리소스를 소유한 확장의 타입 (core/module/plugin/template) |
+| extension_identifier | null | `null` | 이 리소스를 소유한 확장의 식별자 |
+| created_at | string | `2026-07-08 10:41:24` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:40` | 최종 수정 일시 |
+| is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
+| abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "메뉴가 성공적으로 업데이트되었습니다.",
+    "data": {
+        "id": 1,
+        "name": {
+            "ko": "API 문서 샘플 메뉴",
+            "en": "API Doc Sample Menu"
+        },
+        "slug": "apidoc-sample-menu",
+        "url": "/admin/apidoc-sample",
+        "icon": "fas fa-book",
+        "order": 35,
+        "is_active": false,
+        "parent_id": null,
+        "extension_type": null,
+        "extension_identifier": null,
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 12:14:40",
+        "is_owner": true,
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 

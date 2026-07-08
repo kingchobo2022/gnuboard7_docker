@@ -38,6 +38,7 @@ class ApiDocgenCommand extends Command
         {--user= : 실측 토큰 발급 대상 사용자 ID}
         {--seed : 실측 전 완전 샘플 데이터를 시드 (개발 환경 전용)}
         {--check : 생성하지 않고 누락/미실측만 리포트}
+        {--examples-only : 기존 문서에 요청/응답 예시 블록만 in-place 삽입 (표·서술 불가침, 재생성 금지)}
         {--dry-run : 생성 대상만 출력}';
 
     /**
@@ -123,16 +124,18 @@ class ApiDocgenCommand extends Command
             $this->info('실측 기준 URL: '.$probe->baseUrl());
         }
 
-        $stats = ['files' => 0, 'endpoints' => 0, 'probed' => 0, 'skipped' => 0];
+        $stats = ['files' => 0, 'endpoints' => 0, 'probed' => 0, 'skipped' => 0, 'examples' => 0];
         $checkFindings = [];
+        $examplesOnly = (bool) $this->option('examples-only');
 
         foreach ($grouped as $file => $items) {
             $sections = [];
             $sectionKeys = [];
+            $exampleBlocks = [];
 
             foreach ($items as $route) {
                 $request = $introspector->introspect($route['controller'], $route['controller_method']);
-                [$schema, $probeMeta] = $this->probeEndpoint($probe, $inferrer, $route, $probed, $sampleMap);
+                [$schema, $probeMeta] = $this->probeEndpoint($probe, $inferrer, $route, $probed, $sampleMap, $request);
 
                 if ($probeMeta['skipped_reason'] === null) {
                     $stats['probed']++;
@@ -141,9 +144,28 @@ class ApiDocgenCommand extends Command
                     $checkFindings[] = "{$route['method']} {$route['uri']} — {$probeMeta['skipped_reason']}";
                 }
 
+                $key = $route['name'] ?: $route['uri'];
+
+                if ($examplesOnly) {
+                    // 표·서술을 건드리지 않고 예시 2블록만 산출 (SSoT=스캐폴더 예시 메서드).
+                    // 단, 응답 필드 표가 아직 실측 제외 마커(사람이 채운 셀 없음)인데 이번 실측으로
+                    // 스키마가 확보됐으면 그 마커를 실측 필드 표로 갱신한다(쓰기 메서드 실측 도입분).
+                    $commentMap = $this->columnComments($route, $commentResolver, $sampleMap);
+                    $exampleBlocks[$key] = [
+                        'request' => $scaffolder->requestExampleBlock($route, $request, $probeMeta),
+                        'response' => $scaffolder->responseExampleBlock($schema, $probeMeta),
+                        'response_fields' => $schema !== null
+                            ? $scaffolder->responseFieldTableBlock($schema, $probeMeta, $commentMap)
+                            : null,
+                    ];
+                    $stats['endpoints']++;
+
+                    continue;
+                }
+
                 $commentMap = $this->columnComments($route, $commentResolver, $sampleMap);
                 $sections[] = $scaffolder->endpointSection($route, $request, $schema, $probeMeta, $commentMap);
-                $sectionKeys[] = $route['name'] ?: $route['uri'];
+                $sectionKeys[] = $key;
                 $stats['endpoints']++;
             }
 
@@ -151,6 +173,28 @@ class ApiDocgenCommand extends Command
                 if (! File::exists($file)) {
                     $checkFindings[] = "문서 파일 없음: {$file}";
                 }
+
+                continue;
+            }
+
+            // examples-only: 재생성 없이 기존 문서에 예시 블록만 in-place 삽입.
+            // 전체 재생성은 @generated 블록 내부 표(파라미터/응답 필드)의 사람 서술을
+            // TODO 로 되돌리므로, 예시 방출을 위해 재생성을 쓰지 않는다.
+            if ($examplesOnly) {
+                if (! File::exists($file)) {
+                    $this->warn("문서 없음(예시 삽입 건너뜀): {$file}");
+
+                    continue;
+                }
+
+                $existing = File::get($file);
+                [$updated, $inserted] = $scaffolder->insertExampleBlocks($existing, $exampleBlocks);
+
+                if ($updated !== $existing) {
+                    File::put($file, $updated);
+                    $stats['files']++;
+                }
+                $stats['examples'] += $inserted;
 
                 continue;
             }
@@ -182,6 +226,18 @@ class ApiDocgenCommand extends Command
         }
 
         $this->newLine();
+        if ($examplesOnly) {
+            $this->info(sprintf(
+                '예시 삽입 완료: 파일 %d개, 예시 블록 %d개 (실측 %d, 제외 %d)',
+                $stats['files'],
+                $stats['examples'],
+                $stats['probed'],
+                $stats['skipped']
+            ));
+
+            return self::SUCCESS;
+        }
+
         $this->info(sprintf(
             '완료: 파일 %d개, 엔드포인트 %d개 (실측 %d, 제외 %d)',
             $stats['files'],
@@ -277,22 +333,181 @@ class ApiDocgenCommand extends Command
      * @param  array<string, mixed>  $route  라우트 메타데이터
      * @param  bool  $probed  실측 가능 여부
      * @param  array<string, array{model: class-string, key: string, value: string}>  $sampleMap  도메인별 대표 샘플 맵
+     * @param  array<string, mixed>  $request  FormRequest 분석 결과 (쓰기 바디 구성용)
      * @return array{0: array<string, mixed>|null, 1: array<string, mixed>} 스키마와 실측 메타
      */
-    private function probeEndpoint(ApiEndpointProbe $probe, ResponseSchemaInferrer $inferrer, array $route, bool $probed, array $sampleMap = []): array
+    private function probeEndpoint(ApiEndpointProbe $probe, ResponseSchemaInferrer $inferrer, array $route, bool $probed, array $sampleMap = [], array $request = []): array
     {
+        $baseUrl = $probe->baseUrl();
+
         if (! $probed) {
-            return [null, ['status' => null, 'skipped_reason' => 'no-token']];
+            return [null, ['status' => null, 'skipped_reason' => 'no-token', 'base_url' => $baseUrl, 'resolved_uri' => null, 'body' => null]];
         }
 
         $uri = $this->resolvePathParams($route, $sampleMap);
-        $result = $probe->probe($route['method'], $uri);
+        $isWrite = in_array($route['method'], ['POST', 'PUT', 'PATCH', 'DELETE'], true);
 
-        if (! $result['ok'] || $result['body'] === null) {
-            return [null, ['status' => $result['status'], 'skipped_reason' => $result['skipped_reason'] ?? ('http-'.$result['status'])]];
+        // 요청 예시에 노출할 정규 URI (실측용 per_page 보정 제외).
+        $exampleUri = $this->exampleUri($route, $sampleMap);
+
+        // 부수효과가 트랜잭션 롤백으로 되돌릴 수 없는 쓰기(확장 install/activate/update,
+        // 언어팩 설치, 코어 업데이트, 파일 업로드 등)는 in-process 실측에서 제외한다.
+        // 이들은 파일시스템·프로세스·외부 네트워크를 건드려 롤백 불가·hang 위험이 있다.
+        if ($isWrite && $this->isSideEffectfulWrite($route)) {
+            return [null, [
+                'status' => null,
+                'skipped_reason' => 'side-effectful-write',
+                'base_url' => $baseUrl,
+                'resolved_uri' => $exampleUri,
+                'body' => null,
+            ]];
         }
 
-        return [$inferrer->infer($result['body']), ['status' => $result['status'], 'skipped_reason' => null]];
+        // 쓰기 메서드는 FormRequest 규칙 기반 실측 바디를 만들어 in-process 롤백 실측에 사용한다.
+        $writeBody = in_array($route['method'], ['POST', 'PUT', 'PATCH'], true)
+            ? $this->buildWriteBody($request, $sampleMap)
+            : [];
+        $result = $probe->probe($route['method'], $uri, $writeBody);
+
+        if (! $result['ok'] || $result['body'] === null) {
+            return [null, [
+                'status' => $result['status'],
+                'skipped_reason' => $result['skipped_reason'] ?? ('http-'.$result['status']),
+                'base_url' => $baseUrl,
+                'resolved_uri' => $exampleUri,
+                'body' => null,
+            ]];
+        }
+
+        return [$inferrer->infer($result['body']), [
+            'status' => $result['status'],
+            'skipped_reason' => null,
+            'base_url' => $baseUrl,
+            'resolved_uri' => $exampleUri,
+            'body' => $result['body'],
+        ]];
+    }
+
+    /**
+     * 부수효과가 트랜잭션 롤백으로 되돌릴 수 없는 쓰기 엔드포인트인지 판별합니다.
+     *
+     * 확장(모듈/플러그인/템플릿) 및 언어팩 설치·활성·업데이트, 코어 업데이트, 파일 업로드,
+     * 캐시/워밍업/생성 등 파일시스템·프로세스·외부 네트워크를 건드리는 쓰기는 in-process 롤백
+     * 실측이 불가능(hang·비가역 부수효과)하므로 실측에서 제외한다. URI 세그먼트로 판정한다.
+     *
+     * @param  array<string, mixed>  $route  라우트 메타데이터
+     * @return bool 부수효과 쓰기 여부
+     */
+    private function isSideEffectfulWrite(array $route): bool
+    {
+        $uri = (string) $route['uri'];
+
+        // 확장/언어팩 관리 도메인의 쓰기는 전량 제외 (install/activate/... 은 실환경 변경).
+        if (preg_match('#/api/admin/(modules|plugins|templates|language-packs|core-update)(/|$)#', $uri)) {
+            return true;
+        }
+
+        // 동작성 세그먼트를 가진 쓰기 (도메인 무관).
+        $unsafeSegments = [
+            'install', 'install-from-file', 'install-from-github', 'install-from-url', 'install-from-bundled',
+            'uninstall', 'activate', 'deactivate', 'bulk-activate', 'update', 'check-updates',
+            'refresh-cache', 'clear', 'warmup', 'generate', 'sync', 'backup', 'restore',
+            'upload', 'import', 'export', 'manifest-preview', 'preview',
+        ];
+
+        foreach ($unsafeSegments as $seg) {
+            if (str_contains($uri, '/'.$seg)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 요청 예시에 노출할 정규 URI 를 산출합니다.
+     *
+     * `resolvePathParams` 는 목록 GET 실측용으로 `?per_page=25` 를 덧붙이지만,
+     * 요청 예시에는 이 실측 보정을 제외한 순수 경로(치환된 path 파라미터 포함)를 노출한다.
+     * path 파라미터가 치환되지 않은(실측 제외) 경우 `{param}` placeholder 를 그대로 남긴다.
+     *
+     * @param  array<string, mixed>  $route  라우트 메타데이터
+     * @param  array<string, array{model: class-string, key: string, value: string}>  $sampleMap  도메인별 대표 샘플 맵
+     * @return string 요청 예시용 URI
+     */
+    private function exampleUri(array $route, array $sampleMap): string
+    {
+        $resolved = $this->resolvePathParams($route, $sampleMap);
+
+        // 실측용 per_page 보정 쿼리를 제거해 정규 경로만 남긴다.
+        return preg_replace('/[?&]per_page=25$/', '', $resolved) ?? $resolved;
+    }
+
+    /**
+     * 쓰기 메서드 in-process 실측용 요청 바디를 FormRequest 규칙 근거로 구성합니다.
+     *
+     * 필수 파라미터를 우선하고, 검증을 통과할 수 있도록 이름·타입·허용값에 맞는 유효값을 채웁니다.
+     * 파일(image/file) 파라미터는 실측 바디에서 제외한다(in-process dispatch 로 파일 전송 불가 →
+     * 해당 엔드포인트는 http-422 로 스킵되고 정적 요청 예시[multipart]만 방출된다).
+     *
+     * @param  array<string, mixed>  $request  FormRequest 분석 결과
+     * @param  array<string, array{model: class-string, key: string, value: string}>  $sampleMap  도메인별 대표 샘플 맵
+     * @return array<string, mixed> 실측 요청 바디
+     */
+    private function buildWriteBody(array $request, array $sampleMap = []): array
+    {
+        $params = $request['params'] ?? [];
+        $body = [];
+
+        foreach ($params as $p) {
+            $name = (string) $p['name'];
+            $type = (string) ($p['type'] ?? 'string');
+
+            // 파일 타입은 in-process 바디로 전송 불가 → 생략.
+            if (in_array($type, ['file', 'image'], true)) {
+                continue;
+            }
+
+            $body[$name] = $this->writeValue($name, $type, (string) ($p['allowed'] ?? ''), $sampleMap);
+        }
+
+        return $body;
+    }
+
+    /**
+     * 쓰기 실측 바디의 파라미터 값을 검증 통과 가능하도록 생성합니다.
+     *
+     * @param  string  $name  파라미터명
+     * @param  string  $type  타입
+     * @param  string  $allowed  허용값 설명 (in: 열거 등)
+     * @param  array<string, array{model: class-string, key: string, value: string}>  $sampleMap  도메인 샘플 맵
+     * @return mixed 유효 예시값
+     */
+    private function writeValue(string $name, string $type, string $allowed, array $sampleMap): mixed
+    {
+        $lower = strtolower($name);
+
+        // 허용값 in: 열거(백틱)가 있으면 첫 값을 채택(검증 통과 보장).
+        if (preg_match('/`([^`]+)`/', $allowed, $m)) {
+            return $m[1];
+        }
+
+        return match (true) {
+            $type === 'boolean' => true,
+            $type === 'integer', $type === 'number' => 1,
+            $type === 'array' => [],
+            $type === 'email' || str_contains($lower, 'email') => 'probe_'.uniqid().'@example.com',
+            $type === 'uuid' => (string) Str::uuid(),
+            $type === 'date' => '2026-01-01',
+            str_contains($lower, 'password') => 'Password123!',
+            str_contains($lower, 'url') || str_contains($lower, 'homepage') => 'https://example.com',
+            // identifier/slug 는 소문자/숫자/밑줄만 허용하는 규칙이 흔하므로 하이픈 없이 생성.
+            str_contains($lower, 'identifier') || str_contains($lower, 'slug') => 'probe_'.uniqid(),
+            str_contains($lower, 'locale') || $lower === 'language' => 'ko',
+            str_contains($lower, 'country') => 'KR',
+            str_contains($lower, 'timezone') => 'Asia/Seoul',
+            default => '실측 예시값',
+        };
     }
 
     /**
@@ -329,6 +544,17 @@ class ApiDocgenCommand extends Command
 
                 if ($explicit !== null) {
                     $uri = str_replace('{'.$param.'}', (string) $explicit, $uri);
+
+                    continue;
+                }
+
+                // 코어 다수 라우트는 route-model binding 없이 `{id}`/`{identifier}`/`{key}` 문자열
+                // 파라미터를 쓰고 컨트롤러가 직접 조회한다. 도메인 대표 샘플 모델의 route key(또는
+                // 해당 컬럼)로 치환해 실측 가능하게 한다. (마지막 세그먼트 리소스 파라미터에 한함)
+                $generic = $this->resolveGenericPathParam($param, $domain, $sampleMap);
+
+                if ($generic !== null) {
+                    $uri = str_replace('{'.$param.'}', (string) $generic, $uri);
                 }
 
                 continue;
@@ -349,6 +575,64 @@ class ApiDocgenCommand extends Command
         }
 
         return $uri;
+    }
+
+    /**
+     * route-model binding 없는 제네릭 path 파라미터를 도메인 샘플 모델의 실제 키로 치환합니다.
+     *
+     * 코어 다수 라우트는 `{id}`/`{identifier}`/`{key}`/`{slug}` 문자열 파라미터를 쓰고 컨트롤러가
+     * 직접 조회한다. 도메인 대표 샘플 모델을 찾아 파라미터명에 대응하는 컬럼값으로 치환한다:
+     *   - `id`  → 모델 기본키
+     *   - `identifier`/`slug`/`key`/`code` → 같은 이름 컬럼이 있으면 그 값, 없으면 route key
+     *   - 그 외 → 치환 안 함(null 반환 → 실측 제외 유지, 오치환 방지)
+     *
+     * @param  string  $param  path 파라미터명
+     * @param  string|null  $domain  도메인 그룹명
+     * @param  array<string, array{model: class-string, key: string, value: string}>  $sampleMap  도메인 샘플 맵
+     * @return string|null 치환값 (없으면 null)
+     */
+    private function resolveGenericPathParam(string $param, ?string $domain, array $sampleMap): ?string
+    {
+        $modelClass = ($domain !== null && isset($sampleMap[$domain]))
+            ? $sampleMap[$domain]['model']
+            : $this->domainModelHint($domain);
+
+        if (! $modelClass) {
+            return null;
+        }
+
+        try {
+            /** @var Model $model */
+            $model = new $modelClass;
+            $record = $modelClass::query()->orderBy($model->getKeyName())->first();
+
+            if (! $record) {
+                return null;
+            }
+
+            $lower = strtolower($param);
+
+            // id 계열 → 기본키
+            if ($lower === 'id' || str_ends_with($lower, '_id')) {
+                return (string) $record->getKey();
+            }
+
+            // identifier/slug/key/code → 동일 컬럼이 있으면 그 값
+            if (in_array($lower, ['identifier', 'slug', 'key', 'code'], true)) {
+                $val = $record->getAttribute($lower);
+
+                return $val !== null ? (string) $val : (string) $record->getRouteKey();
+            }
+
+            // 도메인 단수 리소스명 파라미터 → route key
+            if ($domain !== null && $this->paramMatchesDomain($param, $domain)) {
+                return (string) $record->getRouteKey();
+            }
+
+            return null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -530,8 +814,8 @@ class ApiDocgenCommand extends Command
 
         ```text
         1. 이 문서는 실제 API 호출로 실측한 {$domain} 엔드포인트 레퍼런스입니다
-        2. 각 엔드포인트: 메서드/URI/권한 + 요청 파라미터 표 + 실측 응답 필드 표
-        3. 응답 필드의 예시값은 실제 호출 응답에서 관측된 값입니다
+        2. 각 엔드포인트: 메서드/URI/권한 + 요청 파라미터 표 + 요청 예시(curl) + 실측 응답 필드 표 + 응답 예시(envelope)
+        3. 응답 필드의 예시값·응답 예시 JSON 은 실제 호출 응답에서 관측된 값입니다
         4. 갱신: 코드 변경 후 php artisan api:docgen 재실행
         5. 설명(TODO) 칸은 사람이 채웁니다
         ```

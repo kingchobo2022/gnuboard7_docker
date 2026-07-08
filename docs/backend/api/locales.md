@@ -27,6 +27,14 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/locales/active HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -35,6 +43,31 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- |
 | locales | array | `["ko","en","fr","ja"]` | 활성 로케일 코드 배열 |
 | locale_names | object | `{"ko":"한국어","en":"English","ja":"日本語","fr":"Français"}` | 로케일 코드별 표시명 맵 (config app.locale_names) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "locales.fetched",
+    "data": {
+        "locales": [
+            "ko",
+            "en",
+            "fr"
+        ],
+        "locale_names": {
+            "ko": "한국어",
+            "en": "English",
+            "fr": "Français"
+        }
+    }
+}
+```
 
 **에러 응답**
 

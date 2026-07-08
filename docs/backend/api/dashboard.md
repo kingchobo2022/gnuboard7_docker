@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/dashboard/activities HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
@@ -38,6 +47,66 @@ _요청 파라미터 없음._
 | description | string | `API 문서 샘플 사용자` | 설명 (다국어 필드는 로케일별 값 객체) |
 | time | string | `4시간 전` | 상대 시각 표시 (예: "24초 전" — diffForHumans() 산물) |
 | timestamp | string | `2026-07-07T10:00:47+09:00` | 활동 발생 절대 시각 (created_at 을 사용자 타임존으로 변환한 ISO 8601) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "최근 활동을 성공적으로 조회했습니다.",
+    "data": [
+        {
+            "type": "admin",
+            "icon": "circle-info",
+            "icon_color": "blue",
+            "title": "사용자 목록 조회",
+            "description": "API 문서 샘플 사용자",
+            "time": "2분 전",
+            "timestamp": "2026-07-08T12:12:12+09:00"
+        },
+        {
+            "type": "admin",
+            "icon": "circle-info",
+            "icon_color": "blue",
+            "title": "사용자 목록 조회",
+            "description": "API 문서 샘플 사용자",
+            "time": "6분 전",
+            "timestamp": "2026-07-08T12:08:26+09:00"
+        },
+        {
+            "type": "admin",
+            "icon": "circle-info",
+            "icon_color": "blue",
+            "title": "사용자 목록 조회",
+            "description": "API 문서 샘플 사용자",
+            "time": "9분 전",
+            "timestamp": "2026-07-08T12:04:38+09:00"
+        },
+        {
+            "type": "admin",
+            "icon": "circle-info",
+            "icon_color": "blue",
+            "title": "사용자 목록 조회",
+            "description": "API 문서 샘플 사용자",
+            "time": "43분 전",
+            "timestamp": "2026-07-08T11:31:03+09:00"
+        },
+        {
+            "type": "admin",
+            "icon": "circle-info",
+            "icon_color": "blue",
+            "title": "사용자 목록 조회",
+            "description": "API 문서 샘플 사용자",
+            "time": "45분 전",
+            "timestamp": "2026-07-08T11:29:30+09:00"
+        }
+    ]
+}
+```
 
 **에러 응답**
 
@@ -61,11 +130,34 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/dashboard/alerts HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 
 
 <!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "시스템 알림을 성공적으로 조회했습니다.",
+    "data": []
+}
+```
 
 **에러 응답**
 
@@ -89,6 +181,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/dashboard/recent-notifications HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
@@ -101,6 +202,31 @@ _요청 파라미터 없음._
 | status | string | `sent` | 발송 상태 (status Enum 값 — sent: 발송 성공, failed: 발송 실패, skipped: 발송 건너뜀) |
 | time | string | `19시간 전` | 상대 시각 표시 (예: "24초 전" — diffForHumans() 산물) |
 | timestamp | string | `2026-07-06T18:20:23+09:00` | 발송 절대 시각 (sent_at, 없으면 created_at 을 사용자 타임존으로 변환한 ISO 8601) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "최근 알림을 성공적으로 조회했습니다.",
+    "data": [
+        {
+            "id": 1,
+            "type": "apidoc.sample.event",
+            "channel": "mail",
+            "recipient": "API 문서 샘플 사용자",
+            "subject": "API 문서 샘플 알림",
+            "status": "sent",
+            "time": "2시간 전",
+            "timestamp": "2026-07-08T09:41:24+09:00"
+        }
+    ]
+}
+```
 
 **에러 응답**
 
@@ -124,6 +250,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/dashboard/resources HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -133,6 +268,37 @@ _단건 응답: `data` 객체의 필드._
 | cpu | object | `{"percentage":6,"color":"green"}` | CPU 사용률 정보 (percentage: 0~100 사용률, color: 임계 색상 — green<50, blue 50~69, yellow 70~89, red≥90) |
 | memory | object | `{"percentage":96,"used":"30.1 GB","total":"31.5 GB","colo…` | 메모리 사용량 정보 (percentage 사용률, used/total: 사용량·총량 형식화 문자열, color: 임계 색상). 수집 불가 시 percentage 0·"알 수 없음"·color gray 폴백 |
 | disk | object | `{"percentage":76,"used":"360.2 GB","total":"474.7 GB","co…` | 디스크 사용량 정보 (percentage 사용률, used/total: 사용량·총량 형식화 문자열, color: 임계 색상). 수집 불가 시 percentage 0·"알 수 없음"·color gray 폴백 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "시스템 리소스 정보를 성공적으로 조회했습니다.",
+    "data": {
+        "cpu": {
+            "percentage": 52,
+            "color": "blue"
+        },
+        "memory": {
+            "percentage": 86,
+            "used": "27 GB",
+            "total": "31.5 GB",
+            "color": "yellow"
+        },
+        "disk": {
+            "percentage": 76,
+            "used": "362.6 GB",
+            "total": "474.7 GB",
+            "color": "yellow"
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -156,6 +322,15 @@ _단건 응답: `data` 객체의 필드._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/dashboard/stats HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -168,6 +343,48 @@ _단건 응답: `data` 객체의 필드._
 | installed_templates | object | `{"total":2,"active":2}` | 설치된 템플릿 집계 객체 (total/active) |
 | language_packs | object | `{"total":20,"active":16}` | 언어팩 집계 객체 (active: 현재 활성 언어팩 수, total: 활성 + 미설치 번들 팩 수) |
 | system_status | object | `{"status":"normal","label":"정상","all_services_running":true}` | 시스템 상태 객체 (status: normal 정상 / warning 경고, label: 상태 다국어 라벨, all_services_running: 전체 서비스 정상 동작 여부) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "대시보드 통계를 성공적으로 조회했습니다.",
+    "data": {
+        "total_users": {
+            "count": 2,
+            "change_percent": 0,
+            "change_display": "+2",
+            "trend": "up"
+        },
+        "installed_modules": {
+            "total": 3,
+            "active": 3
+        },
+        "active_plugins": {
+            "total": 9,
+            "active": 0
+        },
+        "installed_templates": {
+            "total": 2,
+            "active": 0
+        },
+        "language_packs": {
+            "total": 17,
+            "active": 1
+        },
+        "system_status": {
+            "status": "normal",
+            "label": "정상",
+            "all_services_running": true
+        }
+    }
+}
+```
 
 **에러 응답**
 

@@ -13,7 +13,7 @@
 | [activity-log-hooks.md](docs/backend/activity-log-hooks.md) | 활동 로그 훅 레퍼런스 (Activity Log Hooks Reference) | 코어 66훅 + 이커머스 92훅 + 게시판 32훅 + 페이지 8훅 = 총 198훅 |
 | [activity-log.md](docs/backend/activity-log.md) | 활동 로그 시스템 (Activity Log System) | Monolog 기반: Service 훅 → Listener → Log::channel('activity... |
 | [admin-settings-access.md](docs/backend/admin-settings-access.md) | Admin 환경설정 값 접근 (`g7_core_settings` vs `config()`) | 동기화 SSoT: storage/app/settings/*.json → SettingsServicePr... |
-| [api-documentation.md](docs/backend/api-documentation.md) | API 레퍼런스 문서 규정 (API Documentation) | 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 전수 기재 |
+| [api-documentation.md](docs/backend/api-documentation.md) | API 레퍼런스 문서 규정 (API Documentation) | 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 + 요청·응답 예시 ... |
 | [api-resources.md](docs/backend/api-resources.md) | API 리소스 | Resource: BaseApiResource 상속 필수 / Collection: BaseApiColl... |
 | [authentication.md](docs/backend/authentication.md) | 인증 및 세션 처리 | Laravel Sanctum 토큰 전용 인증 (Bearer 토큰만 사용) |
 | [broadcasting.md](docs/backend/broadcasting.md) | Broadcasting (실시간 이벤트) | Laravel Reverb 사용 (WebSocket) |
@@ -117,7 +117,7 @@
 | [module-i18n.md](docs/extension/module-i18n.md) | 모듈 다국어 시스템 | 백엔드: /lang/{locale}/*.php → __('vendor-module::key') |
 | [module-identity-settings.md](docs/extension/module-identity-settings.md) | 모듈/플러그인 본인인증(IDV) 설정 통합 가이드 | 정책/목적/메시지: module.php::getIdentity{Policies,Purposes,Mess... |
 | [module-layouts.md](docs/extension/module-layouts.md) | 모듈 레이아웃 시스템 | 위치: modules/_bundled/vendor-module/resources/layouts/admi... |
-| [module-routing.md](docs/extension/module-routing.md) | 모듈 라우트 규칙 | URL prefix 자동: /api/admin/[vendor-module]/... |
+| [module-routing.md](docs/extension/module-routing.md) | 모듈 라우트 규칙 | URL prefix 자동: /api/modules/[vendor-module]/... |
 | [module-settings.md](docs/extension/module-settings.md) | 모듈 환경설정 시스템 개발 가이드 | - |
 | [permissions.md](docs/extension/permissions.md) | 권한 시스템 | 구조: User → Role → Permission (기능 레벨) |
 | [plugin-development.md](docs/extension/plugin-development.md) | 플러그인 개발 가이드 | 디렉토리: plugins/vendor-plugin (예: sirsoft-payment) |

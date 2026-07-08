@@ -36,6 +36,15 @@
 | sort_by | query | string | 아니오 | `created_at`, `published_at` | 정렬 기준 필드명 |
 | sort_order | query | string | 아니오 | `asc`, `desc` | 정렬 방향 (asc 오름차순 / desc 내림차순) |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/admin/pages?published=1&search=%EC%98%88%EC%8B%9C%EA%B0%92&search_field=all&filters=%EC%98%88%EC%8B%9C%EA%B0%92&per_page=1&page=1&sort_by=created_at&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드._
@@ -53,6 +62,72 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | updated_at | string | `2026-07-06 23:57:18` | 최종 수정 일시 |
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "페이지 정보를 조회했습니다.",
+    "data": {
+        "data": [
+            {
+                "id": 10,
+                "slug": "apidoc-sample-page",
+                "title": "API 문서 샘플 페이지",
+                "published": true,
+                "published_at": "2026-07-08 10:51:59",
+                "current_version": 2,
+                "creator": {
+                    "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                    "name": "API 문서 샘플 사용자"
+                },
+                "created_at": "2026-07-08 10:51:59",
+                "updated_at": "2026-07-08 10:51:59",
+                "is_owner": true,
+                "abilities": {
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true
+                }
+            },
+            {
+                "id": 4,
+                "slug": "terms",
+                "title": "이용약관",
+                "published": true,
+                "published_at": "2026-07-08 10:44:43",
+                "current_version": 1,
+                "creator": null,
+                "created_at": "2026-07-08 10:44:43",
+                "updated_at": "2026-07-08 10:44:43",
+                "is_owner": false,
+                "abilities": {
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true
+                }
+            },
+            "... (총 7건 중 2건 표시)"
+        ],
+        "meta": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 7
+        },
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -85,9 +160,37 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | seo_meta | body | array | 아니오 | — | SEO 메타 정보 맵. 하위 키 `title`(max 255)·`description`(max 500)·`keywords`(max 500)를 담습니다 |
 | temp_key | body | string | 아니오 | max 64 | 저장 전 첨부 업로드 시 발급받은 임시 키. 생성된 페이지에 임시 첨부를 귀속시키는 데 사용합니다 |
 
+**요청 예시**
+
+```http
+POST /api/modules/sirsoft-page/admin/pages HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "slug": "example-key",
+    "title": [
+        "예시 제목"
+    ],
+    "content": "예시 내용입니다.",
+    "content_mode": "html",
+    "published": true,
+    "seo_meta": [
+        "예시값"
+    ],
+    "temp_key": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -115,9 +218,30 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | ids | body | array | 예 | min 1 | 대상 리소스 식별자 배열 (대량 작업 대상) |
 | published | body | boolean | 예 | — | 발행 여부 (발행된 항목만 필터) |
 
+**요청 예시**
+
+```http
+PATCH /api/modules/sirsoft-page/admin/pages/bulk-publish HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ],
+    "published": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -145,9 +269,28 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | slug | body | string | 예 | max 255 | URL 친화 식별자 (slug) |
 | exclude_id | body | integer | 아니오 | min 1 | exclude 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/modules/sirsoft-page/admin/pages/check-slug HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "slug": "example-key",
+    "exclude_id": 1
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -174,9 +317,34 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | --- | --- | --- | --- | --- | --- |
 | page | path | string | 예 | — | 조회할 페이지 번호 (1부터 시작) |
 
+**요청 예시**
+
+```http
+DELETE /api/modules/sirsoft-page/admin/pages/10 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "페이지가 삭제되었습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 
@@ -203,6 +371,15 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | --- | --- | --- | --- | --- | --- |
 | page | path | string | 예 | — | 조회할 페이지 번호 (1부터 시작) |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/admin/pages/10 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -225,6 +402,71 @@ _단건 응답: `data` 객체의 필드._
 | updated_at | string | `2026-07-06 23:57:18` | 최종 수정 일시 |
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "페이지 정보를 조회했습니다.",
+    "data": {
+        "id": 10,
+        "slug": "apidoc-sample-page",
+        "title": {
+            "ko": "API 문서 샘플 페이지",
+            "en": "API Doc Sample Page"
+        },
+        "content": {
+            "ko": "<p>API 레퍼런스 실측용 완전 샘플 페이지 본문입니다.</p>",
+            "en": "<p>Complete sample page body for API reference probing.</p>"
+        },
+        "content_mode": "html",
+        "published": true,
+        "published_at": "2026-07-08 10:51:59",
+        "seo_meta": {
+            "title": "Dolorum et aut officia ipsam doloribus inventore.",
+            "description": "Sint ipsa impedit enim natus tempore quasi dignissimos praesentium numquam rerum tempore nam.",
+            "keywords": "illo,pariatur,quis,necessitatibus,aperiam"
+        },
+        "current_version": 2,
+        "creator": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자"
+        },
+        "updater": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자"
+        },
+        "attachments": [
+            {
+                "id": 4,
+                "hash": "ninrdtsmhhta",
+                "original_filename": "nesciunt.jpg",
+                "mime_type": "image/jpeg",
+                "size": 7124557,
+                "collection": "attachments",
+                "order": 0,
+                "is_image": true,
+                "download_url": "/api/modules/sirsoft-page/pages/attachment/ninrdtsmhhta",
+                "preview_url": "/api/modules/sirsoft-page/pages/attachment/ninrdtsmhhta/preview",
+                "created_at": "2026-07-08 10:51:59"
+            }
+        ],
+        "created_at": "2026-07-08 10:51:59",
+        "updated_at": "2026-07-08 10:51:59",
+        "is_owner": true,
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -258,9 +500,37 @@ _단건 응답: `data` 객체의 필드._
 | seo_meta | body | array | 아니오 | — | SEO 메타 정보 맵. 하위 키 `title`(max 255)·`description`(max 500)·`keywords`(max 500)를 담습니다 |
 | temp_key | body | string | 아니오 | max 64 | 저장 전 첨부 업로드 시 발급받은 임시 키. 새로 업로드한 첨부를 이 페이지에 귀속시키는 데 사용합니다 |
 
+**요청 예시**
+
+```http
+PUT /api/modules/sirsoft-page/admin/pages/10 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "slug": "example-key",
+    "title": [
+        "예시 제목"
+    ],
+    "content": "예시 내용입니다.",
+    "content_mode": "html",
+    "published": true,
+    "seo_meta": [
+        "예시값"
+    ],
+    "temp_key": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -289,9 +559,81 @@ _단건 응답: `data` 객체의 필드._
 | page | path | string | 예 | — | 조회할 페이지 번호 (1부터 시작) |
 | published | body | boolean | 예 | — | 발행 여부 (발행된 항목만 필터) |
 
+**요청 예시**
+
+```http
+PATCH /api/modules/sirsoft-page/admin/pages/10/publish HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "published": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `10` | 기본 키 (내부 식별자) |
+| slug | string | `apidoc-sample-page` | URL 친화 식별자 (slug) |
+| title | object | `{"ko":"API 문서 샘플 페이지","en":"API Doc Sample Page"}` | 제목 |
+| content | object | `{"ko":"<p>API 레퍼런스 실측용 완전 샘플 페이지 본문입니다.<\/p>","en":"<p>Co…` | 본문 내용 |
+| content_mode | string | `html` | 본문 형식 (html, text) |
+| published | boolean | `true` | 발행 여부 (true: 발행, false: 미발행) |
+| published_at | string | `2026-07-08 15:03:15` | published 일시 |
+| seo_meta | object | `{"title":"Dolorum et aut officia ipsam doloribus inventor…` | SEO 메타 정보 (title, description, keywords) |
+| current_version | integer | `2` | 현재 버전 번호 |
+| created_at | string | `2026-07-08 10:51:59` | 생성 일시 |
+| updated_at | string | `2026-07-08 15:03:15` | 최종 수정 일시 |
+| is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
+| abilities | object | `{"can_create":true,"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "페이지 발행 상태가 변경되었습니다.",
+    "data": {
+        "id": 10,
+        "slug": "apidoc-sample-page",
+        "title": {
+            "ko": "API 문서 샘플 페이지",
+            "en": "API Doc Sample Page"
+        },
+        "content": {
+            "ko": "<p>API 레퍼런스 실측용 완전 샘플 페이지 본문입니다.</p>",
+            "en": "<p>Complete sample page body for API reference probing.</p>"
+        },
+        "content_mode": "html",
+        "published": true,
+        "published_at": "2026-07-08 15:03:15",
+        "seo_meta": {
+            "title": "Dolorum et aut officia ipsam doloribus inventore.",
+            "description": "Sint ipsa impedit enim natus tempore quasi dignissimos praesentium numquam rerum tempore nam.",
+            "keywords": "illo,pariatur,quis,necessitatibus,aperiam"
+        },
+        "current_version": 2,
+        "created_at": "2026-07-08 10:51:59",
+        "updated_at": "2026-07-08 15:03:15",
+        "is_owner": true,
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -319,6 +661,15 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | page | path | string | 예 | — | 조회할 페이지 번호 (1부터 시작) |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/admin/pages/10/versions HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
@@ -333,6 +684,63 @@ _단건 응답: `data` 객체의 필드._
 | changes_summary | string | `본문 보강` | 이 버전에서 무엇이 바뀌었는지 요약한 변경 설명 (버전 생성 시 기록, 없으면 null) |
 | creator | object | `{"uuid":"a231747f-e82e-4cf2-9ae1-a261849dce40","name":"AP…` | 생성자 정보 객체 (uuid/name/email — creator 관계 파생) |
 | created_at | string | `2026-07-06 23:57:18` | 생성 일시 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "페이지 정보를 조회했습니다.",
+    "data": [
+        {
+            "id": 14,
+            "page_id": 10,
+            "version": 2,
+            "title": {
+                "ko": "API 문서 샘플 페이지 (v2)",
+                "en": "API Doc Sample Page (v2)"
+            },
+            "content": {
+                "ko": "<p>수정 버전 본문.</p>",
+                "en": "<p>Revised version body.</p>"
+            },
+            "content_mode": "html",
+            "seo_meta": null,
+            "changes_summary": "본문 보강",
+            "creator": {
+                "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                "name": "API 문서 샘플 사용자"
+            },
+            "created_at": "2026-07-08 10:51:59"
+        },
+        {
+            "id": 13,
+            "page_id": 10,
+            "version": 1,
+            "title": {
+                "ko": "API 문서 샘플 페이지 (v1)",
+                "en": "API Doc Sample Page (v1)"
+            },
+            "content": {
+                "ko": "<p>초기 버전 본문.</p>",
+                "en": "<p>Initial version body.</p>"
+            },
+            "content_mode": "html",
+            "seo_meta": null,
+            "changes_summary": "최초 작성",
+            "creator": {
+                "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                "name": "API 문서 샘플 사용자"
+            },
+            "created_at": "2026-07-08 10:51:59"
+        }
+    ]
+}
+```
 
 **에러 응답**
 
@@ -360,9 +768,22 @@ _단건 응답: `data` 객체의 필드._
 | page | path | string | 예 | — | 조회할 페이지 번호 (1부터 시작) |
 | versionId | path | string | 예 | — | 대상 version의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/admin/pages/10/versions/{versionId} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -390,9 +811,22 @@ _단건 응답: `data` 객체의 필드._
 | page | path | string | 예 | — | 조회할 페이지 번호 (1부터 시작) |
 | versionId | path | string | 예 | — | 대상 version의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/modules/sirsoft-page/admin/pages/10/versions/{versionId}/restore HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -419,9 +853,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | hash | path | string | 예 | — | 대상 리소스의 해시 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/pages/attachment/{hash} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -446,9 +893,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | hash | path | string | 예 | — | 대상 리소스의 해시 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/pages/attachment/{hash}/preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -473,9 +933,60 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | slug | path | string | 예 | — | 대상 리소스의 slug (URL 친화 식별자) |
 
+**요청 예시**
+
+```http
+GET /api/modules/sirsoft-page/pages/terms HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `4` | 기본 키 (내부 식별자) |
+| slug | string | `terms` | URL 친화 식별자 (slug) |
+| title | string | `이용약관` | 제목 |
+| content | string | `<h2 style="font-size: 1.25rem; font-w…` | 본문 내용 |
+| content_mode | string | `html` | 본문 형식 (html, text) |
+| is_preview | boolean | `false` | preview 여부 |
+| published_at | string | `2026-07-08 10:44:43` | published 일시 |
+| seo_meta | null | `null` | SEO 메타 정보 (title, description, keywords) |
+| current_version | integer | `1` | 현재 버전 번호 |
+| attachments | array | `[]` | 페이지에 귀속된 첨부파일 목록 (PageAttachmentResource 배열 — id/hash/원본파일명/URL 등, 로드된 경우에만 포함) |
+| created_at | string | `2026-07-08 10:44:43` | 생성 일시 |
+| updated_at | string | `2026-07-08 10:44:43` | 최종 수정 일시 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "페이지 정보를 조회했습니다.",
+    "data": {
+        "id": 4,
+        "slug": "terms",
+        "title": "이용약관",
+        "content": "<h2 style=\"font-size: 1.25rem; font-weight: 700; margin-top: 0; margin-bottom: 1rem;\">제1조 (목적)</h2>\n<p style=\"font-size: 1rem; line-height: 1.75; margin-bottom: 1rem;\">[이용약관의 목적을 입력하세요.]</p>\n\n<h2 style=\"font-size: 1.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;\">제2조 (정의)</h2>\n<p style=\"font-size: 1rem; line-height: 1.75; margin-bottom: 1rem;\">[주요 용어의 정의를 입력하세요.]</p>\n\n<h2 style=\"font-size: 1.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;\">제3조 (약관의 효력 및 변경)</h2>\n<p style=\"font-size: 1rem; line-height: 1.75; margin-bottom: 1rem;\">[약관의 효력 및 변경에 관한 내용을 입력하세요.]</p>\n\n<h2 style=\"font-size: 1.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;\">제4조 (서비스의 제공 및 변경)</h2>\n<p style=\"font-size: 1rem; line-height: 1.75; margin-bottom: 1rem;\">[서비스 제공 및 변경에 관한 내용을 입력하세요.]</p>\n\n<h2 style=\"font-size: 1.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;\">제5조 (회원의 의무)</h2>\n<p style=\"font-size: 1rem; line-height: 1.75; margin-bottom: 1rem;\">[회원의 의무에 관한 내용을 입력하세요.]</p>",
+        "content_mode": "html",
+        "is_preview": false,
+        "published_at": "2026-07-08 10:44:43",
+        "seo_meta": null,
+        "current_version": 1,
+        "attachments": [],
+        "created_at": "2026-07-08 10:44:43",
+        "updated_at": "2026-07-08 10:44:43"
+    }
+}
+```
 
 **에러 응답**
 

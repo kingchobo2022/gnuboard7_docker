@@ -36,9 +36,50 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.attachment.upload_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/attachments HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: multipart/form-data; boundary=----G7ExampleBoundary
+
+------G7ExampleBoundary
+Content-Disposition: form-data; name="file"; filename="example.pdf"
+Content-Type: application/octet-stream
+
+(바이너리 파일 내용)
+------G7ExampleBoundary
+Content-Disposition: form-data; name="attachmentable_type"
+
+예시값
+------G7ExampleBoundary
+Content-Disposition: form-data; name="attachmentable_id"
+
+1
+------G7ExampleBoundary
+Content-Disposition: form-data; name="collection"
+
+예시값
+------G7ExampleBoundary
+Content-Disposition: form-data; name="source_type"
+
+예시값
+------G7ExampleBoundary
+Content-Disposition: form-data; name="source_identifier"
+
+example-key
+------G7ExampleBoundary--
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -72,9 +113,34 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.attachment.upload_batch_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/attachments/batch HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "files": [
+        "예시값"
+    ],
+    "attachmentable_type": "예시값",
+    "attachmentable_id": 1,
+    "collection": "예시값",
+    "source_type": "예시값",
+    "source_identifier": "example-key"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -103,9 +169,29 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.attachment.reorder_validation_rules`).
 
+**요청 예시**
+
+```http
+PATCH /api/admin/attachments/reorder HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "order": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -132,9 +218,22 @@
 | --- | --- | --- | --- | --- | --- |
 | attachment | path | string | 예 | — | 대상 attachment의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/attachments/{attachment} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

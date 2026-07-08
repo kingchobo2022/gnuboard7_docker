@@ -37,6 +37,14 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.search.validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/search?q=%EC%98%88%EC%8B%9C%EA%B0%92&type=%EC%98%88%EC%8B%9C%EA%B0%92&sort=relevance&page=1&per_page=1&board_slug=example-key&category_id=1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -45,6 +53,23 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- |
 | q | string | `` | 실제 검색에 사용된 검색어 (요청 `q` 를 trim 하여 에코, 검색어가 비어 있으면 빈 문자열) |
 | total | integer | `0` | 전체 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "검색어를 입력해주세요.",
+    "data": {
+        "q": "",
+        "total": 0
+    }
+}
+```
 
 **에러 응답**
 

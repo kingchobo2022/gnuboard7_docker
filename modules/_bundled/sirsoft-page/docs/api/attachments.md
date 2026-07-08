@@ -32,9 +32,42 @@
 | collection | body | string | 아니오 | max 100 | 첨부 컬렉션 그룹명 (첨부를 용도별로 묶는 키, 미지정 시 default) |
 | temp_key | body | string | 아니오 | max 64 | 저장 전 임시 귀속 키. 아직 저장되지 않은 페이지의 첨부를 임시로 묶어 두고, 이후 페이지 저장 시 이 키로 확정 귀속합니다 (`page_id` 미지정 시 사용) |
 
+**요청 예시**
+
+```http
+POST /api/modules/sirsoft-page/admin/attachments HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: multipart/form-data; boundary=----G7ExampleBoundary
+
+------G7ExampleBoundary
+Content-Disposition: form-data; name="file"; filename="example.pdf"
+Content-Type: application/octet-stream
+
+(바이너리 파일 내용)
+------G7ExampleBoundary
+Content-Disposition: form-data; name="page_id"
+
+1
+------G7ExampleBoundary
+Content-Disposition: form-data; name="collection"
+
+예시값
+------G7ExampleBoundary
+Content-Disposition: form-data; name="temp_key"
+
+예시값
+------G7ExampleBoundary--
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -61,9 +94,29 @@
 | --- | --- | --- | --- | --- | --- |
 | order | body | array | 예 | min 1 | 새 정렬 순서 배열. 각 원소는 `{"id": 첨부ID(정수), "order": 순서값(0 이상 정수)}` 형태이며, 이 순서대로 첨부 표시 순위가 갱신됩니다 |
 
+**요청 예시**
+
+```http
+PATCH /api/modules/sirsoft-page/admin/attachments/reorder HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "order": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -90,9 +143,22 @@
 | --- | --- | --- | --- | --- | --- |
 | id | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/modules/sirsoft-page/admin/attachments/{id} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

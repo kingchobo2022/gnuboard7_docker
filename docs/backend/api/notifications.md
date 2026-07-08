@@ -34,11 +34,45 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.notification.filter_index_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/notifications?read=unread&per_page=1&page=1&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 <!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "알림 목록을 조회했습니다.",
+    "data": {
+        "data": [],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 0,
+            "from": null,
+            "to": null,
+            "has_more_pages": false
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -65,9 +99,38 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+DELETE /api/admin/notifications/all HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| deleted_count | integer | `0` | deleted 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "모든 알림이 삭제되었습니다.",
+    "data": {
+        "deleted_count": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -93,9 +156,38 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/admin/notifications/read-all HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| marked_count | integer | `0` | marked 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "모든 알림을 읽음 처리했습니다.",
+    "data": {
+        "marked_count": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -125,9 +217,29 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.notification.filter_batch_read_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/notifications/read-batch HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -154,6 +266,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/notifications/unread-count HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -161,6 +282,22 @@ _단건 응답: `data` 객체의 필드._
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
 | --- | --- | --- | --- |
 | unread_count | integer | `0` | unread 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "미읽음 알림 수를 조회했습니다.",
+    "data": {
+        "unread_count": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -188,9 +325,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | notification | path | string | 예 | — | 대상 notification의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/notifications/{notification} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -219,9 +369,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | notification | path | string | 예 | — | 대상 notification의 식별자 |
 
+**요청 예시**
+
+```http
+PATCH /api/admin/notifications/{notification}/read HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -255,11 +418,45 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.notification.filter_index_rules`).
 
+**요청 예시**
+
+```http
+GET /api/user/notifications?read=unread&per_page=1&page=1&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 <!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "알림 목록을 조회했습니다.",
+    "data": {
+        "data": [],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 0,
+            "from": null,
+            "to": null,
+            "has_more_pages": false
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -285,9 +482,38 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+DELETE /api/user/notifications/all HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| deleted_count | integer | `0` | deleted 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "모든 알림이 삭제되었습니다.",
+    "data": {
+        "deleted_count": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -312,9 +538,38 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/user/notifications/read-all HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| marked_count | integer | `0` | marked 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "모든 알림을 읽음 처리했습니다.",
+    "data": {
+        "marked_count": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -343,9 +598,29 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.notification.filter_batch_read_rules`).
 
+**요청 예시**
+
+```http
+POST /api/user/notifications/read-batch HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -371,6 +646,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/user/notifications/unread-count HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -378,6 +662,22 @@ _단건 응답: `data` 객체의 필드._
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
 | --- | --- | --- | --- |
 | unread_count | integer | `0` | unread 개수 (집계) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "미읽음 알림 수를 조회했습니다.",
+    "data": {
+        "unread_count": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -404,9 +704,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | notification | path | string | 예 | — | 대상 notification의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/user/notifications/{notification} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -434,9 +747,22 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | notification | path | string | 예 | — | 대상 notification의 식별자 |
 
+**요청 예시**
+
+```http
+PATCH /api/user/notifications/{notification}/read HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

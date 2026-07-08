@@ -27,9 +27,22 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+DELETE /api/me/avatar HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-404 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -56,9 +69,30 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.upload_avatar_rules`).
 
+**요청 예시**
+
+```http
+POST /api/me/avatar HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: multipart/form-data; boundary=----G7ExampleBoundary
+
+------G7ExampleBoundary
+Content-Disposition: form-data; name="avatar"; filename="example.png"
+Content-Type: image/png
+
+(바이너리 파일 내용)
+------G7ExampleBoundary--
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/extensions/auto-deactivated HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -35,6 +44,27 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- |
 | items | object | `{"plugins":[],"modules":[],"templates":[]}` | 코어 비호환으로 자동 비활성화된 확장을 타입별(`plugins`/`modules`/`templates`)로 묶은 목록. 각 원소는 식별자(`identifier`), 비호환 요구 버전(`incompatible_required_version`), 비활성화 시각(`deactivated_at`)을 가지며, 사용자가 dismiss했거나 hidden(학습용 샘플) 확장은 제외됨 |
 | current_core_version | string | `7.0.1` | 현재 설치된 코어 버전 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "자동 비활성화된 확장 목록입니다.",
+    "data": {
+        "items": {
+            "plugins": [],
+            "modules": [],
+            "templates": []
+        },
+        "current_core_version": "7.0.1"
+    }
+}
+```
 
 **에러 응답**
 
@@ -61,9 +91,22 @@ _단건 응답: `data` 객체의 필드._
 | type | path | string | 예 | module, plugin, template | 대상 확장의 타입 (module: 모듈, plugin: 플러그인, template: 템플릿). 타입에 맞는 Repository/Manager를 해석하는 데 사용되며 그 외 값은 422 |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/extensions/{type}/{identifier}/dismiss HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -91,9 +134,22 @@ _단건 응답: `data` 객체의 필드._
 | type | path | string | 예 | module, plugin, template | 대상 확장의 타입 (module: 모듈, plugin: 플러그인, template: 템플릿). 타입에 맞는 Repository/Manager를 해석하는 데 사용되며 그 외 값은 422 |
 | identifier | path | string | 예 | — | 대상 리소스의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/extensions/{type}/{identifier}/recover HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

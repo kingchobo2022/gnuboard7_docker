@@ -27,9 +27,22 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+DELETE /api/me HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-500 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -53,6 +66,15 @@ _요청 파라미터 없음._
 **요청 파라미터**
 
 _요청 파라미터 없음._
+
+**요청 예시**
+
+```http
+GET /api/me HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -117,6 +139,57 @@ _단건 응답: `data` 객체의 필드._
 | ecommerce_preferred_shipping_country | null | `null` | 선호 배송 국가 코드 (이커머스 모듈 주입, 미설정 시 null) |
 | ecommerce_preferred_shipping_country_name | null | `null` | 선호 배송 국가 이름 (코드 파생, 이커머스 모듈 주입, 미설정 시 null) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "프로필 정보를 성공적으로 가져왔습니다.",
+    "data": {
+        "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "name": "API 문서 샘플 사용자",
+        "nickname": "song.hyunji",
+        "email": "apidoc-sample-user@example.com",
+        "avatar": null,
+        "language": "ko",
+        "timezone": "Asia/Seoul",
+        "country": "KR",
+        "status": "active",
+        "status_label": "활성",
+        "status_variant": "success",
+        "homepage": "https://example.com",
+        "mobile": "010-9595-2897",
+        "phone": "02-637-5618",
+        "zipcode": "16505",
+        "address": "경기도 안양시 봉은사로 2918",
+        "address_detail": "48동 718호",
+        "signature": "Fugit consequuntur repellendus sed.",
+        "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+        "is_super": false,
+        "is_admin": true,
+        "withdrawn_at": null,
+        "last_login_at": "2026-07-07 10:41:24",
+        "last_login_human": "1일 전",
+        "created_at": "2026-07-08 10:41:24",
+        "is_owner": true,
+        "notify_post_complete": false,
+        "notify_post_reply": false,
+        "notify_comment": false,
+        "notify_reply_comment": false,
+        "ecommerce_mileage": {
+            "enabled": false
+        },
+        "ecommerce_preferred_currency": null,
+        "ecommerce_preferred_shipping_country": null,
+        "ecommerce_preferred_shipping_country_name": null
+    }
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -167,9 +240,46 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.update_profile_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/me HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "nickname": "예시 이름",
+    "email": "user@example.com",
+    "password": "Password123!",
+    "current_password": "Password123!",
+    "language": "ko",
+    "country": "KR",
+    "timezone": "Asia/Seoul",
+    "homepage": "https://example.com",
+    "mobile": "010-1234-5678",
+    "phone": "010-1234-5678",
+    "zipcode": "06234",
+    "address": "서울특별시 강남구 테헤란로 1",
+    "address_detail": "서울특별시 강남구 테헤란로 1",
+    "signature": "예시값",
+    "bio": "예시 내용입니다.",
+    "notify_post_complete": true,
+    "notify_post_reply": true,
+    "notify_comment": true,
+    "notify_reply_comment": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

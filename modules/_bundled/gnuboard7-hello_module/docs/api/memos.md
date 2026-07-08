@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/modules/gnuboard7-hello_module/memos HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: http-404 — 응답 필드는 사람이 작성하세요. -->
@@ -73,6 +82,15 @@ _대표 에러 없음 (공개 조회). <!-- TODO: 도메인 특이 에러가 있
 | 이름 | 위치 | 타입 | 필수 | 허용값 | 용도 |
 | --- | --- | --- | --- | --- | --- |
 | id | path | string | 예 | — | 대상 리소스의 식별자 |
+
+**요청 예시**
+
+```http
+GET /api/modules/gnuboard7-hello_module/memos/{id} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
 
 **응답 필드** (`data` 내부)
 

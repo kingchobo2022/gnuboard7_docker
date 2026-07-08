@@ -27,9 +27,20 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-verification_kginicis/me/identity/inicis HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: no-token — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
 
 **에러 응답**
 
@@ -59,7 +70,7 @@ _요청 파라미터 없음._
   | is_foreigner | boolean | `false` | 외국인 여부. |
 
   이 외에 `BaseApiResource` 공통 메타 `is_owner`(항상 본인이므로 `true`) + `abilities` 가 함께 붙는다.
-- **미설치 주의**: 이 문서는 플러그인 미설치 상태의 라우트 정적 분석으로 생성되어 실측 응답이 없다(`no-token`). 설치 후 `php artisan api:docgen --scope=plugin:sirsoft-verification_kginicis --seed` 로 실측하면 응답 예시가 채워진다.
+- **응답 예시 주의**: 실측 시 샘플 사용자에게 본인인증 record 가 없어 `data: null`(record 없음) 응답만 관측된다. 아래 두 응답 예시 중 "record 존재 시" 는 `InicisIdentityResource` 구조 기준 정적 작성이다. 실제 record 가 있는 사용자로 실측하면 마스킹된 본인확인 정보가 채워진다.
 
 **응답 예시** (record 존재 시 — 정적, `InicisIdentityResource` 구조 기준)
 

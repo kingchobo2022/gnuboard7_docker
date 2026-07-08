@@ -42,6 +42,15 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.activity_log.index_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/activity-logs?log_type=%EC%98%88%EC%8B%9C%EA%B0%92&action=%EC%98%88%EC%8B%9C%EA%B0%92&user_id=1&loggable_type=%EC%98%88%EC%8B%9C%EA%B0%92&search=%EC%98%88%EC%8B%9C%EA%B0%92&search_type=%EC%98%88%EC%8B%9C%EA%B0%92&created_by=%EC%98%88%EC%8B%9C%EA%B0%92&date_from=2026-01-01&date_to=2026-01-01&per_page=1&sort_by=%EC%98%88%EC%8B%9C%EA%B0%92&sort_order=%EC%98%88%EC%8B%9C%EA%B0%92 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -70,6 +79,100 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_read":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "활동 로그 정보를 성공적으로 가져왔습니다.",
+    "data": {
+        "data": [
+            {
+                "number": 22,
+                "id": 22,
+                "log_type": "admin",
+                "log_type_label": "관리자",
+                "loggable_type": null,
+                "loggable_type_display": null,
+                "loggable_id": null,
+                "action": "user.index",
+                "action_label": "목록 조회",
+                "localized_description": "사용자 목록 조회",
+                "description_key": "activity_log.description.user_index",
+                "properties": {
+                    "result_count": 2
+                },
+                "changes": null,
+                "bulk_changes": null,
+                "has_changes": false,
+                "actor_name": "API 문서 샘플 사용자",
+                "user": {
+                    "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                    "name": "API 문서 샘플 사용자",
+                    "email": "apidoc-sample-user@example.com"
+                },
+                "ip_address": "127.0.0.1",
+                "created_at": "2026-07-08 12:12:12",
+                "is_owner": true,
+                "abilities": {
+                    "can_read": true,
+                    "can_delete": true
+                }
+            },
+            {
+                "number": 21,
+                "id": 21,
+                "log_type": "admin",
+                "log_type_label": "관리자",
+                "loggable_type": null,
+                "loggable_type_display": null,
+                "loggable_id": null,
+                "action": "user.index",
+                "action_label": "목록 조회",
+                "localized_description": "사용자 목록 조회",
+                "description_key": "activity_log.description.user_index",
+                "properties": {
+                    "result_count": 2
+                },
+                "changes": null,
+                "bulk_changes": null,
+                "has_changes": false,
+                "actor_name": "API 문서 샘플 사용자",
+                "user": {
+                    "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                    "name": "API 문서 샘플 사용자",
+                    "email": "apidoc-sample-user@example.com"
+                },
+                "ip_address": "127.0.0.1",
+                "created_at": "2026-07-08 12:08:26",
+                "is_owner": true,
+                "abilities": {
+                    "can_read": true,
+                    "can_delete": true
+                }
+            },
+            "... (총 22건 중 2건 표시)"
+        ],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 22,
+            "from": 1,
+            "to": 22,
+            "has_more_pages": false
+        },
+        "abilities": {
+            "can_delete": true
+        }
+    }
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -95,9 +198,29 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | ids | body | array | 예 | min 1 | 대상 리소스 식별자 배열 (대량 작업 대상) |
 
+**요청 예시**
+
+```http
+POST /api/admin/activity-logs/bulk-delete HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -124,9 +247,34 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | activityLog | path | string | 예 | — | 대상 activity log의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/activity-logs/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "활동 로그가 삭제되었습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 

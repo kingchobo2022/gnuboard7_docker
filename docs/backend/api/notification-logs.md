@@ -40,6 +40,15 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.notification_log.filter_index_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/notification-logs?sender_user_id=1&recipient_user_id=1&search=%EC%98%88%EC%8B%9C%EA%B0%92&channel=%EC%98%88%EC%8B%9C%EA%B0%92&notification_type=%EC%98%88%EC%8B%9C%EA%B0%92&extension_type=core&status=%EC%98%88%EC%8B%9C%EA%B0%92&per_page=1&sort_by=id&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -68,6 +77,68 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | updated_at | string | `2026-07-06 19:20:23` | 최종 수정 일시 |
 | abilities | object | `{"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "알림 발송 이력을 조회했습니다.",
+    "data": {
+        "data": [
+            {
+                "number": 1,
+                "id": 1,
+                "channel": "mail",
+                "notification_type": "apidoc.sample.event",
+                "extension_type": "core",
+                "extension_identifier": "",
+                "recipient_user_id": 6,
+                "recipient_identifier": "apidoc-sample-user@example.com",
+                "recipient_name": "API 문서 샘플 사용자",
+                "sender_user_id": 6,
+                "sender": {
+                    "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                    "name": "API 문서 샘플 사용자",
+                    "email": "apidoc-sample-user@example.com"
+                },
+                "recipient": {
+                    "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                    "name": "API 문서 샘플 사용자",
+                    "email": "apidoc-sample-user@example.com"
+                },
+                "subject": "API 문서 샘플 알림",
+                "body": "문서 실측용 알림 본문입니다.",
+                "status": "sent",
+                "error_message": null,
+                "source": "apidoc",
+                "sent_at": "2026-07-08 09:41:24",
+                "created_at": "2026-07-08 10:41:24",
+                "updated_at": "2026-07-08 10:41:24",
+                "abilities": {
+                    "can_delete": true
+                }
+            }
+        ],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 1,
+            "from": 1,
+            "to": 1,
+            "has_more_pages": false
+        },
+        "abilities": {
+            "can_delete": true
+        }
+    }
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -93,9 +164,29 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | ids | body | array | 예 | min 1 | 대상 리소스 식별자 배열 (대량 작업 대상) |
 
+**요청 예시**
+
+```http
+POST /api/admin/notification-logs/bulk-delete HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ]
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -122,9 +213,34 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | notificationLog | path | string | 예 | — | 대상 notification log의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/notification-logs/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "알림 발송 이력이 삭제되었습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 

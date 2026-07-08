@@ -143,13 +143,6 @@ class ApiRouteInventory
         $urlPrefix = "api/{$dir}/{$id}";
         $namePrefix = "api.{$dir}.{$id}.";
 
-        // 등록 전 스냅샷 — 이미 등록된(활성) 라우트와 이번 로드분을 구분한다.
-        $existing = [];
-        foreach (RouteFacade::getRoutes() as $route) {
-            /** @var Route $route */
-            $existing[spl_object_id($route)] = true;
-        }
-
         try {
             RouteFacade::prefix($urlPrefix)
                 ->name($namePrefix)
@@ -160,14 +153,15 @@ class ApiRouteInventory
             return [];
         }
 
+        // 이 확장 소유로 확정된 라우트를 전역 라우트 테이블에서 prefix(uri/name) 로 직접 골라낸다.
+        // object-id 스냅샷 방식은 refreshNameLookups() 가 RouteCollection 을 재색인하며 객체를
+        // 다시 만들어 dedup 이 어긋나므로(활성 확장 로드 순서·중복 로드에 취약) 쓰지 않는다.
+        // 대상 확장은 uri 가 `api/{dir}/{id}/`, name 이 `api.{dir}.{id}.` 로 시작해 결정적으로 식별된다.
+        $seen = [];
         $routes = [];
 
         foreach (RouteFacade::getRoutes() as $route) {
             /** @var Route $route */
-            if (isset($existing[spl_object_id($route)])) {
-                continue;
-            }
-
             $uri = $route->uri();
 
             if (! Str::startsWith($uri, 'api/')) {
@@ -177,12 +171,18 @@ class ApiRouteInventory
             $name = $route->getName() ?? '';
             $owner = $this->resolveOwner($name, $uri);
 
-            // 폴백 대상 확장 소유로 확정되지 않으면(코어 등) 제외
+            // 폴백 대상 확장 소유로 확정되지 않으면(코어·타 확장) 제외
             if ($owner['key'] !== $scope) {
                 continue;
             }
 
             foreach ($this->normalizeRoute($route, $uri, $name, $owner) as $entry) {
+                // 파일이 이미 한 번 로드돼 있으면 같은 (method, uri) 가 중복될 수 있어 dedup 한다.
+                $dedupKey = $entry['method'].' '.$entry['uri'];
+                if (isset($seen[$dedupKey])) {
+                    continue;
+                }
+                $seen[$dedupKey] = true;
                 $routes[] = $entry;
             }
         }

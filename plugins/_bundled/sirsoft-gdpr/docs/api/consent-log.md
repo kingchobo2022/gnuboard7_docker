@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/admin/consent-log HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -46,6 +55,30 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | user_agent | string | `Mozilla/5.0 (Windows NT 10.0; Win64; …` | 동의 변경 요청의 User-Agent 문자열. DPO 감사 시 동의 표명 단말/브라우저를 식별하는 용도이며 회원 삭제 시 NULL로 익명화됩니다 |
 | created_at | string | `2026-07-03 00:24:27` | 생성 일시 |
 | user | object | `{"id":130,"uuid":"a21d03b4-df0b-4aa6-ab7a-f51143f6375a","…` | 동의 주체 회원 정보(id/uuid/name/email). 관계가 로드된 경우에만 포함되며 게스트 이력이거나 삭제로 익명화된 경우 null입니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "data": [],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 0,
+            "from": null,
+            "to": null
+        }
+    }
+}
+```
 
 **에러 응답**
 

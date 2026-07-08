@@ -27,6 +27,14 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-marketing/settings HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._

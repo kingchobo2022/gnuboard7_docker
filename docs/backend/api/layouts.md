@@ -29,9 +29,22 @@
 | --- | --- | --- | --- | --- | --- |
 | token | path | string | 예 | — | 인증/검증 토큰 |
 
+**요청 예시**
+
+```http
+GET /api/layouts/preview/{token}.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -57,9 +70,22 @@
 | templateIdentifier | path | string | 예 | — | 대상 template의 식별자 |
 | layoutName | path | string | 예 | — | 대상 layout의 이름 (식별자) |
 
+**요청 예시**
+
+```http
+GET /api/layouts/{templateIdentifier}/{layoutName}.json HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

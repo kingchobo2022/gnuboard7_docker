@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/notification-channels HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -34,6 +43,55 @@ _단건 응답: `data` 객체의 필드._
 | 필드 | 타입 | 실측 예시값 | 용도/설명 |
 | --- | --- | --- | --- |
 | channels | array | `[{"id":"mail","name_key":"notification.channels.mail.name…` | 사용 가능한 알림 채널 메타데이터 목록. 각 원소는 `id`(채널 식별자: mail, database 등), `name`/`name_key`·`description`/`description_key`(활성 locale 기준 해석된 라벨/설명과 원본 다국어 키), `icon`(Font Awesome 클래스), `source`(제공 주체: core/module/plugin)·`source_label`(출처 표시 라벨), `allow_guest`(비회원 발송 허용 여부), `readiness`(컨트롤러가 `ChannelReadinessCheckerInterface`로 붙인 채널 설정 완료 여부 정보)로 구성됩니다. config 기본 채널(mail, database)에 `core.notification.filter_available_channels` 훅으로 추가된 확장 채널이 병합됩니다. |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "알림 채널 목록을 조회했습니다.",
+    "data": {
+        "channels": [
+            {
+                "id": "mail",
+                "name_key": "notification.channels.mail.name",
+                "icon": "fas fa-envelope",
+                "description_key": "notification.channels.mail.description",
+                "source": "core",
+                "source_label_key": "notification.channels.core_default",
+                "allow_guest": true,
+                "name": "메일",
+                "description": "이메일로 알림 발송",
+                "source_label": "코어 기본 채널",
+                "readiness": {
+                    "ready": false,
+                    "reason": "notification.readiness.mail_smtp_host_empty"
+                }
+            },
+            {
+                "id": "database",
+                "name_key": "notification.channels.database.name",
+                "icon": "fas fa-bell",
+                "description_key": "notification.channels.database.description",
+                "source": "core",
+                "source_label_key": "notification.channels.core_default",
+                "allow_guest": false,
+                "name": "사이트내 알림",
+                "description": "사이트내 알림 센터에 표시",
+                "source_label": "코어 기본 채널",
+                "readiness": {
+                    "ready": true,
+                    "reason": null
+                }
+            }
+        ]
+    }
+}
+```
 
 **에러 응답**
 

@@ -38,6 +38,15 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.list_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/users?page=1&per_page=1&filters=%EC%98%88%EC%8B%9C%EA%B0%92&start_date=2026-01-01&end_date=2026-01-01&date_filter=all&sort_by=created_at&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -64,6 +73,112 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | created_at | string | `2026-07-06` | 생성 일시 |
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_read":true,"can_create":true,"can_update":true,"can…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "사용자 정보를 성공적으로 가져왔습니다.",
+    "data": {
+        "data": [
+            {
+                "number": 2,
+                "uuid": "a234c3ea-a4f9-496d-a5e7-b44f0d53fc2f",
+                "name": "선지영",
+                "nickname": null,
+                "email": "jihee74@example.net",
+                "language": "ko",
+                "language_label": "한국어",
+                "country": null,
+                "country_flag": null,
+                "country_name": null,
+                "status": "active",
+                "status_label": "활성",
+                "status_variant": "success",
+                "mobile": null,
+                "roles": [],
+                "email_verified_at": "2026-07-08 10:44:49",
+                "last_login_at": null,
+                "created_at": "2026-07-08",
+                "is_owner": false,
+                "abilities": {
+                    "can_read": true,
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true,
+                    "can_assign_roles": true
+                }
+            },
+            {
+                "number": 1,
+                "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                "name": "API 문서 샘플 사용자",
+                "nickname": "song.hyunji",
+                "email": "apidoc-sample-user@example.com",
+                "language": "ko",
+                "language_label": "한국어",
+                "country": "KR",
+                "country_flag": "🇰🇷",
+                "country_name": "한국",
+                "status": "active",
+                "status_label": "활성",
+                "status_variant": "success",
+                "mobile": "010-9595-2897",
+                "roles": [
+                    {
+                        "id": 1,
+                        "identifier": "admin",
+                        "name": "관리자"
+                    },
+                    {
+                        "id": 4,
+                        "identifier": "apidoc-sample-role",
+                        "name": "API 문서 샘플 역할"
+                    }
+                ],
+                "email_verified_at": "2026-07-08 10:41:24",
+                "last_login_at": "2026-07-07 10:41:24",
+                "created_at": "2026-07-08",
+                "is_owner": true,
+                "abilities": {
+                    "can_read": true,
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true,
+                    "can_assign_roles": true
+                }
+            }
+        ],
+        "statistics": {
+            "total_users": 2,
+            "users_this_week": 2,
+            "users_this_month": 2,
+            "users_today": 2,
+            "active_users_this_week": 1
+        },
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_assign_roles": true
+        },
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 2,
+            "from": 1,
+            "to": 2,
+            "has_more_pages": false
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -120,9 +235,53 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.create_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/users HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "nickname": "예시 이름",
+    "email": "user@example.com",
+    "password": "Password123!",
+    "language": "ko",
+    "country": "KR",
+    "timezone": "Asia/Seoul",
+    "status": "active",
+    "homepage": "https://example.com",
+    "mobile": "010-1234-5678",
+    "phone": "010-1234-5678",
+    "zipcode": "06234",
+    "address": "서울특별시 강남구 테헤란로 1",
+    "address_detail": "서울특별시 강남구 테헤란로 1",
+    "signature": "예시값",
+    "bio": "예시 내용입니다.",
+    "admin_memo": "예시값",
+    "roles": [
+        "예시값"
+    ],
+    "role_ids": [
+        "예시값"
+    ],
+    "notify_post_complete": true,
+    "notify_post_reply": true,
+    "notify_comment": true,
+    "notify_reply_comment": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -154,9 +313,30 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.bulk_update_status_validation_rules`).
 
+**요청 예시**
+
+```http
+PATCH /api/admin/users/bulk-status HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ],
+    "status": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -188,9 +368,28 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.check_email_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/users/check-email HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "exclude_user_id": "9f8b2c1a-4d3e-4a2b-8c1d-0e1f2a3b4c5d"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -221,9 +420,101 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.update_language_validation_rules`).
 
+**요청 예시**
+
+```http
+PATCH /api/admin/users/me/language HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "language": "ko"
+}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| uuid | string | `a234c2b1-cde8-437f-b28b-23323be2b98d` | 외부 노출용 UUID (URL/API 식별자, 내부 id 비노출) |
+| name | string | `API 문서 샘플 사용자` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| nickname | string | `song.hyunji` | 닉네임 |
+| email | string | `apidoc-sample-user@example.com` | 이메일 주소 |
+| avatar | null | `null` | 아바타 이미지 URL (미등록 시 null) |
+| language | string | `ko` | 사용자 언어 설정 (ko: 한국어, en: 영어) |
+| language_label | string | `한국어` | 언어 코드의 현지화 라벨 (user.language.{code} 번역) |
+| country | string | `KR` | 국가 코드 (ISO 3166-1 alpha-2) |
+| status | string | `active` | 상태 값 (도메인별 상태 집합 — 사람이 읽는 라벨은 status_label, UI 변형은 status_variant 참조) |
+| status_label | string | `활성` | 상태의 사람이 읽는 라벨 (상태 Enum label() 산물) |
+| status_variant | string | `success` | 상태 표시 색상/스타일 변형 키 (상태 Enum variant() 산물 — UI 배지용) |
+| is_admin | boolean | `true` | 관리자 역할 보유 여부 (User::isAdmin() — 역할 관계 기반 파생) |
+| homepage | string | `https://example.com` | 홈페이지 URL |
+| mobile | string | `010-9595-2897` | 휴대폰 번호 |
+| phone | string | `02-637-5618` | 전화번호 |
+| zipcode | string | `16505` | 우편번호 |
+| address | string | `경기도 안양시 봉은사로 2918` | 기본 주소 |
+| address_detail | string | `48동 718호` | 상세 주소 |
+| signature | string | `Fugit consequuntur repellendus sed.` | 서명 |
+| bio | string | `Ut magni et sunt ducimus error adipis…` | 자기소개 |
+| last_login_at | string | `2026-07-07 10:41:24` | last login 일시 |
+| email_verified_at | string | `2026-07-08 10:41:24` | email verified 일시 |
+| timezone | string | `Asia/Seoul` | 사용자 시간대 (예: Asia/Seoul, UTC) |
+| created_at | string | `2026-07-08 10:41:24` | 생성 일시 |
+| updated_at | string | `2026-07-08 10:41:24` | 최종 수정 일시 |
+| is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
+| abilities | object | `{"can_read":true,"can_create":true,"can_update":true,"can…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "언어 설정이 성공적으로 변경되었습니다.",
+    "data": {
+        "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "name": "API 문서 샘플 사용자",
+        "nickname": "song.hyunji",
+        "email": "apidoc-sample-user@example.com",
+        "avatar": null,
+        "language": "ko",
+        "language_label": "한국어",
+        "country": "KR",
+        "status": "active",
+        "status_label": "활성",
+        "status_variant": "success",
+        "is_admin": true,
+        "homepage": "https://example.com",
+        "mobile": "010-9595-2897",
+        "phone": "02-637-5618",
+        "zipcode": "16505",
+        "address": "경기도 안양시 봉은사로 2918",
+        "address_detail": "48동 718호",
+        "signature": "Fugit consequuntur repellendus sed.",
+        "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+        "last_login_at": "2026-07-07 10:41:24",
+        "email_verified_at": "2026-07-08 10:41:24",
+        "timezone": "Asia/Seoul",
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 10:41:24",
+        "is_owner": true,
+        "abilities": {
+            "can_read": true,
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_assign_roles": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -248,6 +539,15 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 **요청 파라미터**
 
 _요청 파라미터 없음._
+
+**요청 예시**
+
+```http
+GET /api/admin/users/recent HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -281,6 +581,91 @@ _요청 파라미터 없음._
 | is_owner | boolean | `true` | 현재 인증 사용자가 이 리소스의 소유자인지 여부 (BaseApiResource 표준 메타) |
 | abilities | object | `{"can_read":true,"can_create":true,"can_update":true,"can…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "사용자 정보를 성공적으로 가져왔습니다.",
+    "data": [
+        {
+            "uuid": "a234c3ea-a4f9-496d-a5e7-b44f0d53fc2f",
+            "name": "선지영",
+            "nickname": null,
+            "email": "jihee74@example.net",
+            "avatar": null,
+            "language": "ko",
+            "language_label": "한국어",
+            "country": null,
+            "status": "active",
+            "status_label": "활성",
+            "status_variant": "success",
+            "is_admin": false,
+            "homepage": null,
+            "mobile": null,
+            "phone": null,
+            "zipcode": null,
+            "address": null,
+            "address_detail": null,
+            "signature": null,
+            "bio": null,
+            "last_login_at": null,
+            "email_verified_at": "2026-07-08 10:44:49",
+            "timezone": "Asia/Seoul",
+            "created_at": "2026-07-08 10:44:49",
+            "updated_at": "2026-07-08 10:44:49",
+            "is_owner": false,
+            "abilities": {
+                "can_read": true,
+                "can_create": true,
+                "can_update": true,
+                "can_delete": true,
+                "can_assign_roles": true
+            }
+        },
+        {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자",
+            "nickname": "song.hyunji",
+            "email": "apidoc-sample-user@example.com",
+            "avatar": null,
+            "language": "ko",
+            "language_label": "한국어",
+            "country": "KR",
+            "status": "active",
+            "status_label": "활성",
+            "status_variant": "success",
+            "is_admin": true,
+            "homepage": "https://example.com",
+            "mobile": "010-9595-2897",
+            "phone": "02-637-5618",
+            "zipcode": "16505",
+            "address": "경기도 안양시 봉은사로 2918",
+            "address_detail": "48동 718호",
+            "signature": "Fugit consequuntur repellendus sed.",
+            "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+            "last_login_at": "2026-07-07 10:41:24",
+            "email_verified_at": "2026-07-08 10:41:24",
+            "timezone": "Asia/Seoul",
+            "created_at": "2026-07-08 10:41:24",
+            "updated_at": "2026-07-08 10:41:24",
+            "is_owner": true,
+            "abilities": {
+                "can_read": true,
+                "can_create": true,
+                "can_update": true,
+                "can_delete": true,
+                "can_assign_roles": true
+            }
+        }
+    ]
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -310,9 +695,22 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.search_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/users/search?keyword=%EC%98%88%EC%8B%9C%EA%B0%92&uuid=9f8b2c1a-4d3e-4a2b-8c1d-0e1f2a3b4c5d HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: http-422 — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -339,6 +737,15 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/users/statistics HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -351,6 +758,29 @@ _단건 응답: `data` 객체의 필드._
 | users_today | integer | `0` | 오늘 신규 가입자 수 |
 | active_users_this_week | integer | `2` | 이번 주 활동(로그인) 사용자 수 |
 | language_distribution | object | `{"ko":92,"en":64}` | 언어별 사용자 분포 (언어 코드 => 사용자 수) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "사용자 통계를 성공적으로 가져왔습니다.",
+    "data": {
+        "total_users": 2,
+        "users_this_week": 2,
+        "users_this_month": 2,
+        "users_today": 2,
+        "active_users_this_week": 1,
+        "language_distribution": {
+            "ko": 2
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -378,9 +808,34 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.delete_validation_rules`).
 
+**요청 예시**
+
+```http
+DELETE /api/admin/users/a234c2b1-cde8-437f-b28b-23323be2b98d HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "사용자가 성공적으로 삭제되었습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 
@@ -409,6 +864,15 @@ _단건 응답: `data` 객체의 필드._
 | 이름 | 위치 | 타입 | 필수 | 허용값 | 용도 |
 | --- | --- | --- | --- | --- | --- |
 | user | path | string | 예 | — | 대상 user의 식별자 |
+
+**요청 예시**
+
+```http
+GET /api/admin/users/a234c2b1-cde8-437f-b28b-23323be2b98d HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -489,6 +953,103 @@ _단건 응답: `data` 객체의 필드._
 | ecommerce_preferred_shipping_country | null | `null` | 선호 배송 국가 코드 (sirsoft-ecommerce 모듈 주입, 미설정 시 null) |
 | ecommerce_preferred_shipping_country_name | null | `null` | 선호 배송 국가명 (배송 국가 코드에서 파생, sirsoft-ecommerce 모듈 주입) |
 
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "사용자 정보를 성공적으로 가져왔습니다.",
+    "data": {
+        "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "name": "API 문서 샘플 사용자",
+        "nickname": "song.hyunji",
+        "email": "apidoc-sample-user@example.com",
+        "avatar": null,
+        "language": "ko",
+        "language_label": "한국어",
+        "country": "KR",
+        "status": "active",
+        "status_label": "활성",
+        "status_variant": "success",
+        "is_admin": true,
+        "homepage": "https://example.com",
+        "mobile": "010-9595-2897",
+        "phone": "02-637-5618",
+        "zipcode": "16505",
+        "address": "경기도 안양시 봉은사로 2918",
+        "address_detail": "48동 718호",
+        "signature": "Fugit consequuntur repellendus sed.",
+        "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+        "last_login_at": "2026-07-07 10:41:24",
+        "email_verified_at": "2026-07-08 10:41:24",
+        "timezone": "Asia/Seoul",
+        "modules_count": 0,
+        "plugins_count": 0,
+        "menus_count": 2,
+        "modules": [],
+        "plugins": [],
+        "menus": [
+            {
+                "id": 1,
+                "title": "API 문서 샘플 메뉴",
+                "url": "/admin/apidoc-sample",
+                "is_active": true
+            },
+            {
+                "id": 2,
+                "title": "하위 메뉴",
+                "url": "/admin/nihil-non-eos-doloribus-occaecati-optio",
+                "is_active": true
+            }
+        ],
+        "roles": [
+            {
+                "id": 1,
+                "identifier": "admin",
+                "name": "관리자"
+            },
+            {
+                "id": 4,
+                "identifier": "apidoc-sample-role",
+                "name": "API 문서 샘플 역할"
+            }
+        ],
+        "permissions": [],
+        "consents": [],
+        "terms_consent": null,
+        "privacy_consent": null,
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 10:41:24",
+        "is_owner": true,
+        "abilities": {
+            "can_read": true,
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_assign_roles": true
+        },
+        "admin_memo": "In officiis nemo quaerat debitis quia.",
+        "ip_address": "166.217.51.216",
+        "withdrawn_at": null,
+        "blocked_at": null,
+        "notify_post_complete": false,
+        "notify_post_reply": false,
+        "notify_comment": false,
+        "notify_reply_comment": false,
+        "ecommerce_mileage": {
+            "enabled": false
+        },
+        "ecommerce_preferred_currency": null,
+        "ecommerce_preferred_shipping_country": null,
+        "ecommerce_preferred_shipping_country_name": null
+    }
+}
+```
+
 **에러 응답**
 
 | 상태코드 | 의미 | 발생 조건 |
@@ -545,9 +1106,53 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.update_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/users/a234c2b1-cde8-437f-b28b-23323be2b98d HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "nickname": "예시 이름",
+    "email": "user@example.com",
+    "password": "Password123!",
+    "language": "ko",
+    "country": "KR",
+    "timezone": "Asia/Seoul",
+    "status": "active",
+    "homepage": "https://example.com",
+    "mobile": "010-1234-5678",
+    "phone": "010-1234-5678",
+    "zipcode": "06234",
+    "address": "서울특별시 강남구 테헤란로 1",
+    "address_detail": "서울특별시 강남구 테헤란로 1",
+    "signature": "예시값",
+    "bio": "예시 내용입니다.",
+    "admin_memo": "예시값",
+    "roles": [
+        "예시값"
+    ],
+    "role_ids": [
+        "예시값"
+    ],
+    "notify_post_complete": true,
+    "notify_post_reply": true,
+    "notify_comment": true,
+    "notify_reply_comment": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -577,6 +1182,14 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | user | path | string | 예 | — | 대상 user의 식별자 |
 
+**요청 예시**
+
+```http
+GET /api/users/a234c2b1-cde8-437f-b28b-23323be2b98d/profile HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -591,6 +1204,29 @@ _단건 응답: `data` 객체의 필드._
 | bio | string | `Tenetur omnis et amet omnis veniam to…` | 자기소개 |
 | created_at | string | `2026-07-06` | 생성 일시 |
 | is_withdrawn | boolean | `false` | withdrawn 여부 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "프로필 정보를 성공적으로 가져왔습니다.",
+    "data": {
+        "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "name": "API 문서 샘플 사용자",
+        "status": "active",
+        "status_label": "활성",
+        "avatar": null,
+        "bio": "Ut magni et sunt ducimus error adipisci. Pariatur corporis voluptatem ratione quo non saepe. Illo atque praesentium possimus dolores qui est fugit. Sint fugiat numquam voluptates.",
+        "created_at": "2026-07-08",
+        "is_withdrawn": false
+    }
+}
+```
 
 **에러 응답**
 

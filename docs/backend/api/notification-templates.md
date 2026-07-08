@@ -32,9 +32,34 @@
 | body | body | array | 예 | — | 본문 |
 | locale | body | string | 아니오 | max 10 | 로케일 코드 (표시 언어/지역) |
 
+**요청 예시**
+
+```http
+POST /api/admin/notification-templates/preview HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "definition_id": 1,
+    "subject": [
+        "예시값"
+    ],
+    "body": [
+        "예시값"
+    ],
+    "locale": "ko"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -68,9 +93,37 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.notification_template.filter_update_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/notification-templates/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "subject": [
+        "예시값"
+    ],
+    "body": [
+        "예시값"
+    ],
+    "click_url": "https://example.com",
+    "recipients": [
+        "예시값"
+    ],
+    "is_active": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -98,9 +151,22 @@
 | --- | --- | --- | --- | --- | --- |
 | template | path | string | 예 | — | 대상 template의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/notification-templates/1/reset HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-404 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -127,9 +193,75 @@
 | --- | --- | --- | --- | --- | --- |
 | template | path | string | 예 | — | 대상 template의 식별자 |
 
+**요청 예시**
+
+```http
+PATCH /api/admin/notification-templates/1/toggle-active HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `1` | 기본 키 (내부 식별자) |
+| definition_id | integer | `1` | definition 식별자 (연관 리소스 참조) |
+| channel | string | `mail` | 채널: mail, database, fcm |
+| subject | string | `API 문서 샘플 템플릿 제목` | 다국어 제목 ({"ko": "...", "en": "..."}) |
+| body | string | `안녕하세요 {{name}} 님, 문서 실측용 본문입니다.` | 다국어 본문 ({"ko": "...", "en": "..."}) |
+| click_url | string | `/admin/apidoc-sample` | click URL |
+| recipients | array | `[{"type":"role","value":"admin","display_name":"관리자"}]` | 수신자 규칙 JSON ([{type, value, relation, exclude_trigger_user}]) |
+| is_active | boolean | `false` | active 여부 |
+| is_default | boolean | `false` | default 여부 |
+| user_overrides | array | `["is_active"]` | 사용자가 수정한 필드명 목록 |
+| updated_by | string | `a234c2b1-cde8-437f-b28b-23323be2b98d` | 최종 수정한 사용자 정보 (uuid/name — updated_by 관계 파생, 없으면 null) |
+| created_at | string | `2026-07-08 10:41:24` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:43` | 최종 수정 일시 |
+| abilities | object | `{"can_update":true,"can_delete":true}` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "알림 템플릿 활성 상태가 변경되었습니다.",
+    "data": {
+        "id": 1,
+        "definition_id": 1,
+        "channel": "mail",
+        "subject": "API 문서 샘플 템플릿 제목",
+        "body": "안녕하세요 {{name}} 님, 문서 실측용 본문입니다.",
+        "click_url": "/admin/apidoc-sample",
+        "recipients": [
+            {
+                "type": "role",
+                "value": "admin",
+                "display_name": "관리자"
+            }
+        ],
+        "is_active": false,
+        "is_default": false,
+        "user_overrides": [
+            "is_active"
+        ],
+        "updated_by": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 12:14:43",
+        "abilities": {
+            "can_update": true,
+            "can_delete": true
+        }
+    }
+}
+```
 
 **에러 응답**
 

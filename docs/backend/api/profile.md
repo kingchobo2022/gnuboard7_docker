@@ -27,9 +27,22 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/user/profile HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: http-403 — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -81,9 +94,46 @@ _요청 파라미터 없음._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.user.update_profile_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/user/profile HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "nickname": "예시 이름",
+    "email": "user@example.com",
+    "password": "Password123!",
+    "current_password": "Password123!",
+    "language": "ko",
+    "country": "KR",
+    "timezone": "Asia/Seoul",
+    "homepage": "https://example.com",
+    "mobile": "010-1234-5678",
+    "phone": "010-1234-5678",
+    "zipcode": "06234",
+    "address": "서울특별시 강남구 테헤란로 1",
+    "address_detail": "서울특별시 강남구 테헤란로 1",
+    "signature": "예시값",
+    "bio": "예시 내용입니다.",
+    "notify_post_complete": true,
+    "notify_post_reply": true,
+    "notify_comment": true,
+    "notify_reply_comment": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -109,9 +159,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/user/profile/activity-log HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: http-403 — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-403 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -136,9 +199,22 @@ _요청 파라미터 없음._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+POST /api/user/profile/update-language HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}   (optional.sanctum: 비회원은 헤더 생략 가능)
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: side-effectful-write — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

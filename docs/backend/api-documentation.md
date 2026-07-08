@@ -7,7 +7,7 @@
 ## TL;DR (5초 요약)
 
 ```text
-1. 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 전수 기재
+1. 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 + 요청·응답 예시 전수 기재
 2. 위치: 코어 = docs/backend/api/, 확장 = {modules|plugins}/_bundled/{id}/docs/api/
 3. 생성: php artisan api:docgen — 코드에서 추출한 스캐폴딩 + 사람이 서술 보강 (순수 수기 금지)
 4. 추출 불가분(훅 주입 파라미터·동적 응답)은 <!-- TODO --> 마커 남기고 사람이 채움
@@ -55,13 +55,47 @@ G7 의 REST API 는 라우트 `->name()` 규약은 있으나 엔드포인트별 
 
 ## 표준 문서 포맷
 
-엔드포인트 1개당 아래 4개 구성(헤더 · 요청 파라미터 · 응답 필드 · 에러 응답)을 따른다.
-`<!-- @generated:start -->` ~ `<!-- @generated:end -->` 사이는 `api:docgen` 이 재생성하는 추출 블록이며,
-그 바깥의 사람 서술은 재생성 시 보존된다.
+엔드포인트 1개당 아래 6개 구성(헤더 · 요청 파라미터 · 요청 예시 · 응답 필드 · 응답 예시 · 에러 응답)을
+따른다. `<!-- @generated:start -->` ~ `<!-- @generated:end -->` 사이는 `api:docgen` 이 재생성하는 추출
+블록이며, 그 바깥의 사람 서술(`**설명**`)은 재생성 시 보존된다.
 
 에러 응답 표는 라우트 메타에서 대표 상태코드를 자동 추론한다: 인증 필수(`auth:sanctum`)→401,
 `admin`/`permission:` 요구→403, FormRequest 검증 규칙 존재→422, path 파라미터 존재→404.
 `optional.sanctum`(선택 인증)은 401 을 유발하지 않는다. 도메인 특이 에러(409·429 등)는 사람이 보강한다.
+
+**요청 예시**(raw HTTP 요청)와 **응답 예시**(envelope 전문 JSON)는 실제 호출을 재현할 수 있도록 실측 기반으로
+방출된다(단계 6). 요청 예시는 curl 이 아니라 raw HTTP 요청(요청 라인 + 헤더)으로 표기해 응답 예시의
+`HTTP/1.1 {status}` 상태줄과 대칭을 이룬다. 세부 규칙:
+
+- **요청 예시**: 요청 라인(`{METHOD} {path} HTTP/1.1`) + `Host:` + `Accept: application/json`, 인증 필요 시
+  `Authorization: Bearer {YOUR_TOKEN}`(실측 토큰 평문 유출 방지 마스킹). `Host` 는 실측 기준 URL(로컬 개발
+  호스트 등)을 노출하지 않고 공개 placeholder(`api.example.com`, RFC 2606 예약 도메인)로 마스킹한다.
+  - **바디 메서드(POST/PUT/PATCH)**: `Content-Type: application/json` + 빈 줄 뒤 JSON 바디. 바디는 필수만이
+    아니라 **전체 파라미터**를 담고 값은 이름·타입 기반 현실적 예시값으로 채운다(`"string"` placeholder 남발
+    금지). 허용값 `in:` 열거가 있으면 그 첫 값을 채택한다.
+  - **파일 업로드**(요청 파라미터 타입이 `image`/`file`): `application/json` 이 아니라
+    `Content-Type: multipart/form-data; boundary=...` 로 표기하고 각 파일 파트를 `filename=`+`Content-Type`
+    으로 나타낸다(JSON 으로는 파일 전송 불가).
+  - **GET/DELETE**: query 파라미터는 URL 쿼리스트링(`?a=..&b=..`)으로 반영한다(바디 아님).
+  - `optional.sanctum`(선택 인증) 엔드포인트는 Authorization 헤더에 "비회원은 생략 가능" 주석을 붙인다.
+- **응답 예시**: `HTTP/1.1 {status}` 상태줄 + 실측 응답 body 전문(`{success, data, message, error}` envelope).
+  목록 응답의 `data.data[]` 는 대표 **2항목**으로 절단하고 나머지는 `... (총 N건 중 2건 표시)` 항목으로 대체한다.
+  응답에 섞여 나온 **민감값(토큰·비밀번호·시크릿·API 키)은 `{MASKED}` 로 마스킹**해 방출한다.
+- **쓰기 메서드 실측**: GET/HEAD 는 외부 HTTP 로 read-only 실측하고, 쓰기(POST/PUT/PATCH/DELETE)는 **DB 트랜잭션
+  안에서 in-process dispatch 후 롤백**하여 응답 shape 만 관측한다(부수효과 미영속). 단, 부수효과가 롤백으로
+  되돌릴 수 없는 쓰기(확장 install/activate/update, 언어팩 설치, 코어 업데이트, 파일 업로드, 캐시/워밍업/생성
+  등 파일시스템·프로세스·외부 네트워크 접촉)는 실측에서 제외(`side-effectful-write`)하고 요청 예시만 정적 방출한다.
+- **실측 제외**(부수효과 쓰기·바이너리·미치환 path 파라미터 등) 엔드포인트: 요청 예시는 파라미터 표 기반으로 정적
+  조립(raw HTTP 요청 골격), 응답 예시는 `<!-- 실측 제외: {사유} — 응답 예시는 사람이 작성하세요. -->` 마커로 남긴다.
+- 두 예시 블록은 전량 `@generated` 블록 **내부**에 있다. 다만 이미 파라미터/응답 필드 표의 사람 서술이
+  채워진 문서에 예시를 추가할 때는 전체 재생성(`api:docgen`)을 쓰지 않는다 — 전체 재생성은 표를 통째로
+  다시 조립해 정적 추출로 재현 불가능한 도메인 서술 셀을 TODO 로 되돌린다. 대신 `api:docgen --examples-only`
+  로 표·서술을 건드리지 않고 예시 2블록만 in-place 삽입/치환한다(측정은 재수행하되 표는 불가침). 백필
+  커맨드(`backfill-params`/`backfill-fields`)도 예시 블록을 건드리지 않는다.
+- **`--examples-only` 모드**: 기존 문서의 각 엔드포인트 `@generated` 블록에 요청 예시(응답 필드 표 앞)와
+  응답 예시(에러 응답 표 앞)만 삽입한다. 이미 예시가 있으면 그 블록만 새 실측으로 치환(멱등, 실측 상대시간
+  필드는 재측정으로 값이 달라질 수 있음). 표·필드 설명·엔드포인트 서술은 전량 보존된다. 최초 스캐폴딩이
+  없는 신규 문서는 먼저 `api:docgen` 으로 생성한 뒤 서술을 채우고, 이후 예시는 `--examples-only` 로 유지한다.
 
 ```markdown
 ### GET /api/admin/users
@@ -79,12 +113,43 @@ G7 의 REST API 는 라우트 `->name()` 규약은 있으나 엔드포인트별 
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있음 (`core.user.search_validation_rules`).
 
+**요청 예시**
+
+​```http
+GET /api/admin/users HTTP/1.1
+Host: example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+​```
+
 **응답 필드** (`data` 내부)
 
-| 필드 | 타입 | 용도/설명 |
-|------|------|-----------|
-| id | integer | <!-- TODO: 설명 --> |
-| uuid | string | <!-- TODO: 설명 --> |
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+|------|------|-------------|-----------|
+| id | integer | `1` | <!-- TODO: 설명 --> |
+| uuid | string | `a231747f-...` | <!-- TODO: 설명 --> |
+
+**응답 예시**
+
+​```http
+HTTP/1.1 200
+​```
+
+​```json
+{
+    "success": true,
+    "data": {
+        "data": [
+            { "id": 1, "uuid": "a231747f-..." },
+            { "id": 2, "uuid": "b0f2..." },
+            "... (총 42건 중 2건 표시)"
+        ],
+        "pagination": { "current_page": 1, "total": 42 }
+    },
+    "message": null,
+    "error": null
+}
+​```
 
 **에러 응답**
 
@@ -96,12 +161,6 @@ G7 의 REST API 는 라우트 `->name()` 규약은 있으나 엔드포인트별 
 <!-- @generated:end -->
 
 **설명** <!-- 사람이 작성: 이 엔드포인트의 용도, 주의사항, 예시 시나리오 -->
-
-**응답 예시**
-
-​```json
-{ "success": true, "data": { }, "message": null, "error": null }
-​```
 ```
 
 ### 응답 envelope 표준
@@ -140,6 +199,9 @@ php artisan api:docgen --scope=all
 
 # 생성 없이 누락/drift 만 리포트 (하네스가 소비)
 php artisan api:docgen --check
+
+# 이미 서술이 채워진 문서에 요청/응답 예시 블록만 in-place 삽입 (표·서술 불가침, 재생성 금지)
+php artisan api:docgen --scope=module:sirsoft-board --seed --base-url=https://example.dev --examples-only
 
 # 생성될 대상만 미리보기
 php artisan api:docgen --scope=core --dry-run
@@ -189,6 +251,25 @@ php artisan api:docgen --scope=core --dry-run
 - 확장에 새 PHP 클래스를 추가했으므로 `_bundled` 작업 후 `{type}:update {id} --force` 로 활성 디렉토리에
   반영해야 오토로드된다.
 
+### 설명 백필 커맨드 (`api:docgen-backfill-*`)
+
+파라미터/응답 필드 표의 `<!-- TODO: 설명 -->` 셀 중 **도메인 무관 공통 필드**(페이지네이션·정렬·검색·
+식별자·기간·토글·공통 파생 필드 등)는 전체 재생성 없이 in-place 로 자동 서술한다. 전체 재생성
+(`api:docgen`)은 `@generated` 블록 표를 통째로 재조립해 실측 예시값·사람 서술 셀을 되돌리므로, TODO
+셀만 치환하는 별도 백필 커맨드를 쓴다(멱등 — 채워진 셀·실측 예시값 불가침).
+
+```bash
+# 요청 파라미터 표 TODO 셀 백필 (SSoT: App\Support\ApiDoc\ParameterDescriber)
+php artisan api:docgen-backfill-params
+
+# 응답 필드 표 TODO 셀 백필 (SSoT: App\Support\ApiDoc\ResourceFieldDescriber)
+php artisan api:docgen-backfill-fields
+```
+
+- 도메인 종속 필드(`status`/`type`/`code`/`category`·훅 주입·조건부 필드)는 값 의미가 도메인마다 달라
+  자동 채우지 않고 TODO 로 남겨 사람이 컨트롤러/FormRequest/Resource 근거로 서술한다.
+- 새 공통 필드 규칙을 Describer 사전에 추가한 뒤 백필을 재실행하면 그 필드가 전 문서에서 자동 채워진다.
+
 ---
 
 ## 문서 갱신 의무
@@ -212,7 +293,9 @@ php artisan api:docgen --scope=core --dry-run
 ```text
 □ 엔드포인트가 대응 위치(코어 docs/backend/api/ 또는 확장 docs/api/)에 문서화되었는가?
 □ 요청 파라미터 표에 위치/타입/필수/허용값/용도가 모두 기재되었는가?
+□ 요청 예시(raw HTTP 요청) 블록이 방출되었는가? (curl 금지, 인증 필요 시 Bearer {YOUR_TOKEN} 마스킹)
 □ 응답 필드 표가 envelope 의 data 내부 기준으로 작성되었는가?
+□ 응답 예시(envelope 전문 JSON) 블록이 방출되었는가? (목록은 2항목 절단)
 □ 훅 주입 파라미터가 있으면 주석 + 사람 보강이 되었는가?
 □ TODO 마커가 모두 채워졌는가?
 □ api:docgen --check 가 drift 0 인가?

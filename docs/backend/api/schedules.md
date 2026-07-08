@@ -45,6 +45,15 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.schedule.list_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/schedules?page=1&per_page=1&filters=%EC%98%88%EC%8B%9C%EA%B0%92&type=artisan&frequency=everyMinute&status=active&last_result=success&without_overlapping=0&run_in_maintenance=0&extension_type=core&extension_identifier=example-key&created_from=2026-01-01&created_to=2026-01-01&sort_by=created_at&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -70,6 +79,70 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | creator | object | `{"uuid":"a231747f-e82e-4cf2-9ae1-a261849dce40","name":"AP…` | 생성자 정보 객체 (uuid/name/email — creator 관계 파생) |
 | created_at | string | `2026-07-06` | 생성 일시 |
 | abilities | object | `{"can_create":true,"can_update":true,"can_delete":true,"c…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄 목록을 조회했습니다.",
+    "data": {
+        "data": [
+            {
+                "id": 1,
+                "name": "API 문서 샘플 스케줄",
+                "type": "artisan",
+                "type_label": "Artisan 커맨드",
+                "command": "cache:clear",
+                "expression": "0 3 * * *",
+                "frequency": "daily",
+                "frequency_label": "매일",
+                "without_overlapping": true,
+                "run_in_maintenance": false,
+                "is_active": true,
+                "last_result": "success",
+                "last_result_label": "성공",
+                "last_run_at": "2026-07-07T10:41:24+09:00",
+                "last_duration": null,
+                "next_run_at": "2026-07-08T12:00:00+09:00",
+                "creator": {
+                    "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+                    "name": "API 문서 샘플 사용자"
+                },
+                "created_at": "2026-07-08",
+                "abilities": {
+                    "can_create": true,
+                    "can_update": true,
+                    "can_delete": true,
+                    "can_run": true
+                }
+            }
+        ],
+        "statistics": {
+            "total": 1,
+            "active": 1,
+            "inactive": 0,
+            "success": 1,
+            "failed": 0,
+            "running": 0,
+            "never_run": 0
+        },
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 1,
+            "from": 1,
+            "to": 1,
+            "has_more_pages": false
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -109,9 +182,104 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.schedule.create_validation_rules`).
 
+**요청 예시**
+
+```http
+POST /api/admin/schedules HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "description": "예시 내용입니다.",
+    "type": "artisan",
+    "command": "예시값",
+    "expression": "예시값",
+    "frequency": "everyMinute",
+    "without_overlapping": true,
+    "run_in_maintenance": true,
+    "timeout": 1,
+    "is_active": true,
+    "extension_type": "core",
+    "extension_identifier": "example-key"
+}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `14` | 기본 키 (내부 식별자) |
+| name | string | `실측 예시값` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| description | string | `실측 예시값` | 설명 (다국어 필드는 로케일별 값 객체) |
+| type | string | `artisan` | 작업 유형: artisan(Artisan 커맨드), shell(쉘 명령), url(URL 호출) |
+| type_label | string | `Artisan 커맨드` | `type` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| command | string | `실측 예시값` | 명령어 또는 URL |
+| expression | string | `실측 예시값` | Cron 표현식 |
+| frequency | string | `everyMinute` | 실행 주기: everyMinute(매분), hourly(매시간), daily(매일), weekly(매주), monthly(매월), custom(사용자 정의) |
+| frequency_label | string | `매분` | `frequency` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| without_overlapping | boolean | `true` | 중복 실행 방지 여부: 0(허용), 1(방지) |
+| run_in_maintenance | boolean | `true` | 점검 모드 실행 여부: 0(비실행), 1(실행) |
+| timeout | integer | `1` | 실행 제한 시간 (초) |
+| is_active | boolean | `true` | active 여부 |
+| last_result | string | `never` | 마지막 실행 결과: success(성공), failed(실패), running(실행중), never(미실행) |
+| last_result_label | string | `미실행` | `last_result` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| last_duration | null | `null` | 마지막 실행 소요 시간 (초/밀리초 — 실행 이력 파생) |
+| extension_type | string | `core` | 이 리소스를 소유한 확장의 타입 (core/module/plugin/template) |
+| extension_identifier | string | `probe_6a4dc0a862b69` | 이 리소스를 소유한 확장의 식별자 |
+| creator | object | `{"uuid":"a234c2b1-cde8-437f-b28b-23323be2b98d","name":"AP…` | 생성자 정보 객체 (uuid/name/email — creator 관계 파생) |
+| created_at | string | `2026-07-08 12:14:48` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:48` | 최종 수정 일시 |
+| abilities | object | `{"can_create":true,"can_update":true,"can_delete":true,"c…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 201
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄이 생성되었습니다.",
+    "data": {
+        "id": 14,
+        "name": "실측 예시값",
+        "description": "실측 예시값",
+        "type": "artisan",
+        "type_label": "Artisan 커맨드",
+        "command": "실측 예시값",
+        "expression": "실측 예시값",
+        "frequency": "everyMinute",
+        "frequency_label": "매분",
+        "without_overlapping": true,
+        "run_in_maintenance": true,
+        "timeout": 1,
+        "is_active": true,
+        "last_result": "never",
+        "last_result_label": "미실행",
+        "last_duration": null,
+        "extension_type": "core",
+        "extension_identifier": "probe_6a4dc0a862b69",
+        "creator": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자"
+        },
+        "created_at": "2026-07-08 12:14:48",
+        "updated_at": "2026-07-08 12:14:48",
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_run": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -140,9 +308,22 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.schedule.bulk_delete_validation_rules`).
 
+**요청 예시**
+
+```http
+DELETE /api/admin/schedules/bulk?ids=%EC%98%88%EC%8B%9C%EA%B0%92 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -172,9 +353,30 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.schedule.bulk_update_status_validation_rules`).
 
+**요청 예시**
+
+```http
+PATCH /api/admin/schedules/bulk-status HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "ids": [
+        "예시값"
+    ],
+    "is_active": true
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-422 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -201,9 +403,22 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | historyId | path | string | 예 | — | 대상 history의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/schedules/history/{historyId} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: unresolved-path-param — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 
@@ -228,6 +443,15 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/admin/schedules/statistics HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _단건 응답: `data` 객체의 필드._
@@ -241,6 +465,28 @@ _단건 응답: `data` 객체의 필드._
 | failed | integer | `0` | 마지막 실행 결과가 실패(failed)인 스케줄 수 |
 | running | integer | `0` | 마지막 실행 결과가 실행중(running)인 스케줄 수 |
 | never_run | integer | `0` | 아직 한 번도 실행되지 않은(last_result=never) 스케줄 수 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄 통계를 조회했습니다.",
+    "data": {
+        "total": 1,
+        "active": 1,
+        "inactive": 0,
+        "success": 1,
+        "failed": 0,
+        "running": 0,
+        "never_run": 0
+    }
+}
+```
 
 **에러 응답**
 
@@ -266,9 +512,34 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | schedule | path | string | 예 | — | 대상 schedule의 식별자 |
 
+**요청 예시**
+
+```http
+DELETE /api/admin/schedules/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+
+<!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄이 삭제되었습니다.",
+    "data": null
+}
+```
 
 **에러 응답**
 
@@ -294,6 +565,15 @@ _단건 응답: `data` 객체의 필드._
 | 이름 | 위치 | 타입 | 필수 | 허용값 | 용도 |
 | --- | --- | --- | --- | --- | --- |
 | schedule | path | string | 예 | — | 대상 schedule의 식별자 |
+
+**요청 예시**
+
+```http
+GET /api/admin/schedules/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
 
 **응답 필드** (`data` 내부)
 
@@ -325,6 +605,53 @@ _단건 응답: `data` 객체의 필드._
 | created_at | string | `2026-07-06 19:20:23` | 생성 일시 |
 | updated_at | string | `2026-07-06 19:20:23` | 최종 수정 일시 |
 | abilities | object | `{"can_create":true,"can_update":true,"can_delete":true,"c…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄 목록을 조회했습니다.",
+    "data": {
+        "id": 1,
+        "name": "API 문서 샘플 스케줄",
+        "description": "문서 실측용 스케줄",
+        "type": "artisan",
+        "type_label": "Artisan 커맨드",
+        "command": "cache:clear",
+        "expression": "0 3 * * *",
+        "frequency": "daily",
+        "frequency_label": "매일",
+        "without_overlapping": true,
+        "run_in_maintenance": false,
+        "timeout": 300,
+        "is_active": true,
+        "last_result": "success",
+        "last_result_label": "성공",
+        "last_run_at": "2026-07-07T10:41:24+09:00",
+        "last_duration": null,
+        "next_run_at": "2026-07-08T12:00:00+09:00",
+        "extension_type": null,
+        "extension_identifier": null,
+        "creator": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자"
+        },
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 10:41:24",
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_run": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -365,9 +692,106 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.schedule.update_validation_rules`).
 
+**요청 예시**
+
+```http
+PUT /api/admin/schedules/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "name": "예시 이름",
+    "description": "예시 내용입니다.",
+    "type": "artisan",
+    "command": "예시값",
+    "expression": "예시값",
+    "frequency": "everyMinute",
+    "without_overlapping": true,
+    "run_in_maintenance": true,
+    "timeout": 1,
+    "is_active": true,
+    "extension_type": "core",
+    "extension_identifier": "example-key"
+}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `1` | 기본 키 (내부 식별자) |
+| name | string | `실측 예시값` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| description | string | `실측 예시값` | 설명 (다국어 필드는 로케일별 값 객체) |
+| type | string | `artisan` | 작업 유형: artisan(Artisan 커맨드), shell(쉘 명령), url(URL 호출) |
+| type_label | string | `Artisan 커맨드` | `type` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| command | string | `실측 예시값` | 명령어 또는 URL |
+| expression | string | `실측 예시값` | Cron 표현식 |
+| frequency | string | `everyMinute` | 실행 주기: everyMinute(매분), hourly(매시간), daily(매일), weekly(매주), monthly(매월), custom(사용자 정의) |
+| frequency_label | string | `매분` | `frequency` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| without_overlapping | boolean | `true` | 중복 실행 방지 여부: 0(허용), 1(방지) |
+| run_in_maintenance | boolean | `true` | 점검 모드 실행 여부: 0(비실행), 1(실행) |
+| timeout | integer | `1` | 실행 제한 시간 (초) |
+| is_active | boolean | `true` | active 여부 |
+| last_result | string | `success` | 마지막 실행 결과: success(성공), failed(실패), running(실행중), never(미실행) |
+| last_result_label | string | `성공` | `last_result` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| last_run_at | string | `2026-07-07T10:41:24+09:00` | last run 일시 |
+| last_duration | null | `null` | 마지막 실행 소요 시간 (초/밀리초 — 실행 이력 파생) |
+| extension_type | string | `core` | 이 리소스를 소유한 확장의 타입 (core/module/plugin/template) |
+| extension_identifier | string | `probe_6a4dc0a8e44c0` | 이 리소스를 소유한 확장의 식별자 |
+| creator | object | `{"uuid":"a234c2b1-cde8-437f-b28b-23323be2b98d","name":"AP…` | 생성자 정보 객체 (uuid/name/email — creator 관계 파생) |
+| created_at | string | `2026-07-08 10:41:24` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:48` | 최종 수정 일시 |
+| abilities | object | `{"can_create":true,"can_update":true,"can_delete":true,"c…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄이 수정되었습니다.",
+    "data": {
+        "id": 1,
+        "name": "실측 예시값",
+        "description": "실측 예시값",
+        "type": "artisan",
+        "type_label": "Artisan 커맨드",
+        "command": "실측 예시값",
+        "expression": "실측 예시값",
+        "frequency": "everyMinute",
+        "frequency_label": "매분",
+        "without_overlapping": true,
+        "run_in_maintenance": true,
+        "timeout": 1,
+        "is_active": true,
+        "last_result": "success",
+        "last_result_label": "성공",
+        "last_run_at": "2026-07-07T10:41:24+09:00",
+        "last_duration": null,
+        "extension_type": "core",
+        "extension_identifier": "probe_6a4dc0a8e44c0",
+        "creator": {
+            "uuid": "a234c2b1-cde8-437f-b28b-23323be2b98d",
+            "name": "API 문서 샘플 사용자"
+        },
+        "created_at": "2026-07-08 10:41:24",
+        "updated_at": "2026-07-08 12:14:48",
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_run": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -395,9 +819,83 @@ _단건 응답: `data` 객체의 필드._
 | --- | --- | --- | --- | --- | --- |
 | schedule | path | string | 예 | — | 대상 schedule의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/schedules/1/duplicate HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `15` | 기본 키 (내부 식별자) |
+| name | string | `API 문서 샘플 스케줄 (복사본)` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| description | string | `문서 실측용 스케줄` | 설명 (다국어 필드는 로케일별 값 객체) |
+| type | string | `artisan` | 작업 유형: artisan(Artisan 커맨드), shell(쉘 명령), url(URL 호출) |
+| type_label | string | `Artisan 커맨드` | `type` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| command | string | `cache:clear` | 명령어 또는 URL |
+| expression | string | `0 3 * * *` | Cron 표현식 |
+| frequency | string | `daily` | 실행 주기: everyMinute(매분), hourly(매시간), daily(매일), weekly(매주), monthly(매월), custom(사용자 정의) |
+| frequency_label | string | `매일` | `frequency` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| without_overlapping | boolean | `true` | 중복 실행 방지 여부: 0(허용), 1(방지) |
+| run_in_maintenance | boolean | `false` | 점검 모드 실행 여부: 0(비실행), 1(실행) |
+| timeout | integer | `300` | 실행 제한 시간 (초) |
+| is_active | boolean | `false` | active 여부 |
+| last_result | string | `never` | 마지막 실행 결과: success(성공), failed(실패), running(실행중), never(미실행) |
+| last_result_label | string | `미실행` | `last_result` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| last_duration | null | `null` | 마지막 실행 소요 시간 (초/밀리초 — 실행 이력 파생) |
+| extension_type | null | `null` | 이 리소스를 소유한 확장의 타입 (core/module/plugin/template) |
+| extension_identifier | null | `null` | 이 리소스를 소유한 확장의 식별자 |
+| created_at | string | `2026-07-08 12:14:48` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:48` | 최종 수정 일시 |
+| abilities | object | `{"can_create":true,"can_update":true,"can_delete":true,"c…` | 현재 사용자가 이 리소스에 수행 가능한 작업 불리언 맵 (can_update, can_delete 등 — 권한 맵 기반) |
+
+**응답 예시**
+
+```http
+HTTP/1.1 201
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄이 복제되었습니다.",
+    "data": {
+        "id": 15,
+        "name": "API 문서 샘플 스케줄 (복사본)",
+        "description": "문서 실측용 스케줄",
+        "type": "artisan",
+        "type_label": "Artisan 커맨드",
+        "command": "cache:clear",
+        "expression": "0 3 * * *",
+        "frequency": "daily",
+        "frequency_label": "매일",
+        "without_overlapping": true,
+        "run_in_maintenance": false,
+        "timeout": 300,
+        "is_active": false,
+        "last_result": "never",
+        "last_result_label": "미실행",
+        "last_duration": null,
+        "extension_type": null,
+        "extension_identifier": null,
+        "created_at": "2026-07-08 12:14:48",
+        "updated_at": "2026-07-08 12:14:48",
+        "abilities": {
+            "can_create": true,
+            "can_update": true,
+            "can_delete": true,
+            "can_run": true
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -434,11 +932,45 @@ _단건 응답: `data` 객체의 필드._
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.schedule.history_list_validation_rules`).
 
+**요청 예시**
+
+```http
+GET /api/admin/schedules/1/history?page=1&per_page=1&status=success&trigger_type=scheduled&started_from=2026-01-01&started_to=2026-01-01&sort_by=started_at&sort_order=asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 <!-- 실측 응답에 필드 없음(빈 목록 등) — 데이터가 있는 상태로 재실측하거나 사람이 작성. -->
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "실행 이력을 조회했습니다.",
+    "data": {
+        "data": [],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 0,
+            "from": null,
+            "to": null,
+            "has_more_pages": false
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -466,9 +998,70 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | schedule | path | string | 예 | — | 대상 schedule의 식별자 |
 
+**요청 예시**
+
+```http
+POST /api/admin/schedules/1/run HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_단건 응답: `data` 객체의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| id | integer | `7` | 기본 키 (내부 식별자) |
+| schedule_id | integer | `1` | schedule 식별자 (연관 리소스 참조) |
+| started_at | string | `2026-07-08T12:14:49+09:00` | started 일시 |
+| ended_at | string | `2026-07-08T12:14:49+09:00` | ended 일시 |
+| duration | integer | `0` | 실행 소요 시간 (초/밀리초) |
+| duration_formatted | null | `null` | `duration` 값의 표시용 포맷 문자열 (통화/용량/일시 등 로케일·단위 포맷) |
+| status | string | `success` | 상태 값 (도메인별 상태 집합 — 사람이 읽는 라벨은 status_label, UI 변형은 status_variant 참조) |
+| status_label | string | `성공` | 상태의 사람이 읽는 라벨 (상태 Enum label() 산물) |
+| exit_code | integer | `0` | 실행 종료 코드 (0=성공, 그 외=실패) |
+| memory_usage | integer | `427352` | 실행 중 최대 메모리 사용량 (바이트) |
+| memory_usage_formatted | string | `417.34 KB` | `memory_usage` 값의 표시용 포맷 문자열 (통화/용량/일시 등 로케일·단위 포맷) |
+| output | string | `    INFO  Application cache cleared s…` | 실행 표준 출력 내용 |
+| error_output | null | `null` | 실행 표준 에러 출력 내용 (없으면 빈 문자열/null) |
+| trigger_type | string | `manual` | 동작을 유발한 방식/주체 구분 값 |
+| trigger_type_label | string | `수동 실행` | `trigger_type` 값의 사람이 읽는 라벨 (현지화/Enum 파생) |
+| created_at | string | `2026-07-08 12:14:49` | 생성 일시 |
+| updated_at | string | `2026-07-08 12:14:49` | 최종 수정 일시 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "스케줄이 실행되었습니다.",
+    "data": {
+        "id": 7,
+        "schedule_id": 1,
+        "started_at": "2026-07-08T12:14:49+09:00",
+        "ended_at": "2026-07-08T12:14:49+09:00",
+        "duration": 0,
+        "duration_formatted": null,
+        "status": "success",
+        "status_label": "성공",
+        "exit_code": 0,
+        "memory_usage": 427352,
+        "memory_usage_formatted": "417.34 KB",
+        "output": "\n   INFO  Application cache cleared successfully.  \n\r\n",
+        "error_output": null,
+        "trigger_type": "manual",
+        "trigger_type_label": "수동 실행",
+        "created_at": "2026-07-08 12:14:49",
+        "updated_at": "2026-07-08 12:14:49"
+    }
+}
+```
 
 **에러 응답**
 

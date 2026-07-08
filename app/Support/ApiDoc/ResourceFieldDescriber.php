@@ -103,6 +103,38 @@ class ResourceFieldDescriber
         'origin' => '출처 (설치/등록 원천 구분 값)',
         'target_name' => '대상 확장의 표시 이름 (scope+target_identifier 로 해석)',
         'install_blocked_reason' => '설치가 차단된 사유 (차단 없으면 null)',
+
+        // 감사/관계 공통 (도메인 무관하게 역할 고정 — 쓰기 응답에서 흔히 등장)
+        'updated_by' => '최종 수정한 사용자 정보 (uuid/name — updated_by 관계 파생, 없으면 null)',
+        'creator' => '생성자 정보 객체 (uuid/name/email — creator 관계 파생)',
+        'user' => '대상 사용자 정보 객체 (uuid/name/email 등 — user 관계 파생)',
+        'roles' => '보유 역할 목록 (각 원소 id/name/permissions — roles 관계 파생)',
+        'permissions' => '권한 목록 (각 원소 identifier/name — permissions 관계 파생)',
+        'avatar' => '아바타 이미지 URL (미등록 시 null)',
+
+        // 인증/토큰 (로그인/토큰 발급 응답)
+        'token' => '발급된 API 접근 토큰 평문 (Bearer 토큰으로 사용, 발급 시 1회만 노출)',
+        'token_type' => '토큰 타입 (일반적으로 Bearer)',
+        'trigger_type' => '동작을 유발한 방식/주체 구분 값',
+
+        // 스케줄/실행 이력 (Schedule 실행 결과)
+        'last_duration' => '마지막 실행 소요 시간 (초/밀리초 — 실행 이력 파생)',
+        'duration' => '실행 소요 시간 (초/밀리초)',
+        'exit_code' => '실행 종료 코드 (0=성공, 그 외=실패)',
+        'output' => '실행 표준 출력 내용',
+        'error_output' => '실행 표준 에러 출력 내용 (없으면 빈 문자열/null)',
+        'memory_usage' => '실행 중 최대 메모리 사용량 (바이트)',
+
+        // 캐시/파일/집계 (일회성 동작 응답)
+        'ttl' => '캐시 유효 시간 (Time To Live, 초)',
+        'size_bytes' => '크기 (바이트)',
+        'older_than_days' => '기준 경과 일수 (이 일수보다 오래된 대상 필터/집계)',
+        'entries' => '항목 목록 (각 원소는 대상 도메인 레코드)',
+        'changelog_entries' => '변경 이력 항목 목록 (버전별 변경 내용)',
+        'templates' => '템플릿 목록 (각 원소 identifier/name 등 — 템플릿 관계 파생)',
+        'spec' => '스펙 정의 객체 (편집기/컴포넌트 선언 스키마 등)',
+        'source_meta' => '원천 메타데이터 객체 (출처·경로·해석 정보)',
+        'validation_summary' => '검증 결과 요약 객체 (통과/실패 건수 등)',
     ];
 
     /**
@@ -121,6 +153,13 @@ class ResourceFieldDescriber
             return in_array($type, ['integer', 'number'], true)
                 ? '표시 정렬 순서 값 (작을수록 우선)'
                 : null;
+        }
+
+        // status 는 도메인마다 허용값 집합이 다르나(active/blocked, success/failed 등) 역할은
+        // 공통이다. 문자열 상태값이면 일반 설명을 주고, 구체 허용값은 status_label/변형 필드와
+        // 각 도메인 문서에서 보강한다. (동반 필드 status_label/status_variant 는 EXACT 로 설명됨)
+        if ($field === 'status' && in_array($type, ['string', 'integer'], true)) {
+            return '상태 값 (도메인별 상태 집합 — 사람이 읽는 라벨은 status_label, UI 변형은 status_variant 참조)';
         }
 
         if (isset(self::EXACT[$field])) {

@@ -31,9 +31,27 @@
 
 > 이 엔드포인트는 확장이 파라미터를 추가할 수 있습니다 (`core.auth.verify_password_rules`).
 
+**요청 예시**
+
+```http
+POST /api/me/verify-password HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "password": "Password123!"
+}
+```
+
 **응답 필드** (`data` 내부)
 
 <!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+
+**응답 예시**
+
+<!-- 실측 제외: http-401 — 응답 예시는 사람이 작성하세요. -->
 
 **에러 응답**
 

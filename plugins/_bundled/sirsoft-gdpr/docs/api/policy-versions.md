@@ -27,6 +27,15 @@
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/admin/policy-versions HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
@@ -39,6 +48,39 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | memo | string | `Chrome MCP 정밀 점검 — 마이페이지 정책 갱신 트리거 (P…` | 발행 사유 메모(최대 500자). 수동 발행 시 운영자가 입력하는 감사 추적용 설명으로 자동 감지 밖의 변경 배경을 남깁니다 |
 | created_at | string | `2026-06-18 09:27:39` | 생성 일시 |
 | publisher | object | `{"uuid":"a1e0a91a-fba6-491c-a53e-7285a5686857","name":"관리…` | 이 버전을 발행한 운영자 정보(uuid/name/email). raw FK(created_by)는 노출하지 않고 관계가 로드된 경우에만 포함되며, 발행자가 없으면 null입니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "data": [
+            {
+                "id": 1,
+                "version": 1,
+                "change_type": "initial",
+                "memo": null,
+                "created_at": "2026-07-07 16:38:26",
+                "publisher": null
+            }
+        ],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 25,
+            "total": 1,
+            "from": 1,
+            "to": 1
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -64,9 +106,49 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 | --- | --- | --- | --- | --- | --- |
 | memo | body | string | 예 | min 1, max 500 | 발행 사유 메모(1~500자, 필수). 자동 감지 밖의 변경을 인지하고 명시적으로 새 버전을 발행할 때 감사 추적용으로 남기는 설명입니다 |
 
+**요청 예시**
+
+```http
+POST /api/plugins/sirsoft-gdpr/admin/policy-versions HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+Content-Type: application/json
+
+{
+    "memo": "예시값"
+}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: write-method — 응답 필드는 사람이 작성하세요. -->
+_목록 응답: `data.data[]` 배열 항목의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| uuid | string | `a234c2b1-cde8-437f-b28b-23323be2b98d` | 외부 노출용 UUID (URL/API 식별자, 내부 id 비노출) |
+| name | string | `API 문서 샘플 사용자` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
+| email | string | `apidoc-sample-user@example.com` | 이 버전을 발행한 운영자의 이메일. publisher 관계에서 노출되며 감사 화면에서 발행자를 식별하는 용도입니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "새 정책 버전이 발행되었습니다. 모든 회원이 다음 방문 시 재동의를 진행합니다.",
+    "data": {
+        "data": {
+            "id": 6,
+            "version": 2,
+            "0": "... (총 6건 중 2건 표시)"
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -91,6 +173,15 @@ _목록 응답: `data.data[]` 배열 항목의 필드 + `data.pagination`._
 
 _요청 파라미터 없음._
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/admin/policy-versions/current HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
 _목록 응답: `data.data[]` 배열 항목의 필드._
@@ -100,6 +191,26 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | uuid | string | `a1e0a91a-fba6-491c-a53e-7285a5686857` | 외부 노출용 UUID (URL/API 식별자, 내부 id 비노출) |
 | name | string | `관리자` | 대상의 이름/명칭 (다국어 필드는 로케일별 값 객체) |
 | email | string | `heuristing@gmail.com` | 이 버전을 발행한 운영자의 이메일. publisher 관계에서 노출되며 감사 화면에서 발행자를 식별하는 용도입니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "data": {
+            "id": 1,
+            "version": 1,
+            "0": "... (총 6건 중 2건 표시)"
+        }
+    }
+}
+```
 
 **에러 응답**
 
@@ -125,9 +236,48 @@ _목록 응답: `data.data[]` 배열 항목의 필드._
 | --- | --- | --- | --- | --- | --- |
 | version | path | string | 예 | — | 대상 버전 (버전 문자열) |
 
+**요청 예시**
+
+```http
+GET /api/plugins/sirsoft-gdpr/admin/policy-versions/1 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer {YOUR_TOKEN}
+```
+
 **응답 필드** (`data` 내부)
 
-<!-- 실측 제외: unresolved-path-param — 응답 필드는 사람이 작성하세요. -->
+_목록 응답: `data.data[]` 배열 항목의 필드._
+
+| 필드 | 타입 | 실측 예시값 | 용도/설명 |
+| --- | --- | --- | --- |
+| banner_enabled | boolean | `true` | 발행 시점 스냅샷의 쿠키 배너·자동 차단 통합 활성 여부. `true`일 때만 게스트에게 배너가 노출되고 도메인 차단 엔진이 동작합니다 |
+| banner_position | string | `bottom_bar` | 발행 시점의 쿠키 배너 노출 위치(bottom_bar / bottom_left_popup / bottom_right_popup / centered_modal) |
+| blocked_domains | object | `{"analytics":["google-analytics.com","*.google-analytics.…` | 발행 시점에 설정된 카테고리별 차단 도메인 패턴(키→도메인 배열). 동의 전 로드를 차단하는 대상이며, 분쟁 시 당시 어떤 도메인이 차단 대상이었는지 확인하는 근거입니다 |
+| cookie_categories | array | `[{"key":"necessary","label":{"en":"Strictly Necessary","k…` | 발행 시점의 쿠키 카테고리 카탈로그 배열. 각 항목은 `key`, 필수 여부, 다국어 `label`/`description`을 담으며, 회원 분쟁 시 당시 동의 대상 카테고리 본문을 확인하는 근거가 됩니다 |
+| legal_entity_name | string | `` | 발행 시점에 표기된 개인정보 처리 법인/사업자명. 미설정 시 빈 문자열입니다 |
+| privacy_policy_slug | string | `privacy` | 발행 시점의 개인정보 처리방침 페이지 slug. 배너/마이페이지의 방침 링크 대상이며, 미설정 시 빈 값입니다 |
+| data_storage_location | string | `` | 발행 시점에 표기된 데이터 저장 위치 문자열(국가 단위 안내). 미설정 시 빈 문자열입니다 |
+
+**응답 예시**
+
+```http
+HTTP/1.1 200
+```
+
+```json
+{
+    "success": true,
+    "message": "messages.success",
+    "data": {
+        "data": {
+            "id": 1,
+            "version": 1,
+            "0": "... (총 8건 중 2건 표시)"
+        }
+    }
+}
+```
 
 **에러 응답**
 
