@@ -462,7 +462,7 @@ cp .env.example .env
 | 플러그인 개발 | [docs/extension/plugin-development.md](docs/extension/plugin-development.md) |
 | 템플릿 개발 | [docs/extension/template-basics.md](docs/extension/template-basics.md) |
 | 테스트 | [docs/testing-guide.md](docs/testing-guide.md) |
-| API 레퍼런스 | 준비 중 |
+| API 레퍼런스 | [docs/backend/api-documentation.md](docs/backend/api-documentation.md) |
 
 ---
 
