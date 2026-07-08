@@ -6,13 +6,14 @@
 
 <!-- AUTO-GENERATED-START: docs-quick-reference -->
 
-### 백엔드 [backend/](docs/backend/) (31개)
+### 백엔드 [backend/](docs/backend/) (32개)
 
 | 문서 | 설명 | TL;DR 핵심 |
 |------|------|-----------|
 | [activity-log-hooks.md](docs/backend/activity-log-hooks.md) | 활동 로그 훅 레퍼런스 (Activity Log Hooks Reference) | 코어 66훅 + 이커머스 92훅 + 게시판 32훅 + 페이지 8훅 = 총 198훅 |
 | [activity-log.md](docs/backend/activity-log.md) | 활동 로그 시스템 (Activity Log System) | Monolog 기반: Service 훅 → Listener → Log::channel('activity... |
 | [admin-settings-access.md](docs/backend/admin-settings-access.md) | Admin 환경설정 값 접근 (`g7_core_settings` vs `config()`) | 동기화 SSoT: storage/app/settings/*.json → SettingsServicePr... |
+| [api-documentation.md](docs/backend/api-documentation.md) | API 레퍼런스 문서 규정 (API Documentation) | 모든 API 엔드포인트는 레퍼런스 문서 필수 — 메서드/URI/파라미터/응답 필드 전수 기재 |
 | [api-resources.md](docs/backend/api-resources.md) | API 리소스 | Resource: BaseApiResource 상속 필수 / Collection: BaseApiColl... |
 | [authentication.md](docs/backend/authentication.md) | 인증 및 세션 처리 | Laravel Sanctum 토큰 전용 인증 (Bearer 토큰만 사용) |
 | [broadcasting.md](docs/backend/broadcasting.md) | Broadcasting (실시간 이벤트) | Laravel Reverb 사용 (WebSocket) |
@@ -914,7 +915,7 @@ php artisan migrate:rollback
 
 | 수정 대상 파일 패턴 | 작업 전 필수 참조 |
 | ------------------- | ------------------ |
-| `app/Http/Controllers/**` | [controllers.md](docs/backend/controllers.md) |
+| `app/Http/Controllers/**` | [controllers.md](docs/backend/controllers.md), [api-documentation.md](docs/backend/api-documentation.md) |
 | `app/Services/**` | [service-repository.md](docs/backend/service-repository.md) |
 | `app/Http/Requests/**` | [validation.md](docs/backend/validation.md) |
 | `app/Repositories/**` | [service-repository.md](docs/backend/service-repository.md) |

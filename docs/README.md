@@ -9,7 +9,7 @@
 
 | 카테고리 | 문서 수 | 링크 상태 |
 |----------|---------|----------|
-| [백엔드](backend/) | 32개 | 정상 |
+| [백엔드](backend/) | 33개 | 정상 |
 | [프론트엔드](frontend/) | 51개 | 정상 |
 | [확장 시스템](extension/) | 31개 | 정상 |
 | 공통 | 20개 | 정상 |
@@ -113,13 +113,14 @@
 <!-- AUTO-GENERATED-START: docs-readme-full-list -->
 ## 카테고리별 전체 문서 목록
 
-### 백엔드 (32개)
+### 백엔드 (33개)
 
 | 문서 | 제목 |
 |------|------|
 | [activity-log-hooks.md](backend/activity-log-hooks.md) | 활동 로그 훅 레퍼런스 (Activity Log Hooks Reference) |
 | [activity-log.md](backend/activity-log.md) | 활동 로그 시스템 (Activity Log System) |
 | [admin-settings-access.md](backend/admin-settings-access.md) | Admin 환경설정 값 접근 (`g7_core_settings` vs `config()`) |
+| [api-documentation.md](backend/api-documentation.md) | API 레퍼런스 문서 규정 (API Documentation) |
 | [api-resources.md](backend/api-resources.md) | API 리소스 |
 | [authentication.md](backend/authentication.md) | 인증 및 세션 처리 |
 | [broadcasting.md](backend/broadcasting.md) | Broadcasting (실시간 이벤트) |
