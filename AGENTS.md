@@ -248,10 +248,21 @@
 
 | 금지 | 올바른 사용 |
 |------|------------|
-| `Icon className="w-4 h-4"` | `Icon size="sm"` 또는 `className="text-sm"` |
+| `Icon className="w-4 h-4"` | `className="text-base"` (아래 등가표) 또는 `size` prop |
 | `Select valueKey/labelKey` | computed로 `{ value, label }` 변환 |
 | Form 내 `Button` type 없음 | `type="button"` 명시 (submit 방지) |
 | `options={{options}}` | `options={{options ?? []}}` (fallback) |
+
+Icon 은 `<i>` 글리프라 박스 크기가 곧 `font-size` 다. `w-N h-N` 은 박스만 정하고 글리프는 부모 `font-size` 를 상속하므로 어긋난다. 기존 `w-N h-N` 을 옮길 때는 아래 등가표를 쓴다 (Chrome 실측).
+
+| `w-N h-N` | px | 등가 `className` |
+|---|---|---|
+| `w-3 h-3` | 12 | `text-xs` |
+| `w-3.5 h-3.5` | 14 | `text-sm` |
+| `w-4 h-4` | 16 | `text-base` |
+| `w-5 h-5` | 20 | `text-xl` |
+
+`size` prop 은 Font Awesome `fa-*` 클래스로 매핑되며 등가가 아니다 — `size="sm"` → `fa-sm` → `font-size: 0.875em`(상대값) + `line-height` 붕괴로 16px 이 12.25×0.88px 이 된다. 새 아이콘에는 써도 되지만, 기존 `w-N h-N` 의 치환용으로는 쓰지 않는다.
 
 ### 상태 관리
 
