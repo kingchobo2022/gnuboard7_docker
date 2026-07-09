@@ -15,6 +15,16 @@
 
 ---
 
+## API 레퍼런스
+
+엔드포인트별 요청 파라미터·응답 필드·요청/응답 예시는 [api/README.md](api/README.md) 에 있습니다.
+공통 규약(Bearer 토큰 인증, 응답 봉투, 페이지네이션, 401/403/422/428 에러)도 그 문서 상단에 정리되어 있습니다.
+확장(모듈·플러그인)이 소유한 API 문서 목록도 같은 문서에서 찾을 수 있습니다.
+
+문서 작성·갱신 규정은 [api-documentation.md](api-documentation.md) 를 참고하세요.
+
+---
+
 <!-- AUTO-GENERATED-START: backend-readme-docs -->
 ## 문서 목록
 

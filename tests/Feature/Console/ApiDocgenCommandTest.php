@@ -161,4 +161,132 @@ class ApiDocgenCommandTest extends TestCase
             }
         }
     }
+
+    /**
+     * README 목차 항목/확장 목록 샘플을 반환합니다.
+     *
+     * @return array{0: array<int, array{domain: string, file: string, count: int}>, 1: array<int, array{id: string, type: string, path: string, docs: int, endpoints: int}>}
+     */
+    private function readmeFixtures(): array
+    {
+        $entries = [
+            ['domain' => 'users', 'file' => 'users.md', 'count' => 12],
+            ['domain' => 'auth', 'file' => 'auth.md', 'count' => 15],
+        ];
+
+        $extensions = [
+            ['id' => 'sirsoft-page', 'type' => 'module', 'path' => '../../../modules/_bundled/sirsoft-page/docs/api/README.md', 'docs' => 2, 'endpoints' => 17],
+            ['id' => 'sirsoft-gdpr', 'type' => 'plugin', 'path' => '../../../plugins/_bundled/sirsoft-gdpr/docs/api/README.md', 'docs' => 4, 'endpoints' => 15],
+        ];
+
+        return [$entries, $extensions];
+    }
+
+    /**
+     * 코어 README 는 도메인 목차와 확장 API 목차를 함께 싣고, 재생성해도 멱등합니다.
+     *
+     * 최상위 README 의 "API 레퍼런스" 진입점이 이 문서이므로, 확장 API 문서의 발견 경로가
+     * 여기 없으면 개발자/AI 가 확장 엔드포인트에 도달하지 못한다.
+     */
+    #[Test]
+    public function 코어_readme는_확장_목차를_함께_싣고_멱등하게_재생성된다(): void
+    {
+        $scaffolder = new ApiDocScaffolder;
+        [$entries, $extensions] = $this->readmeFixtures();
+
+        $first = $scaffolder->readmeIndex('코어', $entries, null, $extensions);
+
+        $this->assertStringContainsString('## 확장 API 레퍼런스', $first);
+        $this->assertStringContainsString('`sirsoft-page`', $first);
+        $this->assertStringContainsString('`sirsoft-gdpr`', $first);
+        $this->assertStringContainsString('**확장 수**: 2 · **엔드포인트 수**: 32', $first);
+
+        $second = $scaffolder->readmeIndex('코어', $entries, $first, $extensions);
+        $this->assertSame($first, $second, '동일 입력 재생성은 멱등해야 한다.');
+        $this->assertSame(1, substr_count($second, '## 확장 API 레퍼런스'), '확장 목차가 중복 생성되면 안 된다.');
+    }
+
+    /**
+     * 코어 README 상단의 사람 개요(공통 규약)는 재생성해도 보존됩니다.
+     *
+     * 개요는 목차 표보다 먼저 읽혀야 하므로 @generated 블록 앞에 둔다. 생성기가 이 구간을
+     * 덮어쓰면 인증·응답 봉투·에러 규약 서술이 매 재생성마다 소실된다.
+     */
+    #[Test]
+    public function 코어_readme의_사람_개요는_생성_블록_앞에서_보존된다(): void
+    {
+        $scaffolder = new ApiDocScaffolder;
+        [$entries, $extensions] = $this->readmeFixtures();
+
+        $base = $scaffolder->readmeIndex('코어', $entries, null, $extensions);
+        $withOverview = str_replace(
+            '<!-- @generated:start:api-readme-index -->',
+            "## 공통 규약\n\nBearer 토큰 전용입니다. (사람 개요)\n\n<!-- @generated:start:api-readme-index -->",
+            $base
+        );
+
+        $regenerated = $scaffolder->readmeIndex('코어', $entries, $withOverview, $extensions);
+
+        $this->assertStringContainsString('Bearer 토큰 전용입니다. (사람 개요)', $regenerated);
+        $this->assertSame(1, substr_count($regenerated, '## 공통 규약'), '개요가 중복 삽입되면 안 된다.');
+        // 개요는 목차 표보다 앞에 있어야 한다.
+        $this->assertLessThan(
+            strpos($regenerated, '<!-- @generated:start:api-readme-index -->'),
+            strpos($regenerated, '## 공통 규약')
+        );
+
+        // 재생성 멱등 (개요 포함).
+        $this->assertSame($regenerated, $scaffolder->readmeIndex('코어', $entries, $regenerated, $extensions));
+    }
+
+    /**
+     * 확장 스코프 실행이라 확장 목록을 넘기지 않아도 기존 확장 목차는 소실되지 않습니다.
+     *
+     * `--scope=core` 축소 실행이 코어 README 의 확장 표를 지워버리면, 매 실행마다 진입점이
+     * 사라졌다 살아나는 drift 가 생긴다.
+     */
+    #[Test]
+    public function 확장_목록_미전달_시_기존_확장_목차를_보존한다(): void
+    {
+        $scaffolder = new ApiDocScaffolder;
+        [$entries, $extensions] = $this->readmeFixtures();
+
+        $withExtensions = $scaffolder->readmeIndex('코어', $entries, null, $extensions);
+        $regenerated = $scaffolder->readmeIndex('코어', $entries, $withExtensions, null);
+
+        $this->assertStringContainsString('## 확장 API 레퍼런스', $regenerated);
+        $this->assertStringContainsString('`sirsoft-page`', $regenerated);
+        $this->assertSame(1, substr_count($regenerated, '## 확장 API 레퍼런스'));
+    }
+
+    /**
+     * refreshExtensionIndex 는 코어 목차·개요를 건드리지 않고 확장 표만 갱신합니다.
+     *
+     * 확장 스코프 실행(`--scope=module:...`) 시 그 확장의 엔드포인트 수 변동을 코어 진입점에
+     * 반영하는 경로다. 변경이 없으면 null 을 반환해 불필요한 파일 쓰기를 피한다.
+     */
+    #[Test]
+    public function 확장_목차만_in_place_갱신하고_변경_없으면_null을_반환한다(): void
+    {
+        $scaffolder = new ApiDocScaffolder;
+        [$entries, $extensions] = $this->readmeFixtures();
+
+        $existing = $scaffolder->readmeIndex('코어', $entries, null, $extensions);
+
+        $this->assertNull(
+            $scaffolder->refreshExtensionIndex($existing, $extensions),
+            '동일 확장 목록이면 변경 없음(null)이어야 한다.'
+        );
+
+        // 엔드포인트 수가 늘어난 경우 표만 갱신된다.
+        $extensions[0]['endpoints'] = 20;
+        $updated = $scaffolder->refreshExtensionIndex($existing, $extensions);
+
+        $this->assertNotNull($updated);
+        $this->assertStringContainsString('2 / 20', $updated);
+        // 코어 목차와 도메인 항목은 그대로 남는다.
+        $this->assertStringContainsString('[users.md](users.md)', $updated);
+        $this->assertStringContainsString('<!-- @generated:start:api-readme-index -->', $updated);
+        $this->assertSame(1, substr_count($updated, '## 확장 API 레퍼런스'));
+    }
 }

@@ -19,6 +19,18 @@
 
 ---
 
+## API 레퍼런스
+
+G7 이 제공하는 REST API 의 엔드포인트별 요청 파라미터·응답 필드·요청/응답 예시입니다.
+템플릿의 `data_sources` 를 작성하거나 외부에서 G7 을 연동할 때 참고하세요.
+
+| 문서 | 설명 |
+|------|------|
+| [backend/api/README.md](backend/api/README.md) | **API 레퍼런스 진입점** — 공통 규약(인증·응답 봉투·페이지네이션·에러) + 코어/확장 전체 목차 |
+| [backend/api-documentation.md](backend/api-documentation.md) | API 문서 작성·갱신 규정 (기여자용) |
+
+---
+
 ## 작업 유형별 필수 문서
 
 ### 레이아웃 JSON 작성

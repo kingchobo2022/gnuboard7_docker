@@ -117,6 +117,16 @@ class ApiDocScaffolder
     }
 
     /**
+     * @var string 코어 README 의 확장 API 목차 생성 블록 키
+     */
+    private const GEN_KEY_EXTENSIONS = 'api-readme-extensions';
+
+    /**
+     * @var string 코어/확장 README 의 도메인 목차 생성 블록 키
+     */
+    private const GEN_KEY_INDEX = 'api-readme-index';
+
+    /**
      * 대상(코어/확장)의 API 문서 디렉토리 목차(README.md)를 생성합니다.
      *
      * 도메인 파일별 링크 + 엔드포인트 수를 표로 나열해, 처음 진입한 개발자/AI 가 이 대상의
@@ -124,13 +134,23 @@ class ApiDocScaffolder
      * 갱신되며, 블록 밖 사람 서술(개요·주의사항)은 보존한다. 확장 API 문서의 발견성은
      * 코어 인덱스 생성기가 이 README 를 패턴 스캔(확장명 하드코딩 없이)해 확보한다.
      *
+     * 코어 README 는 프로젝트 최상위 `README.md` 의 "API 레퍼런스" 진입점이므로,
+     * 도메인 목차 뒤에 확장 API 목차 블록을 함께 싣는다. `$extensions` 가 null 이면
+     * 확장 블록을 생성하지 않고 기존 블록(있으면)을 그대로 보존한다 — `--scope` 축소
+     * 실행이 확장 목차를 소실시키지 않도록 하기 위함이다.
+     *
      * @param  string  $ownerLabel  소유 라벨 (예: '코어', '모듈 `sirsoft-ecommerce`')
      * @param  array<int, array{domain: string, file: string, count: int}>  $entries  도메인 파일 목록
      * @param  string|null  $existing  기존 README (사람 서술 보존용, 없으면 null)
+     * @param  array<int, array{id: string, type: string, path: string, docs: int, endpoints: int}>|null  $extensions  확장 API 목차 항목 (코어 전용, 미갱신 시 null)
      * @return string README 마크다운
      */
-    public function readmeIndex(string $ownerLabel, array $entries, ?string $existing = null): string
-    {
+    public function readmeIndex(
+        string $ownerLabel,
+        array $entries,
+        ?string $existing = null,
+        ?array $extensions = null
+    ): string {
         usort($entries, fn ($a, $b) => strcmp($a['domain'], $b['domain']));
         $total = array_sum(array_column($entries, 'count'));
 
@@ -139,13 +159,21 @@ class ApiDocScaffolder
             $rows[] = "| [{$e['file']}]({$e['file']}) | `{$e['domain']}` | {$e['count']} |";
         }
 
-        $genKey = 'api-readme-index';
+        $genKey = self::GEN_KEY_INDEX;
         $lines = [];
         $lines[] = '# API 레퍼런스 문서 목차';
         $lines[] = '';
         $lines[] = "> **소유**: {$ownerLabel} · **생성**: `php artisan api:docgen` (실측 기반).";
         $lines[] = '> 아래 표는 자동 생성됩니다. 각 문서를 열면 엔드포인트별 파라미터·응답·예시를 볼 수 있습니다.';
         $lines[] = '';
+
+        // 헤더와 목차 표 사이의 사람 개요(공통 규약 등)를 보존/삽입한다.
+        $overview = $existing !== null ? $this->extractReadmeOverview($existing, $genKey) : null;
+        if ($overview !== null && $overview !== '') {
+            $lines[] = $overview;
+            $lines[] = '';
+        }
+
         $lines[] = self::GEN_START.$genKey.' -->';
         $lines[] = '- **문서 수**: '.count($entries)." · **엔드포인트 수**: {$total}";
         $lines[] = '';
@@ -156,13 +184,96 @@ class ApiDocScaffolder
 
         $generated = implode("\n", $lines)."\n";
 
-        // 블록 밖 사람 서술(개요 등)이 있으면 보존한다.
-        $prose = $existing !== null ? $this->extractHumanProse($existing, $genKey) : null;
+        // 목차 블록 밖 사람 서술(주의사항 등)이 있으면 보존한다.
+        // 확장 목차(`## 확장 API 레퍼런스`) 이후는 별도 블록이므로 삼키지 않는다.
+        $prose = $existing !== null ? $this->extractReadmeTrailingProse($existing, $genKey) : null;
         if ($prose !== null && $prose !== '') {
             $generated .= "\n".$prose."\n";
         }
 
+        $extensionBlock = $extensions !== null
+            ? $this->extensionIndexBlock($extensions)
+            : ($existing !== null ? $this->extractGeneratedBlock($existing, self::GEN_KEY_EXTENSIONS) : null);
+
+        if ($extensionBlock !== null) {
+            $generated = rtrim($generated)."\n\n".trim($extensionBlock)."\n";
+        }
+
         return $generated;
+    }
+
+    /**
+     * 기존 코어 README 에서 확장 API 목차 블록만 in-place 갱신합니다.
+     *
+     * 확장 스코프 실행(`--scope=module:...`)이라 코어 도메인 목차를 재생성하지 않는 경우에도,
+     * 그 확장의 문서 수·엔드포인트 수 변동을 코어 진입점에 반영하기 위해 사용한다.
+     * 코어 README 에 확장 블록이 아직 없으면 문서 끝에 새로 덧붙인다.
+     *
+     * @param  string  $existing  기존 코어 README
+     * @param  array<int, array{id: string, type: string, path: string, docs: int, endpoints: int}>  $extensions  확장 목록
+     * @return string|null 갱신된 README (변경 없으면 null)
+     */
+    public function refreshExtensionIndex(string $existing, array $extensions): ?string
+    {
+        $block = $this->extensionIndexBlock($extensions);
+        $current = $this->extractGeneratedBlock($existing, self::GEN_KEY_EXTENSIONS);
+
+        if ($current === null) {
+            return rtrim($existing)."\n\n".$block;
+        }
+
+        if (trim($current) === trim($block)) {
+            return null;
+        }
+
+        return str_replace($current, trim($block), $existing);
+    }
+
+    /**
+     * 코어 README 의 확장 API 목차 블록을 생성합니다.
+     *
+     * 확장명을 하드코딩하지 않고, 커맨드가 `{modules,plugins}/_bundled/*\/docs/api/README.md`
+     * 를 스캔해 넘긴 목록을 그대로 표로 만든다.
+     *
+     * @param  array<int, array{id: string, type: string, path: string, docs: int, endpoints: int}>  $extensions  확장 목록
+     * @return string 확장 목차 마크다운 블록 (@generated 경계 포함)
+     */
+    private function extensionIndexBlock(array $extensions): string
+    {
+        usort($extensions, function ($a, $b) {
+            return [$a['type'], $a['id']] <=> [$b['type'], $b['id']];
+        });
+
+        $lines = [];
+        $lines[] = '## 확장 API 레퍼런스';
+        $lines[] = '';
+        $lines[] = '> 각 확장이 자신의 API 문서를 소유합니다. 아래 표는 자동 생성됩니다.';
+        $lines[] = '';
+        $lines[] = self::GEN_START.self::GEN_KEY_EXTENSIONS.' -->';
+
+        if ($extensions === []) {
+            $lines[] = '_설치된 번들 확장 중 API 문서를 소유한 확장이 없습니다._';
+            $lines[] = '';
+            $lines[] = self::GEN_END;
+
+            return implode("\n", $lines)."\n";
+        }
+
+        $lines[] = '- **확장 수**: '.count($extensions)
+            .' · **엔드포인트 수**: '.array_sum(array_column($extensions, 'endpoints'));
+        $lines[] = '';
+        $lines[] = '| 확장 | 유형 | API 문서 목차 | 문서/엔드포인트 |';
+        $lines[] = '| --- | --- | --- | --- |';
+
+        foreach ($extensions as $e) {
+            $type = $e['type'] === 'module' ? '모듈' : '플러그인';
+            $lines[] = "| `{$e['id']}` | {$type} | [docs/api/]({$e['path']}) | {$e['docs']} / {$e['endpoints']} |";
+        }
+
+        $lines[] = '';
+        $lines[] = self::GEN_END;
+
+        return implode("\n", $lines)."\n";
     }
 
     /**
@@ -830,6 +941,99 @@ class ApiDocScaffolder
         }
 
         return $merged;
+    }
+
+    /**
+     * README 헤더(인용 블록)와 첫 생성 블록 사이의 사람 개요를 추출합니다.
+     *
+     * 개요(공통 규약: 인증·응답 봉투·에러·페이지네이션)는 목차 표보다 먼저 읽혀야 하므로
+     * 생성 블록 앞에 둔다. 재생성 시 이 구간을 원문 그대로 되살려 사람 서술을 보존한다.
+     *
+     * @param  string  $existing  기존 README
+     * @param  string  $key  목차 생성 블록 키
+     * @return string|null 보존할 개요 (없으면 null)
+     */
+    private function extractReadmeOverview(string $existing, string $key): ?string
+    {
+        $startPos = strpos($existing, self::GEN_START.$key.' -->');
+        if ($startPos === false) {
+            return null;
+        }
+
+        $head = substr($existing, 0, $startPos);
+
+        // 헤더 인용 블록(`> ...`) 의 마지막 줄 이후가 사람 개요다.
+        if (! preg_match_all('/(?:^|\n)>[^\n]*/', $head, $all, PREG_OFFSET_CAPTURE)) {
+            return null;
+        }
+
+        $last = end($all[0]);
+        $overview = trim(substr($head, $last[1] + strlen($last[0])));
+
+        return $overview === '' ? null : $overview;
+    }
+
+    /**
+     * README 목차 블록 뒤 ~ 확장 목차 헤딩 앞의 사람 서술을 추출합니다.
+     *
+     * @param  string  $existing  기존 README
+     * @param  string  $key  목차 생성 블록 키
+     * @return string|null 보존할 사람 서술 (없으면 null)
+     */
+    private function extractReadmeTrailingProse(string $existing, string $key): ?string
+    {
+        $startPos = strpos($existing, self::GEN_START.$key.' -->');
+        if ($startPos === false) {
+            return null;
+        }
+
+        $endPos = strpos($existing, self::GEN_END, $startPos);
+        if ($endPos === false) {
+            return null;
+        }
+
+        $afterGen = substr($existing, $endPos + strlen(self::GEN_END));
+
+        // 확장 목차 섹션(`## 확장 API 레퍼런스`)부터는 생성 블록 소관이므로 제외한다.
+        $nextSection = preg_match('/\n## /', $afterGen, $m, PREG_OFFSET_CAPTURE)
+            ? $m[0][1]
+            : strlen($afterGen);
+
+        $prose = trim(substr($afterGen, 0, $nextSection));
+
+        return $prose === '' ? null : $prose;
+    }
+
+    /**
+     * 기존 문서에서 지정 키의 생성 블록을 헤딩·인용문 포함해 원문 그대로 추출합니다.
+     *
+     * `--scope` 축소 실행 등으로 이번 회차에 갱신 대상이 아닌 블록을 소실 없이 되살린다.
+     *
+     * @param  string  $existing  기존 문서
+     * @param  string  $key  생성 블록 키
+     * @return string|null 블록 원문 (없으면 null)
+     */
+    private function extractGeneratedBlock(string $existing, string $key): ?string
+    {
+        $startPos = strpos($existing, self::GEN_START.$key.' -->');
+        if ($startPos === false) {
+            return null;
+        }
+
+        $endPos = strpos($existing, self::GEN_END, $startPos);
+        if ($endPos === false) {
+            return null;
+        }
+
+        // 블록 앞의 섹션 헤딩(`## ...`)부터 함께 되살린다.
+        $head = substr($existing, 0, $startPos);
+        $headingPos = preg_match_all('/(?:^|\n)## [^\n]*/', $head, $all, PREG_OFFSET_CAPTURE)
+            ? end($all[0])[1]
+            : null;
+
+        $from = $headingPos !== null ? $headingPos : $startPos;
+
+        return trim(substr($existing, $from, ($endPos + strlen(self::GEN_END)) - $from));
     }
 
     /**

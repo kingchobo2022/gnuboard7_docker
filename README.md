@@ -16,6 +16,11 @@
   <a href="#"><img src="https://img.shields.io/badge/status-Stable-brightgreen" alt="Status"></a>
 </p>
 
+<p align="center">
+  <a href="https://g7.gnuboard.com"><strong>데모 사이트</strong></a> ·
+  <a href="https://g7.gnuboard.com/admin"><strong>관리자 데모</strong></a>
+</p>
+
 ---
 
 [소개](#그누보드7-소개) · [주요 기능](#주요-기능) · [기술 스택](#기술-스택) · [아키텍처](#아키텍처) · [빠른 시작](#빠른-시작) · [기본 제공 확장](#기본-제공-확장) · [비즈니스 모델](#비즈니스-모델) · [기존 사용자](#기존-그누보드-사용자) · [문서](#문서) · [기여하기](#기여하기) · [만든 사람들](#만든-사람들) · [커뮤니티](#커뮤니티) · [변경 기록](#변경-기록) · [라이선스](#라이선스)
@@ -462,7 +467,8 @@ cp .env.example .env
 | 플러그인 개발 | [docs/extension/plugin-development.md](docs/extension/plugin-development.md) |
 | 템플릿 개발 | [docs/extension/template-basics.md](docs/extension/template-basics.md) |
 | 테스트 | [docs/testing-guide.md](docs/testing-guide.md) |
-| API 레퍼런스 | [docs/backend/api-documentation.md](docs/backend/api-documentation.md) |
+| API 레퍼런스 | [docs/backend/api/README.md](docs/backend/api/README.md) |
+| API 문서 작성 규정 | [docs/backend/api-documentation.md](docs/backend/api-documentation.md) |
 
 ---
 

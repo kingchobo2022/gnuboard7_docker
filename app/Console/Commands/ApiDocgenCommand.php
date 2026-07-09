@@ -228,11 +228,27 @@ class ApiDocgenCommand extends Command
         // 대상별 API 문서 목차(README.md) 생성/갱신 — 확장 API 레퍼런스 발견성의 규약 진입점.
         // check/dry-run 은 파일을 쓰지 않으므로 제외. examples-only 는 목차도 최신화한다.
         if (! $this->option('check')) {
+            $coreReadme = $this->readmeFile(['type' => 'core', 'id' => null]);
+
             foreach ($readmeIndex as $readmePath => $meta) {
                 $existing = File::exists($readmePath) ? File::get($readmePath) : null;
-                $content = $scaffolder->readmeIndex($meta['label'], $meta['entries'], $existing);
+                // 코어 README 는 최상위 README 의 "API 레퍼런스" 진입점이므로 확장 목차를 함께 싣는다.
+                $extensions = $readmePath === $coreReadme ? $this->scanExtensionApiReadmes() : null;
+                $content = $scaffolder->readmeIndex($meta['label'], $meta['entries'], $existing, $extensions);
                 File::ensureDirectoryExists(dirname($readmePath));
                 File::put($readmePath, $content);
+            }
+
+            // 확장 스코프 실행이라 코어 README 를 다시 쓰지 않았어도, 그 확장의 엔드포인트 수가
+            // 바뀌었을 수 있으므로 코어 README 의 확장 목차 블록만 in-place 갱신한다.
+            if (! array_key_exists($coreReadme, $readmeIndex) && File::exists($coreReadme)) {
+                $updated = $scaffolder->refreshExtensionIndex(
+                    File::get($coreReadme),
+                    $this->scanExtensionApiReadmes()
+                );
+                if ($updated !== null) {
+                    File::put($coreReadme, $updated);
+                }
             }
         }
 
@@ -814,6 +830,56 @@ class ApiDocgenCommand extends Command
         $base = $owner['type'] === 'module' ? 'modules' : 'plugins';
 
         return base_path("{$base}/_bundled/{$owner['id']}/docs/api/{$domain}.md");
+    }
+
+    /**
+     * 번들 확장이 소유한 API 문서 목차(README.md)를 파일 시스템 패턴 스캔으로 수집합니다.
+     *
+     * 확장명을 하드코딩하지 않고 `{modules,plugins}/_bundled/{*}/docs/api/README.md` 존재
+     * 여부만으로 발견한다(동적 로딩 원칙). 문서 수·엔드포인트 수는 스캐폴더가 방출한
+     * 집계 라인(`**문서 수**: N · **엔드포인트 수**: M`)에서 읽는다.
+     *
+     * 링크 경로는 코어 README(`docs/backend/api/`) 기준 상대경로로 만든다.
+     *
+     * @return array<int, array{id: string, type: string, path: string, docs: int, endpoints: int}> 확장 목록
+     */
+    private function scanExtensionApiReadmes(): array
+    {
+        $results = [];
+
+        foreach (['modules' => 'module', 'plugins' => 'plugin'] as $dir => $type) {
+            $bundled = base_path("{$dir}/_bundled");
+            if (! File::isDirectory($bundled)) {
+                continue;
+            }
+
+            foreach (File::directories($bundled) as $extDir) {
+                $readme = $extDir.DIRECTORY_SEPARATOR.'docs'.DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.'README.md';
+                if (! File::exists($readme)) {
+                    continue;
+                }
+
+                $id = basename($extDir);
+                $content = File::get($readme);
+                $docs = 0;
+                $endpoints = 0;
+                if (preg_match('/\*\*문서 수\*\*:\s*(\d+)\s*·\s*\*\*엔드포인트 수\*\*:\s*(\d+)/u', $content, $m)) {
+                    $docs = (int) $m[1];
+                    $endpoints = (int) $m[2];
+                }
+
+                $results[] = [
+                    'id' => $id,
+                    'type' => $type,
+                    // docs/backend/api/README.md → 프로젝트 루트까지 3단계 상위
+                    'path' => "../../../{$dir}/_bundled/{$id}/docs/api/README.md",
+                    'docs' => $docs,
+                    'endpoints' => $endpoints,
+                ];
+            }
+        }
+
+        return $results;
     }
 
     /**

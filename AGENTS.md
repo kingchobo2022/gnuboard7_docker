@@ -144,6 +144,15 @@
 | [e2e-testing.md](docs/testing/e2e-testing.md) | 그누보드7 Playwright E2E 테스트 가이드 | - |
 
 
+### API 레퍼런스 진입점
+
+> 엔드포인트별 요청 파라미터·응답 필드·요청/응답 예시. 공통 규약(Bearer 토큰 인증, 응답 봉투, 페이지네이션, 401/403/422/428)은 진입점 문서 상단에 정리되어 있다.
+
+| 대상 | 진입점 | 문서/엔드포인트 |
+|------|--------|----------------|
+| 코어 | [docs/backend/api/README.md](docs/backend/api/README.md) | 35 / 291 |
+
+
 ### 확장 API 레퍼런스 (9개 확장, 자동 스캔)
 
 > 각 확장이 소유하는 API 문서 목차. `php artisan api:docgen` 이 생성하며, 이 표는 `{modules,plugins}/_bundled/*/docs/api/README.md` 를 패턴 스캔해 자동 편입된다(확장명 하드코딩 없음).

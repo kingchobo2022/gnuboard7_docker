@@ -54,20 +54,39 @@ G7 의 REST API 는 라우트 `->name()` 규약은 있으나 엔드포인트별 
 ### 문서 목차와 발견성 (README.md 규약)
 
 각 대상(코어·확장)의 API 문서 디렉토리에는 `README.md` 목차가 있어야 한다. `api:docgen` 이 도메인 파일
-목록·엔드포인트 수를 담아 자동 생성한다(`@generated` 블록, 재생성 멱등, 블록 밖 사람 개요는 보존).
+목록·엔드포인트 수를 담아 자동 생성한다(`@generated` 블록, 재생성 멱등, 블록 밖 사람 서술은 보존).
 
 - 코어: `docs/backend/api/README.md`
 - 확장: `{modules|plugins}/_bundled/{id}/docs/api/README.md`
 
-확장 API 문서의 발견성은 이 목차를 통해 확보한다. 코어 인덱스 생성기(`generate-docs-index.cjs`)는
-확장명을 하드코딩하지 않고 `{modules,plugins}/_bundled/*/docs/api/README.md` 를 **패턴 스캔**해,
-CLAUDE.md·AGENTS.md·docs-index 의 "확장 API 레퍼런스" 표에 자동 편입한다(동적 로딩 원칙 — 코어는 규약과
-스캔 패턴만, 확장 이름은 파일 시스템에서 발견). 처음 진입하는 개발자/AI 의 도달 경로:
+코어 README 는 프로젝트 최상위 `README.md` 의 "API 레퍼런스" 진입점이다. 따라서 확장 목차와 달리 세
+부분으로 구성된다. 이 문서(작성 규정)와 혼동되지 않도록 최상위 `README.md` 는 둘을 "API 레퍼런스" 와
+"API 문서 작성 규정" 으로 분리해 링크한다.
+
+| 구성 | 위치 | 소유 |
+| --- | --- | --- |
+| 공통 규약 개요 (인증·응답 봉투·페이지네이션·에러) | 헤더 인용 블록 뒤 ~ 첫 `@generated` 앞 | 사람 (재생성 시 원문 보존) |
+| 코어 도메인 목차 | `@generated:start:api-readme-index` | `api:docgen` |
+| 확장 API 목차 | `@generated:start:api-readme-extensions` | `api:docgen` (코어 README 전용) |
+
+개요를 첫 생성 블록 앞에 두는 이유는 목차 표보다 먼저 읽혀야 하기 때문이다. 확장 README 에는 확장 목차
+블록을 넣지 않는다. `--scope` 를 좁혀 실행해도 이번 회차에 갱신하지 않는 블록과 사람 서술은 원문 그대로
+보존된다.
+
+확장 API 문서의 발견성은 이 목차를 통해 확보한다. `api:docgen` 과 코어 인덱스 생성기
+(`generate-docs-index.cjs`) 는 확장명을 하드코딩하지 않고
+`{modules,plugins}/_bundled/*/docs/api/README.md` 를 **패턴 스캔**해, 코어 README 의 "확장 API 레퍼런스"
+표와 CLAUDE.md·AGENTS.md·docs-index 에 자동 편입한다(동적 로딩 원칙 — 코어는 규약과 스캔 패턴만, 확장
+이름은 파일 시스템에서 발견). 문서 수·엔드포인트 수는 각 README 의 집계 라인
+(`**문서 수**: N · **엔드포인트 수**: M`)에서 읽으므로, 이 라인 형식을 바꾸면 두 스캐너를 함께 갱신한다.
+
+처음 진입하는 개발자/AI 의 도달 경로:
 
 ```text
-CLAUDE.md "확장 API 레퍼런스" 표 (자동 스캔)
-  → {확장}/docs/api/README.md (확장 소유 목차)
-  → {도메인}.md (엔드포인트별 파라미터·응답·예시)
+README.md "API 레퍼런스"  또는  CLAUDE.md "API 레퍼런스 진입점" 표
+  → docs/backend/api/README.md (공통 규약 + 코어 목차 + 확장 목차)
+  → {도메인}.md  또는  {확장}/docs/api/README.md
+  → 엔드포인트별 파라미터·응답·예시
 ```
 
 ---
