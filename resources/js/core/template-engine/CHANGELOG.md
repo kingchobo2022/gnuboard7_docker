@@ -5,6 +5,20 @@
 >
 > 형식: [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)
 
+## [engine-v1.52.2] - 2026-07-10
+
+### Fixed
+
+#### 다중 progressive 데이터소스의 `_localInit` 상호 덮어쓰기
+
+- `template-engine.ts::updateTemplateData()` — `_localInit` 을 얕은 스프레드(`...data`)로 교체하던 것을 **소비 여부를 가드로 둔 누적 병합**으로 바꿨다. `_localInit` 소비부(`DynamicRenderer` 의 useEffect)는 React commit 이후에 실행되는데, `initLocal` 을 가진 progressive 데이터소스가 한 레이아웃에 둘 이상이면 각 소스가 응답 순서대로 독립적으로 `updateTemplateData({ _localInit })` 를 호출한다. 두 호출이 같은 commit 사이에 들어오면 나중 payload 가 슬롯을 통째로 교체해, 먼저 도착한 소스의 `initLocal` 이 **한 번도 관측되지 않은 채** 사라졌다. `_global` 은 바로 윗줄에서 깊은 병합을 받고 있었으나 `_localInit` 에는 그 처리가 없었다.
+- `localInitSlot.ts`(신규) — `_localInit` 슬롯 병합과 `__g7LocalInitTracking` 레지스트리의 단일 소유자. 아직 어떤 렌더러도 관측하지 않은(unconsumed) 슬롯만 누적 병합하고, 이미 관측된 슬롯은 종전대로 교체한다. 그래야 사용자가 화면을 쓰는 도중 `refetchDataSource` 가 발생해도 소비가 끝난 과거 payload 가 재적용되어 폼 편집 결과를 되돌리지 않는다. `_forceLocalInit` 은 한쪽에만 있으면 보존하고 양쪽에 있으면 최신 타임스탬프를 취한다.
+- `DynamicRenderer.tsx` — `_localInit` 관측 시 그 슬롯 참조를 `markLocalInitConsumed()` 로 기록한다. 해시 계산식을 생산부에 복제하지 않으므로 생산·소비 양쪽의 판정 기준이 어긋날 수 없다. 적용(`shouldApply`)/건너뜀(동일 해시) 여부와 무관하게 기록한다 — 건너뛴 payload 도 이미 `_local` 에 반영되어 있으므로 소비된 것이다. A(`setLocalDynamicState`)/B(`_globalSetState`) 이중 저장소 갱신 대칭은 그대로 유지한다.
+- `TemplateApp.ts` — SPA 레이아웃 전환으로 `_local` 을 리셋할 때 `__g7LocalInitTracking` 도 함께 초기화한다(`resetLocalInitTracking()`). 종전에는 리셋 지점이 아예 없어, 새 레이아웃의 `_localInit` payload 가 이전 레이아웃과 우연히 같으면 "이미 적용됨" 으로 오판되어 건너뛰었다.
+- 부수 수정 — `init_actions` 안의 `refetchDataSource` 가 React commit 이전에 `updateTemplateData` 를 호출하는 경우(`pendingDataUpdates` 큐 경유)에도 blocking 소스의 `initLocal` 이 조용히 유실되던 잠재 결함이 함께 닫힌다.
+
+> 사용자 영향: `initLocal` 을 가진 데이터소스가 둘 이상인 화면에 SPA 네비게이션으로 진입할 때, 먼저 도착한 데이터소스의 초기값이 간헐적으로 비어 보이던 문제가 해소된다.
+
 ## [engine-v1.52.1] - 2026-07-10
 
 ### Fixed
