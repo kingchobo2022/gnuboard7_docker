@@ -5,6 +5,18 @@
 >
 > 형식: [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)
 
+## [engine-v1.52.1] - 2026-07-10
+
+### Fixed
+
+#### `$localized()` 가 ActionDispatcher 경로에서 항상 ko 를 반환하던 문제
+
+- `DataBindingEngine.evaluateExpression()` — `$localized()` 의 활성 로케일 해석이 `context.$locale || 'ko'` 로 하드코딩 폴백해, `$locale` 을 컨텍스트에 담지 않는 경로(`init_actions` / `actions` 등 ActionDispatcher 가 빌드하는 data context)에서 로케일과 무관하게 늘 ko 값을 반환했다. `$locale` 부재는 "로케일이 ko" 가 아니라 "이 경로가 로케일을 넘기지 않는다" 는 뜻이다.
+- 로케일/`templateId` 해석을 `$localized` 와 `$t` 앞으로 끌어올려 공유한다. `$t` 가 engine-v1.38.2 에서 이미 갖고 있던 `window.__templateApp.getConfig()` 회수 폴백을 `$localized` 도 그대로 사용한다. 컨텍스트의 `$locale` 이 있으면 그것이 우선하고, 없을 때만 앱 설정에서 회수하며, 그마저 없으면 종전대로 ko 로 폴백한다.
+- 부수 효과 — `$t` 의 로케일 회수 조건이 `!templateId` 에서 `!templateId || !locale` 로 넓어졌다. `$templateId` 는 있는데 `$locale` 만 없는 컨텍스트에서 종전에는 ko 로 번역되던 것이 이제 앱 로케일로 번역된다.
+
+> 사용자 영향: 헤더 배송국가 셀렉터처럼 `init_actions` 파생으로 만든 다국어 목록이, 서버가 내려준 en/ja 이름 대신 한국어로 표시되던 문제가 해소된다.
+
 ## [engine-v1.52.0] - 2026-07-04
 
 ### Added
