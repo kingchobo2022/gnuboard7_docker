@@ -1,29 +1,57 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.3-fpm
 
-# 필수 시스템 라이브러리 및 PHP 확장 설치
-RUN apk update && apk add --no-cache \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
     zip \
     unzip \
-    bash \
-    nodejs \
-    npm \
-    oniguruma-dev \
-    $PHPIZE_DEPS  # PECL 컴파일을 위해 추가
+    libzip-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libmagickwand-dev \
+    libicu-dev \
+    libssl-dev \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
-# PHP 익스텐션 구성 및 설치
+# Install imagick and redis extensions via PECL
+RUN pecl install imagick redis && docker-php-ext-enable imagick redis
+
+# Configure and install PHP core extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mbstring exif bcmath
+    && docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    intl \
+    opcache \
+    dom \
+    xml \
+    xmlwriter \
+    simplexml \
+    fileinfo \
+    posix
 
-# ★ PECL을 통해 PHP Redis 확장 설치 ★
-RUN pecl install redis && docker-php-ext-enable redis
+# Copy custom php.ini configuration
+COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# Composer 설치
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install Node.js 20.x
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
+
+# Set permission rules
+RUN chown -R www-data:www-data /var/www/html
