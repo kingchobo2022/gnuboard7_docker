@@ -1,21 +1,17 @@
 services:
-  # 1. PHP & Node.js Application Service
   app:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     container_name: g7-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
       - ./src:/var/www/html
-    networks:
-      - g7-network
     depends_on:
       - db
       - redis
 
-  # 2. Nginx Web Server
   web:
     image: nginx:alpine
     container_name: g7-web
@@ -24,28 +20,23 @@ services:
       - "8080:80"
     volumes:
       - ./src:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    networks:
-      - g7-network
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
 
-  # 3. MySQL Database
   db:
     image: mysql:8.0
     container_name: g7-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: gnuboard7
-      MYSQL_USER: gnu_user
-      MYSQL_PASSWORD: gnu_password
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: g7
+      MYSQL_PASSWORD: g7password
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "3306:3306"
     volumes:
-      - g7-db-data:/var/lib/mysql
-    networks:
-      - g7-network
+      - dbdata:/var/lib/mysql
 
   redis:
     image: redis:alpine
@@ -53,15 +44,6 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-    volumes:
-      - g7-redis-data:/data
-    networks:
-      - g7-network
-
-networks:
-  g7-network:
-    driver: bridge
 
 volumes:
-  g7-db-data:
-  g7-redis-data:
+  dbdata:
