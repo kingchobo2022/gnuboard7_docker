@@ -13,6 +13,7 @@ services:
       - g7-network
     depends_on:
       - db
+      - redis
 
   # 2. Nginx Web Server
   web:
@@ -46,9 +47,21 @@ services:
     networks:
       - g7-network
 
+  redis:
+    image: redis:alpine
+    container_name: g7-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - g7-redis-data:/data
+    networks:
+      - g7-network
+
 networks:
   g7-network:
     driver: bridge
 
 volumes:
   g7-db-data:
+  g7-redis-data:
