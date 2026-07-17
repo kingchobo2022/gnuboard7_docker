@@ -1,40 +1,25 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm-alpine
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# 필수 시스템 라이브러리 및 PHP 확장 설치
+RUN apk update && apk add --no-cache \
     git \
     curl \
     libpng-dev \
-    libonig-dev \
-    libxml2-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
     zip \
     unzip \
-    libzip-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libmagickwand-dev \
-    libldap2-dev \
-    libicu-dev \
-    g++ \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    bash \
+    nodejs \
+    npm \
+    oniguruma-dev
 
-# Configure and install PHP extensions
+# PHP 익스텐션 구성 및 설치
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl ldap posix
+    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mbstring exif bcmath
 
-# Install Imagick and Redis via PECL
-RUN pecl install imagick redis \
-    && docker-php-ext-enable imagick redis
+# Composer 설치
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www
-
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
-CMD ["php-fpm"]
+WORKDIR /var/www/html
